@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF-Stapler — PDFs zusammenfügen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{
+  --paper:#E6E4DE;
+  --card:#F3F2ED;
+  --ink:#16191B;
+  --ink-soft:#5C6268;
+  --rule:#C9C6BD;
+  --stamp:#1B4D3E;
+  --alert:#A93520;
+  --amber:#8A6A17;
+  --shadow:0 1px 0 rgba(0,0,0,.06), 0 8px 24px -18px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:15px;line-height:1.5;
+  background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.018) 0 1px,transparent 1px 4px);
+}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 64px}
+
+/* Kopf */
+header{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:26px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+h1{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:clamp(38px,7vw,64px);line-height:.92;letter-spacing:.01em;text-transform:uppercase;margin:6px 0 8px}
+h1 span{color:var(--stamp)}
+.sub{max-width:52ch;color:var(--ink-soft);font-size:14px}
+
+/* Layout */
+.grid{display:grid;grid-template-columns:1fr 320px;gap:26px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+h2{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 10px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+/* Ablage */
+.drop{
+  border:2px dashed var(--rule);background:var(--card);
+  padding:30px 22px;text-align:center;cursor:pointer;
+  transition:border-color .15s,background .15s,transform .15s;
+}
+.drop:hover,.drop:focus-visible{border-color:var(--stamp);outline:none}
+.drop.over{border-color:var(--stamp);background:#EAF0EC;transform:scale(1.004)}
+.drop strong{display:block;font-size:17px;margin-bottom:4px}
+.drop small{color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:11.5px}
+
+/* Stapel */
+ul#stack{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.row{
+  position:relative;background:var(--card);border:1px solid var(--rule);
+  box-shadow:var(--shadow);display:grid;
+  grid-template-columns:44px 1fr auto;align-items:center;gap:12px;
+  padding:10px 12px 10px 0;
+}
+.row.dragging{opacity:.4}
+.row.drop-target{border-color:var(--stamp);border-style:dashed}
+.tab{
+  align-self:stretch;background:var(--ink);color:var(--paper);
+  font-family:'IBM Plex Mono',monospace;font-size:13px;
+  display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none;
+}
+.tab:active{cursor:grabbing}
+.row.locked .tab{background:var(--alert)}
+.row.raster .tab{background:var(--amber)}
+.meta{min-width:0}
+.fname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.finfo{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-top:2px;display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center}
+.badge{border:1px solid currentColor;padding:0 5px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.b-ok{color:var(--stamp)}.b-raster{color:var(--amber)}.b-lock{color:var(--alert)}
+.tools{display:flex;gap:4px;align-items:center;padding-right:2px}
+button.icon{
+  width:28px;height:28px;border:1px solid var(--rule);background:transparent;color:var(--ink);
+  font-size:14px;line-height:1;cursor:pointer;border-radius:0;
+}
+button.icon:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.icon:disabled{opacity:.3;cursor:not-allowed}
+.rowextra{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+input[type=text],input[type=password]{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;padding:6px 8px;
+  border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:0;
+}
+input:focus-visible,select:focus-visible,button:focus-visible,.drop:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+.pw-hint{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--alert)}
+
+.empty{padding:26px 4px;color:var(--ink-soft);font-size:14px}
+
+/* Ausgabe */
+aside{position:sticky;top:20px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:18px}
+@media(max-width:860px){aside{position:static}}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px}
+.field input,.field select{width:100%}
+select{font-family:'IBM Plex Mono',monospace;font-size:12px;padding:6px 8px;border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:0}
+.count{font-family:'Anton',sans-serif;font-size:44px;line-height:1;letter-spacing:.02em}
+.count small{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-top:4px}
+button.primary{
+  width:100%;padding:13px;background:var(--ink);color:var(--paper);border:none;border-radius:0;
+  font-family:'Anton',sans-serif;font-size:17px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+}
+button.primary:hover:not(:disabled){background:var(--stamp)}
+button.primary:disabled{background:var(--rule);color:#8b877e;cursor:not-allowed}
+a.download{display:block;margin-top:10px;padding:13px;background:var(--stamp);color:#fff;text-align:center;text-decoration:none;font-family:'Anton',sans-serif;font-size:17px;letter-spacing:.06em;text-transform:uppercase}
+a.download:hover{background:#14382e}
+.bar{height:4px;background:var(--rule);margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--stamp);transition:width .2s}
+#log{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-top:10px;max-height:150px;overflow:auto;white-space:pre-wrap}
+#log b{color:var(--alert);font-weight:500}
+
+/* Stempel */
+.stamp{
+  margin-top:14px;border:3px double var(--stamp);color:var(--stamp);
+  font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.1em;text-transform:uppercase;
+  text-align:center;padding:8px 6px;transform:rotate(-4deg);opacity:0;
+}
+.stamp.on{animation:stamp .45s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes stamp{0%{opacity:0;transform:rotate(-4deg) scale(2.2)}70%{opacity:1;transform:rotate(-4deg) scale(.94)}100%{opacity:.9;transform:rotate(-4deg) scale(1)}}
+@media(prefers-reduced-motion:reduce){.stamp.on{animation:none;opacity:.9}*{transition:none!important}}
+
+footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-soft);max-width:70ch}
+footer code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--card);padding:1px 4px;border:1px solid var(--rule)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Läuft vollständig im Browser · nichts wird hochgeladen</div>
+  <h1>PDF-<span>Stapler</span></h1>
+  <p class="sub">PDFs in beliebiger Reihenfolge zu einer Datei zusammenfügen — auch schreibgeschützte und passwortgeschützte. Ergebnis herunterladen, auf den USB-Stick kopieren, am Drucker ausgeben.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Stapel</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDFs auswählen">
+      <strong>PDFs hierher ziehen</strong>
+      <small>oder klicken zum Auswählen — mehrere gleichzeitig möglich</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" multiple hidden>
+
+    <ul id="stack"></ul>
+    <div class="empty" id="empty">Noch nichts im Stapel. Die Reihenfolge hier oben ist die Reihenfolge im fertigen Dokument — Zeilen lassen sich ziehen oder mit den Pfeilen verschieben.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="pagecount">0<small>Seiten gesamt</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="outname">Dateiname</label>
+      <input type="text" id="outname" value="zusammengefuegt.pdf">
+    </div>
+
+    <div class="field">
+      <label for="dpi">Auflösung für geschützte PDFs</label>
+      <select id="dpi">
+        <option value="150">150 dpi — kleine Datei</option>
+        <option value="200" selected>200 dpi — empfohlen</option>
+        <option value="300">300 dpi — Druckqualität</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Zusammenfügen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p><strong>Wie das mit geschützten PDFs funktioniert:</strong> Normale PDFs werden Seite für Seite übernommen, Text und Vektoren bleiben scharf. Verschlüsselte oder beschädigte PDFs lassen sich nicht direkt kopieren — die werden gerendert und als Bild eingebettet. Sieht im Druck identisch aus, nur Text markieren und durchsuchen geht danach nicht mehr. Bei einem echten Öffnungs­passwort fragt die Zeile danach; ohne das Passwort geht nichts.</p>
+  <p><strong>Offline nutzen:</strong> Die Datei lädt zwei Bibliotheken vom CDN (<code>pdf-lib</code> und <code>pdf.js</code>), braucht beim Öffnen also Internet. Für echten Offline-Betrieb die beiden <code>.js</code>-Dateien plus <code>pdf.worker.min.js</code> danebenlegen und die drei Pfade oben im Quelltext auf die lokalen Dateien ändern.</p>
+</footer>
+</div>
+
+<script>
+const { PDFDocument } = PDFLib;
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const $ = s => document.querySelector(s);
+const stackEl = $('#stack'), emptyEl = $('#empty'), logEl = $('#log');
+let entries = [], uid = 0, blobUrl = null;
+
+/* ---------- Hilfen ---------- */
+const fmtBytes = n => n < 1024*1024 ? (n/1024).toFixed(0)+' KB' : (n/1048576).toFixed(1)+' MB';
+function log(msg, bad){ logEl.innerHTML += (bad?`<b>${msg}</b>`:msg) + '\n'; logEl.scrollTop = logEl.scrollHeight; }
+
+function parseRanges(str, max){
+  if(!str || !str.trim()) return Array.from({length:max},(_,i)=>i);
+  const out = [];
+  for(const part of str.split(',')){
+    const m = part.trim().match(/^(\d+)\s*(?:-\s*(\d+))?$/);
+    if(!m) continue;
+    let a = +m[1], b = m[2] ? +m[2] : a;
+    if(a > b) [a,b] = [b,a];
+    for(let p = Math.max(1,a); p <= Math.min(max,b); p++) if(!out.includes(p-1)) out.push(p-1);
+  }
+  return out.length ? out : Array.from({length:max},(_,i)=>i);
+}
+
+/* ---------- Dateien aufnehmen ---------- */
+function addFiles(list){
+  for(const file of list){
+    if(!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') continue;
+    const e = { id:++uid, file, name:file.name, size:file.size, bytes:null,
+                pages:0, mode:'pending', password:'', ranges:'', note:'wird geprüft …' };
+    entries.push(e);
+    analyse(e);
+  }
+  render();
+}
+
+async function analyse(e){
+  try{
+    e.bytes = new Uint8Array(await e.file.arrayBuffer());
+  }catch(err){
+    e.mode='error'; e.note='Datei nicht lesbar'; return render();
+  }
+
+  // 1. Versuch: verlustfreies Kopieren möglich?
+  try{
+    const doc = await PDFDocument.load(e.bytes.slice(), { ignoreEncryption:false });
+    e.pages = doc.getPageCount(); e.mode='copy'; e.note='';
+    return render();
+  }catch(_){ /* verschlüsselt oder ungewöhnlich aufgebaut */ }
+
+  // 2. Versuch: über den Renderer öffnen
+  await probe(e, '');
+  render();
+}
+
+async function probe(e, password){
+  try{
+    const doc = await pdfjsLib.getDocument({ data:e.bytes.slice(), password }).promise;
+    e.pages = doc.numPages; e.mode='raster'; e.password = password; e.note='';
+    doc.destroy();
+  }catch(err){
+    if(err && err.name === 'PasswordException'){
+      e.mode = 'locked';
+      e.note = password ? 'Passwort stimmt nicht' : 'Öffnungspasswort nötig';
+    }else{
+      e.mode = 'error'; e.note = 'Datei kann nicht gelesen werden';
+    }
+  }
+}
+
+/* ---------- Anzeige ---------- */
+function render(){
+  emptyEl.style.display = entries.length ? 'none' : '';
+  stackEl.innerHTML = '';
+
+  entries.forEach((e,i) => {
+    const li = document.createElement('li');
+    li.className = 'row ' + e.mode;
+    li.draggable = false;
+    li.dataset.id = e.id;
+
+    const badge = {
+      copy:  '<span class="badge b-ok">verlustfrei</span>',
+      raster:'<span class="badge b-raster">geschützt · wird gerastert</span>',
+      locked:'<span class="badge b-lock">gesperrt</span>',
+      error: '<span class="badge b-lock">Fehler</span>',
+      pending:''
+    }[e.mode];
+
+    li.innerHTML = `
+      <div class="tab" draggable="true" title="Zum Verschieben ziehen">${String(i+1).padStart(2,'0')}</div>
+      <div class="meta">
+        <div class="fname">${e.name.replace(/</g,'&lt;')}</div>
+        <div class="finfo">
+          <span>${fmtBytes(e.size)}</span>
+          ${e.pages ? `<span>${e.pages} Seiten</span>` : ''}
+          ${badge}
+          ${e.note ? `<span class="pw-hint">${e.note}</span>` : ''}
+        </div>
+      </div>
+      <div class="tools">
+        <button class="icon up" title="Nach oben" ${i===0?'disabled':''}>↑</button>
+        <button class="icon down" title="Nach unten" ${i===entries.length-1?'disabled':''}>↓</button>
+        <button class="icon del" title="Entfernen">✕</button>
+      </div>`;
+
+    const extra = document.createElement('div');
+    extra.className = 'rowextra';
+    if(e.mode === 'locked'){
+      extra.innerHTML = `<input type="password" class="pw" placeholder="Öffnungspasswort" style="width:190px">
+                         <button class="icon unlock" title="Entsperren">↵</button>`;
+    }else if(e.mode === 'copy' || e.mode === 'raster'){
+      extra.innerHTML = `<input type="text" class="rng" placeholder="alle Seiten — oder z. B. 1-3, 8" value="${e.ranges}" style="width:230px">`;
+    }
+    if(extra.innerHTML) li.appendChild(extra);
+
+    // Aktionen
+    li.querySelector('.up').onclick = () => { [entries[i-1],entries[i]]=[entries[i],entries[i-1]]; render(); };
+    li.querySelector('.down').onclick = () => { [entries[i+1],entries[i]]=[entries[i],entries[i+1]]; render(); };
+    li.querySelector('.del').onclick = () => { entries.splice(i,1); render(); };
+
+    const rng = li.querySelector('.rng');
+    if(rng) rng.oninput = ev => { e.ranges = ev.target.value; updateTotals(); };
+
+    const pw = li.querySelector('.pw');
+    if(pw){
+      const tryPw = async () => {
+        e.note = 'prüfe …'; render();
+        await probe(e, pw.value);
+        render();
+      };
+      li.querySelector('.unlock').onclick = tryPw;
+      pw.onkeydown = ev => { if(ev.key === 'Enter') tryPw(); };
+    }
+
+    // Ziehen
+    const tab = li.querySelector('.tab');
+    tab.addEventListener('dragstart', ev => {
+      ev.dataTransfer.setData('text/plain', String(e.id));
+      ev.dataTransfer.effectAllowed = 'move';
+      li.classList.add('dragging');
+    });
+    tab.addEventListener('dragend', () => li.classList.remove('dragging'));
+    li.addEventListener('dragover', ev => { ev.preventDefault(); li.classList.add('drop-target'); });
+    li.addEventListener('dragleave', () => li.classList.remove('drop-target'));
+    li.addEventListener('drop', ev => {
+      ev.preventDefault(); li.classList.remove('drop-target');
+      const from = entries.findIndex(x => x.id === +ev.dataTransfer.getData('text/plain'));
+      const to = entries.findIndex(x => x.id === e.id);
+      if(from < 0 || from === to) return;
+      entries.splice(to, 0, entries.splice(from,1)[0]);
+      render();
+    });
+
+    stackEl.appendChild(li);
+  });
+
+  updateTotals();
+}
+
+function usable(e){ return e.mode === 'copy' || e.mode === 'raster'; }
+
+function updateTotals(){
+  const total = entries.filter(usable).reduce((s,e) => s + parseRanges(e.ranges, e.pages).length, 0);
+  $('#pagecount').innerHTML = total + '<small>Seiten gesamt</small>';
+  const blocked = entries.some(e => e.mode === 'locked' || e.mode === 'pending');
+  $('#go').disabled = total === 0 || blocked;
+  $('#go').textContent = blocked ? 'Erst alle Dateien freigeben' : 'Zusammenfügen';
+}
+
+/* ---------- Zusammenfügen ---------- */
+async function merge(){
+  const go = $('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  logEl.textContent = ''; $('#stamp').classList.remove('on');
+  if(blobUrl){ URL.revokeObjectURL(blobUrl); blobUrl = null; }
+  document.querySelector('a.download')?.remove();
+
+  const dpi = +$('#dpi').value;
+  const list = entries.filter(usable);
+  const totalPages = list.reduce((s,e) => s + parseRanges(e.ranges, e.pages).length, 0);
+  let done = 0;
+  const tick = () => { $('#bar').style.width = (++done / totalPages * 100) + '%'; };
+
+  try{
+    const out = await PDFDocument.create();
+
+    for(const e of list){
+      const idx = parseRanges(e.ranges, e.pages);
+
+      if(e.mode === 'copy'){
+        log(`${e.name} — ${idx.length} Seiten übernommen`);
+        const src = await PDFDocument.load(e.bytes.slice(), { ignoreEncryption:false });
+        const copied = await out.copyPages(src, idx);
+        copied.forEach(p => { out.addPage(p); tick(); });
+      }else{
+        log(`${e.name} — ${idx.length} Seiten werden mit ${dpi} dpi gerendert`);
+        const doc = await pdfjsLib.getDocument({ data:e.bytes.slice(), password:e.password }).promise;
+        for(const i of idx){
+          const page = await doc.getPage(i+1);
+          const base = page.getViewport({ scale:1 });
+          const vp = page.getViewport({ scale:dpi/72 });
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height);
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+          await page.render({ canvasContext:ctx, viewport:vp }).promise;
+          const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+          const img = await out.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+          const p = out.addPage([base.width, base.height]);
+          p.drawImage(img, { x:0, y:0, width:base.width, height:base.height });
+          canvas.width = canvas.height = 0;
+          page.cleanup(); tick();
+        }
+        await doc.destroy();
+      }
+    }
+
+    let name = ($('#outname').value || 'zusammengefuegt').trim();
+    if(!/\.pdf$/i.test(name)) name += '.pdf';
+    out.setTitle(name.replace(/\.pdf$/i,''));
+    out.setProducer('PDF-Stapler');
+    out.setCreationDate(new Date());
+
+    const bytes = await out.save();
+    const blob = new Blob([bytes], { type:'application/pdf' });
+    blobUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.className = 'download'; a.href = blobUrl; a.download = name;
+    a.textContent = 'Herunterladen';
+    $('#stamp').before(a);
+
+    log(`Fertig: ${out.getPageCount()} Seiten, ${fmtBytes(blob.size)}`);
+    $('#stamp').classList.add('on');
+  }catch(err){
+    console.error(err);
+    log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    $('#bar').style.width = '0';
+  }finally{
+    go.disabled = false; updateTotals();
+  }
+}
+
+/* ---------- Ereignisse ---------- */
+$('#drop').onclick = () => $('#picker').click();
+$('#drop').onkeydown = e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('#picker').click(); } };
+$('#picker').onchange = e => { addFiles(e.target.files); e.target.value = ''; };
+$('#go').onclick = merge;
+
+['dragenter','dragover'].forEach(t => $('#drop').addEventListener(t, e => { e.preventDefault(); $('#drop').classList.add('over'); }));
+['dragleave','drop'].forEach(t => $('#drop').addEventListener(t, e => { e.preventDefault(); $('#drop').classList.remove('over'); }));
+$('#drop').addEventListener('drop', e => addFiles(e.dataTransfer.files));
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+</script>
+</body>
+</html>

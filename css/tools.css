@@ -1,0 +1,94 @@
+/* Alleskonverter — geteilte Komponenten der Werkzeug-Seiten */
+
+/* Zweispaltiges Arbeitslayout */
+.grid{display:grid;grid-template-columns:1fr 320px;gap:26px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+/* Ablagefläche */
+.drop{
+  border:2px dashed var(--rule);background:var(--card);
+  padding:30px 22px;text-align:center;cursor:pointer;
+  transition:border-color .15s,background .15s,transform .15s;
+}
+.drop:hover,.drop:focus-visible{border-color:var(--stamp);outline:none}
+.drop.over{border-color:var(--stamp);background:#EAF0EC;transform:scale(1.004)}
+.drop strong{display:block;font-size:17px;margin-bottom:4px}
+.drop small{color:var(--ink-soft);font-family:var(--mono);font-size:11.5px}
+
+/* Dateiliste („Stapel“) */
+ul.stack{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.row{
+  position:relative;background:var(--card);border:1px solid var(--rule);
+  box-shadow:var(--shadow);display:grid;
+  grid-template-columns:44px 1fr auto;align-items:center;gap:12px;
+  padding:10px 12px 10px 0;
+}
+.row.dragging{opacity:.4}
+.row.drop-target{border-color:var(--stamp);border-style:dashed}
+.tab{
+  align-self:stretch;background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:13px;
+  display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none;
+}
+.tab:active{cursor:grabbing}
+.row.locked .tab{background:var(--alert)}
+.row.raster .tab{background:var(--amber)}
+.row .meta{min-width:0}
+.fname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.finfo{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:2px;display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center}
+.row .tools{display:flex;gap:4px;align-items:center;padding-right:2px}
+.rowextra{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.pw-hint{font-family:var(--mono);font-size:11px;color:var(--alert)}
+.empty{padding:26px 4px;color:var(--ink-soft);font-size:14px}
+
+/* Seitenkacheln (PDF bearbeiten / Bild-Vorschau) */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:18px;list-style:none;padding:0}
+.tile{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:8px;text-align:center;position:relative}
+.tile.dragging{opacity:.4}
+.tile.drop-target{border-color:var(--stamp);border-style:dashed}
+.tile canvas,.tile img{max-width:100%;height:auto;display:block;margin:0 auto;background:#fff;border:1px solid var(--rule);cursor:grab}
+.tile .tno{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:6px;display:block}
+.tile .ttools{display:flex;justify-content:center;gap:4px;margin-top:6px}
+.tile.gone{opacity:.35}
+.tile.gone canvas{filter:grayscale(1)}
+
+/* Seitenleiste „Ausgabe“ */
+aside{position:sticky;top:20px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:18px}
+@media(max-width:860px){aside{position:static}}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px}
+.field input,.field select{width:100%}
+.field .hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:4px}
+.count{font-family:var(--display);font-size:44px;line-height:1;letter-spacing:.02em}
+.count small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-top:4px}
+
+a.download{display:block;margin-top:10px;padding:13px;background:var(--stamp);color:#fff;text-align:center;text-decoration:none;font-family:var(--display);font-size:17px;letter-spacing:.06em;text-transform:uppercase}
+a.download:hover{background:#14382e}
+
+.bar{height:4px;background:var(--rule);margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--stamp);transition:width .2s}
+#log{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px;max-height:150px;overflow:auto;white-space:pre-wrap}
+#log b{color:var(--alert);font-weight:500}
+
+/* Stempel */
+.stamp{
+  margin-top:14px;border:3px double var(--stamp);color:var(--stamp);
+  font-family:var(--display);font-size:15px;letter-spacing:.1em;text-transform:uppercase;
+  text-align:center;padding:8px 6px;transform:rotate(-4deg);opacity:0;
+}
+.stamp.on{animation:stamp .45s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes stamp{0%{opacity:0;transform:rotate(-4deg) scale(2.2)}70%{opacity:1;transform:rotate(-4deg) scale(.94)}100%{opacity:.9;transform:rotate(-4deg) scale(1)}}
+@media(prefers-reduced-motion:reduce){.stamp.on{animation:none;opacity:.9}}
+
+/* Textflächen (Markdown, Text-Extraktion, Tabellen) */
+textarea.pane{width:100%;min-height:320px;resize:vertical;line-height:1.55}
+.preview{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:18px 20px;overflow:auto;max-height:520px}
+.preview :first-child{margin-top:0}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:860px){.twocol{grid-template-columns:1fr}}
+
+/* Datentabellen-Vorschau */
+.tablewrap{overflow-x:auto;background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);max-height:420px;overflow-y:auto}
+.tablewrap table{border-collapse:collapse;font-family:var(--mono);font-size:11.5px;width:100%}
+.tablewrap th,.tablewrap td{border:1px solid var(--rule);padding:4px 8px;text-align:left;white-space:nowrap}
+.tablewrap th{background:var(--card);position:sticky;top:0}
