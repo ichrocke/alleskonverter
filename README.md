@@ -94,6 +94,22 @@ python3 -m http.server 8000
 Nach jeder Änderung: `CHANGELOG.md` ergänzen → Commit → Push → `./deploy.sh`
 (SFTP-Upload auf den Strato-Webspace; Zugangsdaten in `.env`, nicht im Repo).
 
+## Bibliotheken
+
+Welche Fremdbibliothek in welcher Fassung und unter welcher Lizenz eingebunden ist,
+steht in [vendor/VERSIONEN.md](vendor/VERSIONEN.md) — inklusive Hinweis, wann eine
+Aktualisierung ansteht.
+
+## Tests
+
+```sh
+cd tests && npm install && npm test
+```
+
+Öffnet jedes Werkzeug in einem echten Browser, schiebt eine Testdatei hinein und
+prüft das Ergebnis; zusätzlich wird gemessen, ob die Oberfläche bedienbar bleibt.
+Läuft bei jedem Push auch über GitHub Actions.
+
 ## Mitmachen
 
 Fehler gefunden oder ein Werkzeug vermisst? Gern als

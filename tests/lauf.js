@@ -186,6 +186,44 @@ const FAELLE = [
     } },
 ];
 
+/* ---------- Bleibt die Oberfläche bedienbar? ----------
+   Gemessen wird, ob der Hauptstrang blockiert: Ein Zeitgeber im Sekundentakt
+   müsste bei einer eingefrorenen Seite große Lücken zeigen. Solange die
+   schwere Arbeit in eigenen Strängen läuft (pdf.js, canvas.toBlob, ffmpeg,
+   Texterkennung) und zwischen den Schritten pausiert wird, bleibt alles flüssig. */
+async function bedienbarkeit(browser){
+  const page = await browser.newPage();
+  const grenze = 600;   // ab hier merkt man ein Ruckeln deutlich
+  try{
+    await page.goto(`http://localhost:${PORT}/tools/pdf-komprimieren/`, { waitUntil:'load' });
+    await page.waitForFunction(() => typeof window.addFiles === 'function', { timeout:20000 });
+    const grossesPdf = pdf(120, 'Kapitel');
+    await page.evaluate(async d => {
+      const b = atob(d); const a = new Uint8Array(b.length);
+      for(let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i);
+      await window.addFiles([new File([a], 'gross.pdf', { type:'application/pdf' })]);
+    }, grossesPdf);
+    await page.waitForFunction(() => !document.querySelector('#go').disabled, { timeout:20000 });
+    await page.evaluate(() => { window.__t = []; window.__i = setInterval(() => window.__t.push(performance.now()), 100); });
+    await page.click('#go');
+    await page.waitForSelector('a.download', { timeout:180000 });
+    const max = await page.evaluate(() => {
+      clearInterval(window.__i);
+      const t = window.__t; let m = 0;
+      for(let i = 1; i < t.length; i++) m = Math.max(m, t[i] - t[i-1]);
+      return Math.round(m);
+    });
+    if(max > grenze) throw new Error(`Oberfläche war ${max} ms blockiert (erlaubt: ${grenze} ms)`);
+    console.log(`  ok    Bedienbarkeit bei 120 Seiten (längste Blockade ${max} ms)`);
+    await page.close();
+    return true;
+  }catch(err){
+    console.log(`  FEHLT Bedienbarkeit — ${err.message.slice(0,120)}`);
+    await page.close();
+    return false;
+  }
+}
+
 /* ---------- Durchlauf ---------- */
 (async () => {
   const srv = server();
@@ -240,8 +278,10 @@ const FAELLE = [
     await page.close();
   }
 
+  if(!await bedienbarkeit(browser)) fehler++;
+
   await browser.close();
   srv.close();
-  console.log(`\n${FAELLE.length - fehler} von ${FAELLE.length} Werkzeugen in Ordnung.`);
+  console.log(`\n${FAELLE.length + 1 - fehler} von ${FAELLE.length + 1} Prüfungen in Ordnung.`);
   process.exit(fehler ? 1 : 0);
 })();
