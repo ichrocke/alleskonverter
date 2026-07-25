@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 24)
+
+### Hinzugefügt
+- Werkzeug **Hintergrund entfernen** (`tools/hintergrund-entfernen/`): stellt das Motiv automatisch frei — als PNG mit Transparenz oder direkt vor einer neuen Hintergrundfarbe, mit Vorher-Nachher-Vorschau und regelbarer Kantenschärfe (weich für Haare, hart für Gegenstände). Rechnet mit dem Modell U²-Net über die ONNX-Laufzeitumgebung vollständig im Browser; Modell und Laufzeit (~15 MB) liegen auf diesem Server und werden erst auf Klick geladen.
+- **Zur Lizenzwahl:** Die bekannte Bibliothek `@imgly/background-removal` steht unter AGPL-3.0 und hätte diese Lizenz auf die gesamte Website übertragen. Stattdessen kommt der klar permissive Stapel zum Einsatz: U²-Net (Apache-2.0) mit onnxruntime-web (MIT).
+
 ## 2026-07-26 (Werkzeug 23 & offener Quellcode)
 
 ### Geändert

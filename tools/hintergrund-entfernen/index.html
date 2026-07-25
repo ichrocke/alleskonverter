@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hintergrund entfernen — Bild freistellen, kostenlos | Alleskonverter</title>
+<meta name="description" content="Bildhintergrund automatisch entfernen und freistellen — als PNG mit Transparenz oder mit neuer Hintergrundfarbe. Kostenlos, ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/hintergrund-entfernen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Hintergrund entfernen — Bild freistellen, kostenlos | Alleskonverter">
+<meta property="og:description" content="Bildhintergrund automatisch entfernen — als PNG mit Transparenz oder mit neuer Farbe. Ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/hintergrund-entfernen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hintergrund entfernen — Bild freistellen, kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Hintergrund entfernen — Alleskonverter","url":"https://alleskonverter.de/tools/hintergrund-entfernen/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Bildhintergrund automatisch entfernen und freistellen — ohne Upload, im Browser."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wird mein Bild hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das Freistellen läuft vollständig in deinem Browser. Nur das Erkennungsmodell wird einmalig von dieser Website geladen."}},{"@type":"Question","name":"Wie gut funktioniert das Freistellen?","acceptedAnswer":{"@type":"Answer","text":"Bei klar abgegrenzten Motiven vor ruhigem Hintergrund sehr gut. Feine Haarspitzen, Gitter, Glas und transparente Ränder bleiben schwierig — dort hilft eine höhere Kantenschärfe oder Nacharbeit."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#buehne{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;display:none}
+#buehne.on{display:block}
+.paar{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.paar{grid-template-columns:1fr}}
+.paar figure{margin:0;text-align:center}
+.paar figcaption{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+.paar canvas{max-width:100%;height:auto;border:1px solid var(--rule);display:block;margin:0 auto}
+/* Schachbrett zeigt Transparenz an */
+#nachher{background-image:
+  linear-gradient(45deg,#d8d6cf 25%,transparent 25%),
+  linear-gradient(-45deg,#d8d6cf 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#d8d6cf 75%),
+  linear-gradient(-45deg,transparent 75%,#d8d6cf 75%);
+  background-size:18px 18px;
+  background-position:0 0,0 9px,9px -9px,-9px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Hintergrund <span>entfernen</span></h1>
+  <p class="sub">Motiv automatisch freistellen — als PNG mit durchsichtigem Hintergrund oder gleich mit neuer Farbe dahinter. Die Erkennung läuft auf deinem Gerät, das Bild verlässt es nicht.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bild</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>JPG, PNG, WebP, HEIC — am besten ein klares Motiv</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" hidden>
+
+    <div id="buehne">
+      <div class="paar">
+        <figure><canvas id="vorher"></canvas><figcaption>Vorher</figcaption></figure>
+        <figure><canvas id="nachher"></canvas><figcaption>Freigestellt</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="empty" id="empty">Noch kein Bild geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="field" id="f-lib">
+      <label>Erkennungsmodell</label>
+      <button class="ghost" id="loadlib" style="width:100%">Laden — einmalig ~15 MB</button>
+      <div class="hint" id="libhint">Kommt von diesem Server, wird danach zwischengespeichert.</div>
+    </div>
+
+    <div class="field">
+      <label for="grund">Neuer Hintergrund</label>
+      <select id="grund">
+        <option value="transparent" selected>Durchsichtig (PNG)</option>
+        <option value="#ffffff">Weiß</option>
+        <option value="#000000">Schwarz</option>
+        <option value="#E6E4DE">Papier</option>
+        <option value="eigene">Eigene Farbe …</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-farbe" hidden>
+      <label for="farbe">Farbe wählen</label>
+      <input type="color" id="farbe" value="#1B4D3E" style="width:100%;height:38px;padding:2px;border:1px solid var(--rule);background:var(--field)">
+    </div>
+
+    <div class="field">
+      <label for="kante">Kantenschärfe: <span id="kanteVal">50</span></label>
+      <input type="range" id="kante" min="0" max="100" value="50" style="width:100%">
+      <div class="hint">niedrig = weiche Übergänge, hoch = harte Kanten</div>
+    </div>
+
+    <button class="primary" id="go" disabled>Freistellen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Produktfoto ohne störenden Schreibtisch, ein Porträt für die Website, ein Motiv für eine Collage: Beim Freistellen wird das Hauptmotiv erkannt und alles andere durchsichtig gemacht. Das Ergebnis lässt sich als PNG mit Transparenz speichern oder direkt vor eine neue Hintergrundfarbe setzen. Anders als bei den bekannten Online-Diensten bleibt dein Bild dabei auf deinem Gerät.</p>
+  <h3>Wird mein Bild hochgeladen?</h3>
+  <p>Nein. Einmalig wird das Erkennungsmodell von dieser Website geladen (rund 15&nbsp;MB, danach zwischengespeichert). Das Bild selbst wird nie übertragen — es gibt keinen Server, der es annehmen könnte.</p>
+  <h3>Wie gut funktioniert das?</h3>
+  <p>Bei klar abgegrenzten Motiven vor ruhigem Hintergrund erstaunlich gut. Schwierig bleiben feine Haarspitzen, Gitterstrukturen, Glas und alles Halbdurchsichtige. Mit der Kantenschärfe lässt sich nachjustieren: niedrige Werte geben weiche Übergänge (gut bei Haaren), hohe Werte harte Kanten (gut bei Gegenständen).</p>
+  <h3>Warum dauert es ein paar Sekunden?</h3>
+  <p>Weil ein neuronales Netz auf deinem Gerät rechnet statt in einem Rechenzentrum. Genau das ist der Punkt: Deine Fotos bleiben privat.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein — und es gibt auch keine Wasserzeichen, keine Auflösungsgrenze und kein Guthaben, das ausgeht.</p>
+</section>
+
+<footer>
+  <p>Freigestelltes Bild danach zuschneiden? Das geht mit <a href="../bild-zuschneiden/index.html">Bild zuschneiden</a>. Verwendet wird das Modell U²-Net (Apache-2.0) mit der ONNX-Laufzeitumgebung (MIT). Dieses Werkzeug braucht einen Webserver.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+const ONNX = '../../vendor/onnx/';
+const KANTE = 320;            // Eingabegröße des Modells
+let sitzung = null, bild = null, basisName = 'freigestellt', maske = null;
+
+function skript(url){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = res;
+    s.onerror = () => rej(new Error('Download fehlgeschlagen'));
+    document.head.appendChild(s);
+  });
+}
+
+async function ladeModell(){
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  const btn = AK.$('#loadlib');
+  btn.disabled = true; btn.textContent = 'Lädt …';
+  try{
+    await skript(ONNX + 'ort.wasm.min.js');
+    ort.env.wasm.wasmPaths = ONNX;
+    ort.env.wasm.numThreads = 1;      // ohne besondere Serverkopfzeilen nicht mehr möglich
+    AK.$('#libhint').textContent = 'Modell wird geladen (~15 MB) …';
+    sitzung = await ort.InferenceSession.create(ONNX + 'u2netp.onnx', { executionProviders:['wasm'] });
+    AK.$('#f-lib').innerHTML = '<label>Erkennungsmodell</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
+    AK.log('Modell bereit.');
+    pruefe();
+  }catch(err){
+    console.error(err);
+    btn.disabled = false; btn.textContent = 'Laden — einmalig ~15 MB';
+    AK.log('Modell konnte nicht geladen werden: ' + (err.message || ''), true);
+  }
+}
+
+/* ---------- Bild ---------- */
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|avif|hei[cf])$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  try{
+    let blob = file;
+    if(/\.(hei[cf])$/i.test(file.name) || /hei[cf]/.test(file.type)){
+      blob = await heic2any({ blob:file, toType:'image/png' });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+    bild = 'createImageBitmap' in window ? await createImageBitmap(blob) : await new Promise((res,rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(blob);
+    });
+    maske = null;
+    zeigeVorher();
+    AK.$('#buehne').classList.add('on');
+    AK.$('#empty').style.display = 'none';
+    pruefe();
+  }catch(err){
+    console.error(err);
+    AK.log('Bild kann nicht gelesen werden.', true);
+  }
+}
+
+function anzeigeMass(){
+  const max = 520;
+  const s = Math.min(1, max / Math.max(bild.width, bild.height));
+  return { w: Math.round(bild.width * s), h: Math.round(bild.height * s) };
+}
+
+function zeigeVorher(){
+  const { w, h } = anzeigeMass();
+  const c = AK.$('#vorher');
+  c.width = w; c.height = h;
+  c.getContext('2d').drawImage(bild, 0, 0, w, h);
+  const n = AK.$('#nachher');
+  n.width = w; n.height = h;
+  n.getContext('2d').clearRect(0, 0, w, h);
+}
+
+function pruefe(){
+  AK.$('#go').disabled = !(bild && sitzung);
+}
+
+/* ---------- Freistellen ---------- */
+async function berechneMaske(){
+  // Bild auf 320×320 bringen und normalisieren, wie das Modell es erwartet
+  const c = document.createElement('canvas');
+  c.width = c.height = KANTE;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(bild, 0, 0, KANTE, KANTE);
+  const d = ctx.getImageData(0, 0, KANTE, KANTE).data;
+
+  const mittel = [0.485, 0.456, 0.406], streuung = [0.229, 0.224, 0.225];
+  const eingabe = new Float32Array(3 * KANTE * KANTE);
+  const flaeche = KANTE * KANTE;
+  for(let i = 0; i < flaeche; i++){
+    for(let k = 0; k < 3; k++){
+      eingabe[k*flaeche + i] = ((d[i*4 + k] / 255) - mittel[k]) / streuung[k];
+    }
+  }
+
+  const ergebnis = await sitzung.run({
+    [sitzung.inputNames[0]]: new ort.Tensor('float32', eingabe, [1, 3, KANTE, KANTE])
+  });
+  const roh = ergebnis[sitzung.outputNames[0]].data;
+
+  // Werte auf 0…1 spreizen
+  let min = Infinity, max = -Infinity;
+  for(const v of roh){ if(v < min) min = v; if(v > max) max = v; }
+  const spanne = (max - min) || 1;
+  const m = new Float32Array(flaeche);
+  for(let i = 0; i < flaeche; i++) m[i] = (roh[i] - min) / spanne;
+  return m;
+}
+
+/* Maske auf Bildgröße bringen, mit Kantenschärfe verrechnen */
+function maskeAufGroesse(m, breite, hoehe){
+  const schaerfe = +AK.$('#kante').value / 100;
+  const klein = document.createElement('canvas');
+  klein.width = klein.height = KANTE;
+  const kctx = klein.getContext('2d');
+  const bild320 = kctx.createImageData(KANTE, KANTE);
+  for(let i = 0; i < KANTE*KANTE; i++){
+    let a = m[i];
+    // Übergang um 0,5 herum je nach Einstellung steiler machen
+    if(schaerfe > 0){
+      const steigung = 1 + schaerfe * 14;
+      a = 1 / (1 + Math.exp(-steigung * (a - 0.5)));
+    }
+    const v = Math.round(Math.max(0, Math.min(1, a)) * 255);
+    bild320.data[i*4] = bild320.data[i*4+1] = bild320.data[i*4+2] = v;
+    bild320.data[i*4+3] = 255;
+  }
+  kctx.putImageData(bild320, 0, 0);
+
+  const gross = document.createElement('canvas');
+  gross.width = breite; gross.height = hoehe;
+  const gctx = gross.getContext('2d');
+  gctx.imageSmoothingQuality = 'high';
+  gctx.drawImage(klein, 0, 0, breite, hoehe);
+  klein.width = klein.height = 0;
+  return gctx.getImageData(0, 0, breite, hoehe).data;
+}
+
+function male(ziel, breite, hoehe, m){
+  ziel.width = breite; ziel.height = hoehe;
+  const ctx = ziel.getContext('2d');
+  const wahl = AK.$('#grund').value;
+  const grund = wahl === 'transparent' ? null : (wahl === 'eigene' ? AK.$('#farbe').value : wahl);
+  if(grund){ ctx.fillStyle = grund; ctx.fillRect(0, 0, breite, hoehe); }
+  ctx.drawImage(bild, 0, 0, breite, hoehe);
+  const bd = ctx.getImageData(0, 0, breite, hoehe);
+  const alpha = maskeAufGroesse(m, breite, hoehe);
+  if(grund){
+    // Auf farbigem Grund überblenden statt Transparenz setzen
+    const [gr, gg, gb] = grund.length === 7
+      ? [1,3,5].map(i => parseInt(grund.substr(i,2),16)) : [255,255,255];
+    for(let i = 0; i < bd.data.length; i += 4){
+      const a = alpha[i] / 255;
+      bd.data[i]   = Math.round(bd.data[i]   * a + gr * (1-a));
+      bd.data[i+1] = Math.round(bd.data[i+1] * a + gg * (1-a));
+      bd.data[i+2] = Math.round(bd.data[i+2] * a + gb * (1-a));
+      bd.data[i+3] = 255;
+    }
+  }else{
+    for(let i = 0; i < bd.data.length; i += 4) bd.data[i+3] = alpha[i];
+  }
+  ctx.putImageData(bd, 0, 0);
+}
+
+async function freistellen(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Rechnet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.2);
+  try{
+    if(!maske){
+      AK.log('Motiv wird erkannt — das dauert je nach Gerät ein paar Sekunden …');
+      maske = await berechneMaske();
+    }
+    AK.bar(0.7);
+    const { w, h } = anzeigeMass();
+    male(AK.$('#nachher'), w, h, maske);          // Vorschau
+
+    const voll = document.createElement('canvas');
+    male(voll, bild.width, bild.height, maske);   // volle Auflösung
+    const durchsichtig = AK.$('#grund').value === 'transparent';
+    const blob = await new Promise(r => voll.toBlob(r, durchsichtig ? 'image/png' : 'image/png'));
+    voll.width = voll.height = 0;
+    AK.bar(1);
+    AK.offerDownload(blob, basisName + '-freigestellt.png');
+    AK.log(`Fertig: ${bild.width} × ${bild.height} px, ${AK.fmtBytes(blob.size)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Freistellen'; pruefe();
+  }
+}
+
+AK.$('#grund').onchange = () => {
+  AK.$('#f-farbe').hidden = AK.$('#grund').value !== 'eigene';
+  if(maske) freistellen();
+};
+AK.$('#farbe').onchange = () => { if(maske) freistellen(); };
+AK.$('#kante').oninput = e => AK.$('#kanteVal').textContent = e.target.value;
+AK.$('#kante').onchange = () => { if(maske) freistellen(); };
+AK.$('#loadlib').onclick = ladeModell;
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = freistellen;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
