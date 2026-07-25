@@ -3,6 +3,24 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-25 (zweiter Wurf: Auftritt & Recht)
+
+### Hinzugefügt
+- Startseite: USP-Leiste („100 % lokal · kein Upload/datenschutzkonform · kein Konto · kostenlos & ohne Limits · keine Cookies/kein Tracking“) und PayPal-Spendenknopf (paypal.me/marc85444)
+- Social-Media-/SEO-Metadaten auf der Startseite: Open-Graph- und Twitter-Card-Tags mit `assets/og.png`, Meta-Description, Canonical auf https://alleskonverter.de/
+- Logo eingebunden: `assets/logo-header.png` (zugeschnittene Variante) im Kopf der Startseite, `assets/favicon.png` (aus dem Logo-Icon) als Favicon auf allen Seiten
+- Seiten `impressum.html` und `datenschutz.html` im Site-Design; Fußzeilen-Links (Impressum · Datenschutz · Spenden) auf Startseite und allen 12 Werkzeugseiten
+
+### Geändert
+- Name ohne Bindestrich: Überschrift jetzt „Alleskonverter“ (Domain wird alleskonverter.de)
+- Der bisherige Datenschutz-Absatz der Startseite ist inhaltlich in die Datenschutzerklärung umgezogen (dort ergänzt um Hoster-Logs, jsDelivr-Hinweis fürs Medien-Werkzeug, PayPal, Betroffenenrechte)
+
+### Entfernt
+- Offline-Hinweistext im Fuß der Startseite
+
+### Offen
+- Impressum: Name und Anschrift sind noch Platzhalter und müssen vor dem Livegang eingetragen werden
+
 ## 2026-07-25
 
 ### Behoben
