@@ -10,6 +10,8 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
 ### Geändert
 - Startseite: großes Logo oben links ersetzt Domain-Zeile, „Läuft vollständig im Browser“-Zeile und den Textschriftzug „Alleskonverter“
+- Impressum mit echten Angaben gefüllt (Marc Schüßler, Flurstr. 31, 33609 Bielefeld) — Punkt „Offen“ vom zweiten Wurf damit erledigt
+- „AI-Generated“-Kennzeichnung oben rechts aus `assets/og.png` und `assets/logo.png` entfernt (Hintergrund retuschiert)
 
 ## 2026-07-25 (zweiter Wurf: Auftritt & Recht)
 
