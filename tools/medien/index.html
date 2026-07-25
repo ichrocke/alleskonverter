@@ -22,8 +22,6 @@
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -40,7 +38,7 @@
   <section>
     <h2>Datei</h2>
 
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Audio- oder Videodatei auswählen">
+    <div class="drop" id="drop" tabindex="0" role="button">
       <strong>Audio- oder Videodatei hierher ziehen</strong>
       <small>oder klicken zum Auswählen</small>
     </div>
@@ -125,6 +123,8 @@
 </footer>
 </div>
 
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
 <script>
 /* ffmpeg liegt komplett auf dem eigenen Server (vendor/ffmpeg/) — kein CDN.
    Der Core ist die ESM-Variante, weil der Module-Worker ihn per import() lädt. */

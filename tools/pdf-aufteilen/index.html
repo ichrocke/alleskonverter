@@ -22,11 +22,6 @@
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
-<script src="../../vendor/pdf-lib.min.js"></script>
-<script src="../../vendor/jszip.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
-<script src="../../js/pdf-common.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -43,7 +38,7 @@
   <section>
     <h2>Dokument</h2>
 
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF auswählen">
+    <div class="drop" id="drop" tabindex="0" role="button">
       <strong>PDF hierher ziehen</strong>
       <small>oder klicken zum Auswählen</small>
     </div>
@@ -105,6 +100,11 @@
 </footer>
 </div>
 
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
 <script>
 const { PDFDocument } = PDFLib;
 let src = null; // { name, bytes, pages, doc }

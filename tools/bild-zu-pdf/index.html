@@ -22,11 +22,6 @@
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
-<script src="../../vendor/pdf-lib.min.js"></script>
-<script src="../../vendor/heic2any.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
-<script src="../../js/filelist.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -43,7 +38,7 @@
   <section>
     <h2>Stapel</h2>
 
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Bilder auswählen">
+    <div class="drop" id="drop" tabindex="0" role="button">
       <strong>Bilder hierher ziehen</strong>
       <small>oder klicken zum Auswählen — mehrere gleichzeitig möglich</small>
     </div>
@@ -99,6 +94,11 @@
 </footer>
 </div>
 
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/filelist.js"></script>
 <script>
 const { PDFDocument } = PDFLib;
 const A4 = [595.28, 841.89];

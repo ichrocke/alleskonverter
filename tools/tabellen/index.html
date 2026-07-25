@@ -22,9 +22,6 @@
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
-<script src="../../vendor/xlsx.full.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -41,7 +38,7 @@
   <section>
     <h2>Vorschau</h2>
 
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Tabelle auswählen">
+    <div class="drop" id="drop" tabindex="0" role="button">
       <strong>Tabelle hierher ziehen</strong>
       <small>.csv · .tsv · .json · .xlsx · .xls</small>
     </div>
@@ -106,6 +103,9 @@
 </footer>
 </div>
 
+<script src="../../vendor/xlsx.full.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
 <script>
 let wb = null, fileBase = 'tabelle';
 

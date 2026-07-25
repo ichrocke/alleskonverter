@@ -22,9 +22,6 @@
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
-<script src="../../vendor/mammoth.browser.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -41,7 +38,7 @@
   <section>
     <h2>Vorschau</h2>
 
-    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Word-Datei auswählen">
+    <div class="drop" id="drop" tabindex="0" role="button">
       <strong>Word-Datei (.docx) hierher ziehen</strong>
       <small>oder klicken zum Auswählen</small>
     </div>
@@ -91,6 +88,9 @@
 </footer>
 </div>
 
+<script src="../../vendor/mammoth.browser.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
 <script>
 let src = null; // { name, buffer }
 
