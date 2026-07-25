@@ -64,8 +64,8 @@ window.AK = window.AK || {};
       try{
         await window.addFiles(dateien);
         if(AK.log) AK.log(dateien.length === 1
-          ? `„${dateien[0].name}“ von der Startseite übernommen.`
-          : `${dateien.length} Dateien von der Startseite übernommen.`);
+          ? `„${dateien[0].name}“ übernommen.`
+          : `${dateien.length} Dateien übernommen.`);
       }catch(err){
         console.warn('Übergebene Datei konnte nicht geladen werden:', err);
       }

@@ -103,6 +103,7 @@ const CSV  = Buffer.from('Name;Stadt;Alter\nMüller;Köln;34\nSchäfer;München;
 const MD   = Buffer.from('# Überschrift\n\nEin **Test**.\n', 'utf8').toString('base64');
 const SRT  = Buffer.from('1\n00:00:01,000 --> 00:00:03,500\nErster Untertitel\n', 'utf8').toString('base64');
 const TXT  = Buffer.from('Hallo Welt mit Umlauten: äöü\n', 'utf8').toString('base64');
+const JSON_B64 = Buffer.from('{"b":2,"a":{"z":1,"y":[3,4]}}', 'utf8').toString('base64');
 
 /* docx: kleinstmögliches gültiges Dokument */
 function docx(){
@@ -143,6 +144,21 @@ function docx(){
 
 /* ---------- Was wird geprüft ---------- */
 const PDF3 = pdf(3, 'Seite');
+/* PDF mit Formularfeldern — mit pdf-lib aus dem Projekt erzeugt */
+function formularPdf(){
+  global.window = global; global.self = global;
+  const mod = { exports:{} };
+  new Function('exports','module', fs.readFileSync(path.join(WURZEL,'vendor/pdf-lib.min.js'),'utf8'))(mod.exports, mod);
+  const L = mod.exports;
+  return (async () => {
+    const doc = await L.PDFDocument.create();
+    const seite = doc.addPage([595, 842]);
+    const f = doc.getForm();
+    f.createTextField('name').addToPage(seite, { x:60, y:700, width:300, height:24 });
+    f.createCheckBox('haken').addToPage(seite, { x:60, y:650, width:18, height:18 });
+    return Buffer.from(await doc.save()).toString('base64');
+  })();
+}
 const PNG  = png();
 
 const FAELLE = [
@@ -173,6 +189,43 @@ const FAELLE = [
       const v = await p.$eval('#output', e => e.value);
       if(v !== 'SGFsbG8gV2VsdA==') throw new Error('Base64 falsch: ' + v);
     } },
+  { werkzeug:'bild-metadaten',     dateien:[['b.png', PNG, 'image/png']], kein_download:true,
+    pruefen: async p => { await p.waitForSelector('table.daten', {timeout:15000}); } },
+  { werkzeug:'bild-base64',        dateien:[['b.png', PNG, 'image/png']], kein_download:true,
+    pruefen: async p => {
+      const v = await p.$eval('#ausgabe', e => e.value);
+      if(!v.startsWith('data:image/png;base64,')) throw new Error('kein Daten-URI: ' + v.slice(0,40));
+    } },
+  { werkzeug:'bilder-umbenennen',  dateien:[['a.txt', TXT, 'text/plain'], ['b.txt', TXT, 'text/plain']] },
+  { werkzeug:'pdf-kontaktabzug',   dateien:[['a.pdf', PDF3, 'application/pdf']] },
+  { werkzeug:'pdf-formular',       formular:true },
+  { werkzeug:'farben',             kein_download:true,
+    pruefen: async p => {
+      await p.evaluate(() => { const h=document.querySelector('#hex'); h.value='#FF8800'; h.dispatchEvent(new Event('input')); });
+      const rgb = await p.$eval('#rgb', e => e.value);
+      if(rgb !== 'rgb(255, 136, 0)') throw new Error('Umrechnung falsch: ' + rgb);
+    } },
+  { werkzeug:'passwort',           kein_download:true,
+    pruefen: async p => {
+      const a = await p.$eval('#ausgabe', e => e.textContent);
+      await p.click('#neu');
+      const b = await p.$eval('#ausgabe', e => e.textContent);
+      if(a === b || a.length < 8) throw new Error('Zufall wirkt nicht: ' + a);
+    } },
+  { werkzeug:'einheiten',          kein_download:true,
+    pruefen: async p => {
+      await p.evaluate(() => {
+        const k=document.querySelector('#kategorie'); k.value='Länge'; k.dispatchEvent(new Event('change'));
+        document.querySelector('#von').value='Zoll (inch)'; document.querySelector('#nach').value='Millimeter';
+        const w=document.querySelector('#wert'); w.value='1'; w.dispatchEvent(new Event('input'));
+      });
+      const e = await p.$eval('#ergebnis', x => x.value);
+      if(e !== '25,4') throw new Error('1 Zoll ≠ 25,4 mm, sondern ' + e);
+    } },
+  { werkzeug:'json-yaml',          dateien:[['d.json', JSON_B64, 'application/json']] },
+  { werkzeug:'gif-erstellen',      nur_laden:true },
+  { werkzeug:'ton-verbessern',     nur_laden:true },
+  { werkzeug:'pdf-durchsuchbar',   nur_laden:true },
   // Schwergewichte: nur laden und auf Fehler prüfen
   { werkzeug:'medien',             nur_laden:true },
   { werkzeug:'medien-schneiden',   nur_laden:true },
@@ -226,6 +279,7 @@ async function bedienbarkeit(browser){
 
 /* ---------- Durchlauf ---------- */
 (async () => {
+  const FORMULAR = await formularPdf();
   const srv = server();
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -242,6 +296,7 @@ async function bedienbarkeit(browser){
     try{
       await page.goto(`http://localhost:${PORT}/tools/${fall.werkzeug}/`, { waitUntil:'load', timeout:45000 });
 
+      if(fall.formular) fall.dateien = [['f.pdf', FORMULAR, 'application/pdf']];
       if(fall.dateien){
         await page.evaluate(async specs => {
           const dateien = specs.map(([name, daten, typ]) => {

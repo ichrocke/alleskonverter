@@ -1,0 +1,56 @@
+name: Lighthouse
+
+# Prüft, dass die Wertungen nicht unbemerkt abrutschen. Läuft gegen die
+# gebaute Seite im Repository, nicht gegen die Live-Seite — so schlägt es
+# schon vor dem Deploy an.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  messen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Lighthouse installieren
+        run: npm install -g lighthouse@12
+
+      - name: Seite ausliefern
+        run: |
+          npx --yes http-server . -p 8080 --silent &
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:8080/ >/dev/null && break
+            sleep 1
+          done
+
+      - name: Startseite und drei Werkzeugseiten messen
+        run: |
+          fehler=0
+          for pfad in "" "tools/pdf-zusammenfuegen/" "tools/bild-konvertieren/" "tools/tabellen/"; do
+            echo "── /$pfad"
+            lighthouse "http://localhost:8080/$pfad" \
+              --quiet --chrome-flags="--headless=new --no-sandbox" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --output=json --output-path=./bericht.json
+            node -e '
+              const r = require("./bericht.json");
+              // Die Messung im CI-Container schwankt; unter 90 ist ein echtes Problem
+              const grenze = { performance: 80, accessibility: 95, "best-practices": 90, seo: 95 };
+              let schlecht = false;
+              for (const [schluessel, kategorie] of Object.entries(r.categories)) {
+                const wert = Math.round(kategorie.score * 100);
+                const min = grenze[schluessel] ?? 90;
+                console.log(`  ${String(wert).padStart(3)}  ${kategorie.title} (mindestens ${min})`);
+                if (wert < min) schlecht = true;
+              }
+              if (schlecht) process.exit(1);
+            ' || fehler=1
+          done
+          exit $fehler

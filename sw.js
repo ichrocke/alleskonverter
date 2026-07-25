@@ -23,6 +23,7 @@ const SHELL = [
   '/js/hub.js',
   '/js/uebergabe.js',
   '/js/einstellungen.js',
+  '/js/weiter.js',
   '/manifest.webmanifest',
   '/assets/favicon.png',
   '/assets/apple-touch-icon.png',
