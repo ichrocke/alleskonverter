@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sicheres Passwort erstellen — Generator ohne Server | Alleskonverter</title>
+<meta name="description" content="Passwörter und Passphrasen sicher erzeugen — im Browser mit echtem Zufall, ohne Server, mit verständlicher Stärkeanzeige. Kostenlos und ohne Anmeldung.">
+<link rel="canonical" href="https://alleskonverter.de/tools/passwort/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Sicheres Passwort erstellen — Generator ohne Server | Alleskonverter">
+<meta property="og:description" content="Passwörter und Passphrasen sicher erzeugen — im Browser, ohne Server, mit Stärkeanzeige.">
+<meta property="og:url" content="https://alleskonverter.de/tools/passwort/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sicheres Passwort erstellen — Generator ohne Server | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Passwortgenerator — Alleskonverter","url":"https://alleskonverter.de/tools/passwort/","applicationCategory":"SecurityApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Passwörter und Passphrasen im Browser erzeugen — ohne Server, mit Stärkeanzeige."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Kennt jemand mein erzeugtes Passwort?","acceptedAnswer":{"@type":"Answer","text":"Nein. Es entsteht direkt in deinem Browser über die Krypto-Schnittstelle des Systems und wird nirgendwohin geschickt oder gespeichert."}},{"@type":"Question","name":"Was ist eine Passphrase?","acceptedAnswer":{"@type":"Answer","text":"Mehrere zufällige Wörter statt Zeichensalat — etwa „Anker-Wolke-Trommel-Feige“. Aus rund 1300 Wörtern gezogen, steuert jedes Wort gut 10 Bit Zufall bei. Ähnlich sicher wie Zeichensalat, aber deutlich leichter zu merken und einzutippen."}},{"@type":"Question","name":"Wie lang sollte ein Passwort sein?","acceptedAnswer":{"@type":"Answer","text":"Mindestens 16 gemischte Zeichen oder fünf bis sechs zufällige Wörter als Passphrase. Länge hilft mehr als Sonderzeichen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.ausgabe{background:var(--card);border:1.5px solid var(--ink);box-shadow:var(--shadow);padding:18px 16px;margin-top:4px;
+  font-family:var(--mono);font-size:clamp(15px,2.6vw,21px);word-break:break-all;line-height:1.5;min-height:70px;
+  display:flex;align-items:center;justify-content:center;text-align:center}
+.balken{height:8px;background:var(--rule);margin-top:12px;overflow:hidden}
+.balken i{display:block;height:100%;width:0;transition:width .25s,background .25s}
+.urteil{font-family:var(--mono);font-size:12px;margin-top:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.liste{margin-top:18px;display:none}
+.liste.on{display:block}
+.liste ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.liste li{background:var(--card);border:1px solid var(--rule);padding:8px 10px;font-family:var(--mono);font-size:13px;
+  display:flex;justify-content:space-between;gap:10px;align-items:center;word-break:break-all}
+.liste button{flex:0 0 auto;padding:4px 8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  font-family:var(--mono);font-size:10px;text-transform:uppercase;cursor:pointer}
+.check{display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:8px}
+.check input{width:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Passwort-<span>Generator</span></h1>
+  <p class="sub">Sichere Passwörter und leicht merkbare Passphrasen — erzeugt mit dem Zufallsgenerator deines Systems, direkt hier auf dem Gerät. Nichts wird übertragen, nichts gespeichert.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Vorschlag</h2>
+    <div class="ausgabe" id="ausgabe">—</div>
+    <div class="balken"><i id="balken"></i></div>
+    <div class="urteil">
+      <span id="staerke">—</span>
+      <span id="dauer"></span>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="ghost" id="neu">Neu erzeugen</button>
+      <button class="ghost" id="kopieren">In die Zwischenablage</button>
+      <button class="ghost" id="mehrere">Zehn Vorschläge</button>
+    </div>
+
+    <div class="liste" id="liste"><h2 style="margin-top:22px">Weitere Vorschläge</h2><ul id="listeul"></ul></div>
+  </section>
+
+  <aside>
+    <h2>Einstellungen</h2>
+
+    <div class="field" style="margin-top:4px">
+      <label for="art">Art</label>
+      <select id="art">
+        <option value="zeichen" selected>Zeichenfolge</option>
+        <option value="phrase">Passphrase aus Wörtern</option>
+        <option value="pin">Zahlen-PIN</option>
+      </select>
+    </div>
+
+    <div id="p-zeichen">
+      <div class="field">
+        <label for="laenge">Länge: <span id="laengeVal">20</span> Zeichen</label>
+        <input type="range" id="laenge" min="8" max="64" value="20" style="width:100%">
+      </div>
+      <label class="check"><input type="checkbox" id="klein" checked> Kleinbuchstaben (a–z)</label>
+      <label class="check"><input type="checkbox" id="gross" checked> Großbuchstaben (A–Z)</label>
+      <label class="check"><input type="checkbox" id="ziffern" checked> Ziffern (0–9)</label>
+      <label class="check"><input type="checkbox" id="sonder" checked> Sonderzeichen</label>
+      <label class="check"><input type="checkbox" id="eindeutig" checked> Verwechselbare weglassen (0/O, 1/l/I)</label>
+    </div>
+
+    <div id="p-phrase" hidden>
+      <div class="field">
+        <label for="woerter">Wörter: <span id="woerterVal">5</span></label>
+        <input type="range" id="woerter" min="3" max="10" value="5" style="width:100%">
+      </div>
+      <div class="field">
+        <label for="trenner">Trennzeichen</label>
+        <select id="trenner">
+          <option value="-" selected>Bindestrich</option>
+          <option value=".">Punkt</option>
+          <option value="_">Unterstrich</option>
+          <option value=" ">Leerzeichen</option>
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" id="phraseZahl" checked> Zahl anhängen</label>
+      <label class="check"><input type="checkbox" id="phraseGross" checked> Wörter groß beginnen</label>
+    </div>
+
+    <div id="p-pin" hidden>
+      <div class="field">
+        <label for="pinlaenge">Stellen: <span id="pinVal">6</span></label>
+        <input type="range" id="pinlaenge" min="4" max="12" value="6" style="width:100%">
+      </div>
+    </div>
+
+    <button class="primary" id="go">Neu erzeugen</button>
+    <div id="log" aria-live="polite"></div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein guter Passwortgenerator hat eine unangenehme Eigenschaft: Man muss ihm vertrauen. Wird das Passwort auf einem fremden Server erzeugt, könnte es dort mitgelesen oder gespeichert werden — und ausgerechnet beim Passwort will man das am wenigsten. Hier entsteht es direkt in deinem Browser, über die Krypto-Schnittstelle deines Betriebssystems. Es wird weder übertragen noch gespeichert, und schließt du den Tab, ist es weg.</p>
+  <h3>Was ist eine Passphrase und warum ist sie besser?</h3>
+  <p>Statt Zeichensalat mehrere zufällige Wörter, etwa <code>Anker-Wolke-Trommel-Feige</code>. Die hier verwendete Liste umfasst rund 1300 deutsche Hauptwörter, jedes Wort steuert also gut 10 Bit Zufall bei: fünf Wörter plus Zahl ergeben etwa 58 Bit. Der große Vorteil — man kann sie sich tatsächlich merken und auf dem Handy eintippen, ohne dreimal danebenzugreifen. Für besonders wichtige Zugänge lieber sechs oder sieben Wörter nehmen; die Stärkeanzeige zeigt sofort, was das bringt.</p>
+  <h3>Wie lang sollte ein Passwort sein?</h3>
+  <p>Länge schlägt Komplexität. 16 gemischte Zeichen sind besser als 8 Zeichen mit drei Sonderzeichen. Für wichtige Konten sind 20 Zeichen oder fünf Wörter eine gute Wahl — und für alles andere gehört ohnehin ein Passwortmanager her, der sich die Dinger merkt.</p>
+  <h3>Woher kommt der Zufall?</h3>
+  <p>Aus <code>crypto.getRandomValues</code>, dem kryptografisch sicheren Zufallsgenerator des Browsers. Die einfache <code>Math.random</code>-Funktion wäre dafür ungeeignet, weil ihre Werte vorhersagbar sein können.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Die Zeitangabe zum Durchprobieren ist eine grobe Schätzung für einen gut ausgestatteten Angreifer (etwa hundert Milliarden Versuche pro Sekunde bei einem schwach gesicherten Dienst). Sie zeigt Größenordnungen, keine Garantien.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+/* Kurze, gut unterscheidbare deutsche Wörter für Passphrasen.
+   1321 Stück — das ergibt rund 10.4 Bit Zufall je Wort. */
+const WOERTER = (
+'acker adler ahorn akkord alarm album alge almhuette amsel anbau angel anis antenne april arena armband aroma ' +
+'asche aster atlas atrium auster auto bache bagger bahn bake balken ballon bambus banane bandit bank bar ' +
+'barren basar basis bastei batist bauer becher becken beere befund beleg bengel berg bericht besen beton bett ' +
+'beutel bezirk bibel biber biene bier bilanz bild binde birke bison blatt blech blei blitz block blockade ' +
+'blues bluete boden bohne boje bolzen bombe bonus boot bord bote bottich bowle boxer brand brasse brauch brei ' +
+'bremse brett brise brocken brombeere bronze brot bruch bruecke brunnen buch bucht buegel buendel buero ' +
+'buffet bug bulle bund burg busch butter chalet chance chaos chef chip chor chrom clown coach comic couch ' +
+'creme dach dachs dackel dahlie damm dampfer dattel deich delta demut denkmal depot deutung diamant dichte ' +
+'diele dienst diesel dill ding diplom disko distel docht dogge dohle dolch dorf dorn dose dotter drache draht ' +
+'drama drang drossel druck duene duft dune dur durst dusche ebbe ebene echo edel efeu egel ehre eiche eichel ' +
+'eifer eile eimer eis eisen ekel elch elefant elend elf elite ellbogen email emblem empore ende energie engel ' +
+'enkel ente epoche erbe erbse erde erfolg erle ernte esche esel espe essen etage etappe eule euter fabrik ' +
+'fach fackel faden fahne fahrt falke falle falte fanfare farm fasan faser fass faust feder fehler feier feige ' +
+'feile feld felge fels fenchel fenster ferien ferse fest fett fibel figur film filter finger finne firma ' +
+'fisch flagge flanke flasche flaum fleck fliege fliese floete floss flotte flug fluss foehn folie fontaene ' +
+'forelle form forst forum foto frack frage franse frau frei frevel friede frist frosch frucht fuchs fuge ' +
+'fuhre fund funke furche fuss futter gabel galerie galopp gans garage garbe garn gartenzaun gast gatter gaudi ' +
+'gaumen gebiet geblaese gebot gedanke geduld gefaess gehalt gehege geier geige geist gelenk gemuese genie ' +
+'genuss gepaeck gerste geruch gesang gesetz gestein gewehr gewinn gicht giebel gier gips gitter glanz glas ' +
+'glaube glied glocke glueck gnade gold golf gondel gosse gramm granat granit gras grat graupel greif grenze ' +
+'griff grille grippe groschen grotte grube gruen gruss gulasch gummi gurke gurt guss hacke hafen hafer hagel ' +
+'hahn hain haken halde halle halm hals hammer hamster hand hanf hang hantel harfe harke harz hase hast haube ' +
+'hauch haufen haupt haus haut hebel hecht heck hecke heer heft heide heil heim hering herz heu hexe hilfe ' +
+'himmel hirsch hirse hitze hobel hoch hocker hoehe hoehle hof holz honig hopfen horde horn hose hotel huegel ' +
+'huette huhn hummel hummer humor hund hunger hupe hyaene idee igel imker insel jacht jacke jade jagd jahr ' +
+'jasmin jetzt joch jod jubel jugend jura kabel kabine kachel kaefer kaefig kaese kahn kaiser kajak kakao ' +
+'kaktus kalb kalk kamel kamera kamin kamm kampf kanal kandis kanone kante kapelle kapitel kappe kapsel karo ' +
+'karpfen karte kartoffel kasten kater katze kaufen kaution kegel kehle keil keim keks kelle keller kelter ' +
+'kerbe kern kerze kessel kette kiefer kiel kies kilo kind kinn kiosk kirsche kissen kiste kittel klamm klang ' +
+'klappe klasse klavier klebstoff klee kleid klemme klette klima klinge klippe kloster klotz knabe knebel knie ' +
+'knoblauch knochen knopf knospe koben koch koffer kohl kohle kokos kolben kolibri komet kommode kompott ' +
+'konsum kontur konzert kopf koralle korb korn kraft kragen krahn kralle kran kranz kraut krebs kreide kreis ' +
+'kreuz krieg krippe krone krug kruste kuchen kugel kuh kultur kunde kunst kupfer kuppel kurve kutsche labor ' +
+'lachs lack laden laerm lage lager lampe land lanze lappen larve laser last latte laub lauch lauf laune laute ' +
+'leber leder legende lehm lehne leiste leiter lenker lerche leuchte licht lid lied liege lilie linie linse ' +
+'lippe list liter lob loch locke loeffel loewe logik lohn lorbeer los lot luchs lucke luft luke lunge lupine ' +
+'lust luv magen magnet mais makel malve mandel mango mann mantel mappe marder marke markt marmor maschine ' +
+'masse mast matte mauer maus meer mehl meile meise meister melone menge mensch messe messer metall meter ' +
+'methode metzger miete milch mine minute mispel mission mitte mixer mode moewe molke moment monat mond moor ' +
+'moos mops morgen mosaik most motor motte muehle mund muschel muskel muster mut mutter nabe nabel nacht nadel ' +
+'nagel nahrung name narbe nase nashorn natur nebel neffe neigung nelke nerv nest netz neu nicht nickel niere ' +
+'niete nische norden not notiz nudel nummer nuss oase obst ochse ofen ohr oktave olive onkel oper opfer ' +
+'orange orchidee orden organ orgel orkan ort osten otter paar pacht paket palast palme panda panik panther ' +
+'papier paprika park parkett partie pass paste pastete pate pause pavillon pech pedal pegel pelikan pelz ' +
+'pendel pension perle person pfahl pfanne pfau pfeffer pfeife pfeil pferd pfingsten pflanze pflaume pflug ' +
+'pforte pfosten pfote pfund phase piano pilger pilot pilz pinsel pirat piste pistole plan planet platte platz ' +
+'plombe pokal pol polster pony porree post pracht prahm praline preis presse priester prinz prise probe ' +
+'profil promenade prosa protokoll prozent prunk pudel puder pulver pumpe punkt puppe pyramide qualle quark ' +
+'quarz quelle quirl quitte rabatt rabe rad radar rahm rahmen rakete rampe rand rang rappe raps rasen rasse ' +
+'rast rat ratte raubtier rauch raum raupe rebe rechen recht rede reff regal regen regie reh reif reihe reim ' +
+'reis reise reiter rekord relief rente reptil rest revier rezept rhabarber richter riege riegel riemen riese ' +
+'rille rind ring rinne rippe ritter robbe robe rodel roggen rohr rolle roman rose rosine rost rotor rubin ' +
+'ruder ruesse ruhe ruine rumpf runde runzel saal saat sache sack saft sage sahne saite salat salbe salz same ' +
+'sammlung sand saphir sardine satz sauger saum schacht schaden schaf schal schale schar scharte schatten ' +
+'schaufel schaum scheibe schein schere scherz scheune schicht schiene schiff schild schilf schirm schlacht ' +
+'schlaf schlamm schlange schlauch schleife schlepper schleuse schlips schloss schlucht schluessel schmied ' +
+'schnabel schnecke schnee schnitt schnur schokolade scholle schote schrank schraube schreck schrift schritt ' +
+'schrott schuessel schuh schuld schule schulter schuppe schuss schutt schutz schwamm schwan schwarm schwein ' +
+'schwelle schwert schwester see seele segel segen seide seife seil sekunde sellerie semmel senf sense serie ' +
+'sessel seuche sicht sieb sieg signal silber silo sinn sirup sitz skala ski skizze sockel soda sofa sohle ' +
+'sohn soldat sole sommer sonde sonne sorte spalte span spargel sparte spaten specht speiche speise sperre ' +
+'spiegel spiel spiess spinne spirale spitze splitter sporn sport sprache spritze spross spule spur staat stab ' +
+'stachel stadt stahl stall stamm stand stange stapel star stark statue staub steg steig stein stelle stempel ' +
+'stengel stern steuer stich stiefel stiel stier stift stil stimme stirn stock stoff stollen stolz storch ' +
+'stoss strahl strand strasse strauch strauss streifen strom strudel strumpf stube stufe stuhl stunde sturm ' +
+'suche sumpf suppe symbol tabak tafel tag takt tal talg tang tank tanne tante tanz tapete tara tasche tasse ' +
+'taste tat tau taube tauwerk teich teig teil telegramm teller tempel tempo tenne teppich termin terrasse ' +
+'teufel text theater thema thron tiegel tier tinte tisch titel toast tochter tod ton tonne topas topf tor ' +
+'torte tour trabant tracht trafo trage traktor trane traube traum treppe tresor tribuene trichter trieb ' +
+'trikot tritt trog trommel trompete tropfen trosse trotz trubel truhe truppe tuch tuelle tuete tulpe tunnel ' +
+'turban turm turnier typ ufer uhr ulme umlauf umschlag unfall union unruhe unterschrift urlaub ursache urteil ' +
+'vase vater veilchen ventil verband verdacht verein verkehr verlag verlust vers vertrag verwalter video vieh ' +
+'viertel villa violine vitrine vogel volk vollmond vorhang vorrat vulkan waage wabe wache wachs wachtel ' +
+'waffel wagen wahl wald walnuss walze wand wange wanne wappen ware warze wasser watte weber wechsel weg wehr ' +
+'weide wein weizen welle welt wende werft werk wermut wespe weste wetter wicht wicke wiege wiese wild wimpel ' +
+'wind winkel winter wippe wirbel wirt wisch wissen witz woche woge wolf wolke wolle wort wrack wuerfel wunde ' +
+'wunsch wurf wurm wurzel zahl zahn zange zapfen zaun zebra zeder zeh zeichen zeile zeit zelle zelt zement ' +
+'zentner zeug ziege ziegel ziel ziffer zigarre zimmer zimt zinke zinn zins zirkel zirkus zitrone zoll zone ' +
+'zopf zucker zug zunder zunge zwerg zwiebel zwilling zwirn').split(/\s+/);
+
+const ZEICHEN = {
+  klein: 'abcdefghijkmnopqrstuvwxyz',           // ohne l
+  kleinVoll: 'abcdefghijklmnopqrstuvwxyz',
+  gross: 'ABCDEFGHJKLMNPQRSTUVWXYZ',            // ohne I und O
+  grossVoll: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  ziffern: '23456789',                           // ohne 0 und 1
+  ziffernVoll: '0123456789',
+  sonder: '!@#$%&*+-=?_~',
+};
+
+/* Echter Zufall, gleichverteilt (Rest-Verzerrung vermeiden) */
+function zufallszahl(grenze){
+  const max = Math.floor(0xFFFFFFFF / grenze) * grenze;
+  const feld = new Uint32Array(1);
+  let z;
+  do { crypto.getRandomValues(feld); z = feld[0]; } while(z >= max);
+  return z % grenze;
+}
+const zufallsElement = liste => liste[zufallszahl(liste.length)];
+
+function mische(feld){
+  for(let i = feld.length - 1; i > 0; i--){
+    const j = zufallszahl(i + 1);
+    [feld[i], feld[j]] = [feld[j], feld[i]];
+  }
+  return feld;
+}
+
+/* ---------- Erzeugen ---------- */
+function erzeuge(){
+  const art = AK.$('#art').value;
+
+  if(art === 'pin'){
+    const n = +AK.$('#pinlaenge').value;
+    let s = '';
+    for(let i = 0; i < n; i++) s += zufallszahl(10);
+    return { wert:s, bits: n * Math.log2(10) };
+  }
+
+  if(art === 'phrase'){
+    const n = +AK.$('#woerter').value;
+    const trenner = AK.$('#trenner').value;
+    const teile = [];
+    for(let i = 0; i < n; i++){
+      let w = zufallsElement(WOERTER);
+      if(AK.$('#phraseGross').checked) w = w[0].toUpperCase() + w.slice(1);
+      teile.push(w);
+    }
+    let bits = n * Math.log2(WOERTER.length);
+    if(AK.$('#phraseZahl').checked){
+      teile.push(String(10 + zufallszahl(90)));
+      bits += Math.log2(90);
+    }
+    return { wert: teile.join(trenner), bits };
+  }
+
+  const eindeutig = AK.$('#eindeutig').checked;
+  const gruppen = [];
+  if(AK.$('#klein').checked)   gruppen.push(eindeutig ? ZEICHEN.klein : ZEICHEN.kleinVoll);
+  if(AK.$('#gross').checked)   gruppen.push(eindeutig ? ZEICHEN.gross : ZEICHEN.grossVoll);
+  if(AK.$('#ziffern').checked) gruppen.push(eindeutig ? ZEICHEN.ziffern : ZEICHEN.ziffernVoll);
+  if(AK.$('#sonder').checked)  gruppen.push(ZEICHEN.sonder);
+  if(!gruppen.length) return { wert:'', bits:0, fehler:'Mindestens eine Zeichengruppe auswählen.' };
+
+  const n = +AK.$('#laenge').value;
+  const alle = gruppen.join('');
+  // Aus jeder gewählten Gruppe mindestens ein Zeichen, Rest frei — dann mischen
+  const zeichen = gruppen.map(g => zufallsElement(g));
+  while(zeichen.length < n) zeichen.push(zufallsElement(alle));
+  return { wert: mische(zeichen).slice(0, n).join(''), bits: n * Math.log2(alle.length) };
+}
+
+/* ---------- Bewertung ---------- */
+function dauerText(bits){
+  // Annahme: 10^11 Versuche pro Sekunde, im Mittel die Hälfte des Raums
+  const sekunden = Math.pow(2, bits) / 2 / 1e11;
+  const einheiten = [
+    [1, 'unter einer Sekunde'], [60, 'Sekunden'], [3600, 'Minuten'], [86400, 'Stunden'],
+    [2592000, 'Tage'], [31536000, 'Monate'], [3153600000, 'Jahre'],
+  ];
+  if(sekunden < 1) return 'Knacken: sofort';
+  if(sekunden < 60) return `Knacken: ~${Math.round(sekunden)} Sekunden`;
+  if(sekunden < 3600) return `Knacken: ~${Math.round(sekunden/60)} Minuten`;
+  if(sekunden < 86400) return `Knacken: ~${Math.round(sekunden/3600)} Stunden`;
+  if(sekunden < 2592000) return `Knacken: ~${Math.round(sekunden/86400)} Tage`;
+  if(sekunden < 31536000) return `Knacken: ~${Math.round(sekunden/2592000)} Monate`;
+  const jahre = sekunden / 31536000;
+  if(jahre < 1000) return `Knacken: ~${Math.round(jahre)} Jahre`;
+  if(jahre < 1e6) return `Knacken: ~${Math.round(jahre/1000)} tausend Jahre`;
+  if(jahre < 1e9) return `Knacken: ~${Math.round(jahre/1e6)} Millionen Jahre`;
+  return 'Knacken: praktisch unmöglich';
+}
+
+function bewerte(bits){
+  const stufen = [
+    [28, 'sehr schwach', 'var(--alert)'],
+    [40, 'schwach',      'var(--alert)'],
+    [60, 'brauchbar',    'var(--amber)'],
+    [80, 'gut',          'var(--stamp)'],
+    [Infinity, 'sehr gut', 'var(--stamp)'],
+  ];
+  const [, text, farbe] = stufen.find(([g]) => bits < g);
+  AK.$('#balken').style.width = Math.min(100, bits / 100 * 100) + '%';
+  AK.$('#balken').style.background = farbe;
+  AK.$('#staerke').innerHTML = `<span style="color:${farbe}">Stärke: ${text}</span> · ${Math.round(bits)} Bit Zufall`;
+  AK.$('#dauer').textContent = dauerText(bits);
+}
+
+function zeige(){
+  AK.logClear();
+  const { wert, bits, fehler } = erzeuge();
+  if(fehler){ AK.$('#ausgabe').textContent = '—'; AK.log(fehler, true); bewerte(0); return; }
+  AK.$('#ausgabe').textContent = wert;
+  bewerte(bits);
+}
+
+/* ---------- Bedienung ---------- */
+AK.$('#art').onchange = () => {
+  const a = AK.$('#art').value;
+  AK.$('#p-zeichen').hidden = a !== 'zeichen';
+  AK.$('#p-phrase').hidden  = a !== 'phrase';
+  AK.$('#p-pin').hidden     = a !== 'pin';
+  AK.$('#liste').classList.remove('on');
+  zeige();
+};
+AK.$('#laenge').oninput = e => { AK.$('#laengeVal').textContent = e.target.value; zeige(); };
+AK.$('#woerter').oninput = e => { AK.$('#woerterVal').textContent = e.target.value; zeige(); };
+AK.$('#pinlaenge').oninput = e => { AK.$('#pinVal').textContent = e.target.value; zeige(); };
+['#klein','#gross','#ziffern','#sonder','#eindeutig','#trenner','#phraseZahl','#phraseGross']
+  .forEach(s => AK.$(s).addEventListener('change', zeige));
+
+AK.$('#neu').onclick = zeige;
+AK.$('#go').onclick = zeige;
+AK.$('#kopieren').onclick = async () => {
+  const w = AK.$('#ausgabe').textContent;
+  if(w === '—') return;
+  await navigator.clipboard.writeText(w);
+  AK.log('Kopiert. Denk daran: Die Zwischenablage lesen auch andere Programme mit.');
+};
+AK.$('#mehrere').onclick = () => {
+  const ul = AK.$('#listeul');
+  ul.innerHTML = '';
+  for(let i = 0; i < 10; i++){
+    const { wert } = erzeuge();
+    if(!wert) break;
+    const li = document.createElement('li');
+    const span = document.createElement('span'); span.textContent = wert;
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Kopieren';
+    b.onclick = async () => { await navigator.clipboard.writeText(wert); AK.log('Kopiert.'); };
+    li.append(span, b); ul.appendChild(li);
+  }
+  AK.$('#liste').classList.add('on');
+};
+
+zeige();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

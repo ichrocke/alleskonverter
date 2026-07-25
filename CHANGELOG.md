@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeuge 26 und 27)
+
+### Hinzugefügt
+- Werkzeug **Farbwerte umrechnen** (`tools/farben/`): HEX, RGB, HSL und CMYK ineinander (jedes Feld ist bearbeitbar und zieht die anderen nach), neun Helligkeitsabstufungen zum Anklicken, Pipette zum Aufnehmen einer Farbe aus einem Bild und eine Kontrastprüfung nach der WCAG-Formel mit Urteil für Fließtext, große Schrift und die strenge Stufe.
+- Werkzeug **Passwort-Generator** (`tools/passwort/`): Zeichenfolgen, Passphrasen aus rund 1300 deutschen Wörtern und Zahlen-PINs — erzeugt mit `crypto.getRandomValues` und gleichverteilt ohne Rest-Verzerrung, aus jeder gewählten Zeichengruppe mindestens ein Zeichen. Mit Stärkeanzeige in Bit und einer Schätzung, wie lange Durchprobieren dauern würde. Nichts wird gespeichert oder übertragen.
+
 ## 2026-07-26 (Werkzeug 25)
 
 ### Hinzugefügt

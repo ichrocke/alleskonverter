@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farbwerte umrechnen: HEX, RGB, HSL — kostenlos | Alleskonverter</title>
+<meta name="description" content="Farben umrechnen zwischen HEX, RGB, HSL und CMYK, Farbe aus einem Bild aufnehmen und Kontrast prüfen. Kostenlos, ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/farben/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Farbwerte umrechnen: HEX, RGB, HSL — kostenlos | Alleskonverter">
+<meta property="og:description" content="Farben umrechnen, aus Bildern aufnehmen und Kontrast prüfen — ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/farben/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Farbwerte umrechnen: HEX, RGB, HSL — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Farbwerte umrechnen — Alleskonverter","url":"https://alleskonverter.de/tools/farben/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Farben zwischen HEX, RGB, HSL und CMYK umrechnen, aus Bildern aufnehmen, Kontrast prüfen."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was bedeutet der Kontrastwert?","acceptedAnswer":{"@type":"Answer","text":"Er beschreibt, wie gut sich Text von seinem Hintergrund abhebt. Die Barrierefreiheitsrichtlinie WCAG verlangt mindestens 4,5:1 für normalen Text und 3:1 für große Schrift."}},{"@type":"Question","name":"Wird mein Bild hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das Aufnehmen der Farbe passiert vollständig in deinem Browser."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.probe{height:120px;border:1px solid var(--rule);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:22px;letter-spacing:.05em;text-transform:uppercase}
+.werte{display:grid;gap:10px;margin-top:18px}
+.wert{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;
+  background:var(--card);border:1px solid var(--rule);padding:8px 10px}
+.wert b{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+.wert input{width:100%;font-family:var(--mono);font-size:13px;border:0;background:transparent;color:var(--ink);padding:2px 0}
+.wert button{padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.wert button:hover{background:var(--ink);color:var(--paper)}
+#pipette{max-width:100%;height:auto;border:1px solid var(--rule);display:block;margin-top:14px;cursor:crosshair}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin-top:14px}
+.palette button{aspect-ratio:1.3;border:1px solid var(--rule);cursor:pointer;position:relative;font-size:0}
+.palette button:hover{outline:2px solid var(--ink);outline-offset:1px}
+.kontrast{margin-top:18px;background:var(--card);border:1px solid var(--rule);padding:14px}
+.kontrast .zahl{font-family:var(--display);font-size:34px;line-height:1}
+.urteil{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border:1px solid currentColor;display:inline-block;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Farb<span>werte</span></h1>
+  <p class="sub">HEX, RGB, HSL und CMYK ineinander umrechnen, eine Farbe direkt aus einem Bild aufnehmen, passende Abstufungen erzeugen und den Kontrast auf Lesbarkeit prüfen.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Farbe</h2>
+
+    <div class="probe" id="probe">Beispieltext</div>
+
+    <div class="werte">
+      <div class="wert"><b>HEX</b><input type="text" id="hex" spellcheck="false" aria-label="HEX-Wert"><button data-kopie="hex">Kopieren</button></div>
+      <div class="wert"><b>RGB</b><input type="text" id="rgb" spellcheck="false" aria-label="RGB-Wert"><button data-kopie="rgb">Kopieren</button></div>
+      <div class="wert"><b>HSL</b><input type="text" id="hsl" spellcheck="false" aria-label="HSL-Wert"><button data-kopie="hsl">Kopieren</button></div>
+      <div class="wert"><b>CMYK</b><input type="text" id="cmyk" spellcheck="false" readonly aria-label="CMYK-Wert"><button data-kopie="cmyk">Kopieren</button></div>
+    </div>
+
+    <h2 style="margin-top:26px">Abstufungen</h2>
+    <div class="palette" id="palette"></div>
+
+    <h2 style="margin-top:26px">Farbe aus einem Bild aufnehmen</h2>
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>danach ins Bild klicken, um die Farbe zu übernehmen</small>
+    </div>
+    <input type="file" id="picker" accept="image/*" hidden>
+    <canvas id="pipette" hidden></canvas>
+
+    <div class="kontrast">
+      <h2 style="margin:0 0 10px">Kontrast prüfen</h2>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <label style="font-family:var(--mono);font-size:11px">gegen
+          <input type="color" id="gegen" value="#FFFFFF" style="vertical-align:middle;height:30px;width:52px;padding:1px;border:1px solid var(--rule)">
+        </label>
+        <span class="zahl" id="kontrastwert">—</span>
+        <span id="urteile"></span>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Auswahl</h2>
+    <div class="field" style="margin-top:4px">
+      <label for="waehler">Farbwähler</label>
+      <input type="color" id="waehler" value="#1B4D3E" style="width:100%;height:56px;padding:2px;border:1px solid var(--rule);background:var(--field)">
+    </div>
+
+    <div class="field">
+      <label for="benannt">Benannte Farbe</label>
+      <select id="benannt">
+        <option value="">— auswählen —</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go">Als Textdatei sichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Dieselbe Farbe wird je nach Programm anders geschrieben: Im Web als HEX oder RGB, in Grafikprogrammen oft als HSL, in der Druckvorstufe als CMYK. Hier lassen sich alle Schreibweisen ineinander umrechnen — Änderungen in einem Feld ziehen die anderen sofort nach. Dazu gibt es passende Abstufungen von hell nach dunkel und eine Kontrastprüfung, die zeigt, ob Text auf dieser Farbe lesbar bleibt.</p>
+  <h3>Was bedeutet der Kontrastwert?</h3>
+  <p>Er gibt an, wie stark sich zwei Farben voneinander abheben — von 1:1 (identisch) bis 21:1 (Schwarz auf Weiß). Die Barrierefreiheitsrichtlinie WCAG verlangt mindestens <strong>4,5:1</strong> für normalen Text und <strong>3:1</strong> für große oder fette Schrift. Wer darunter bleibt, macht Menschen mit Sehschwäche das Lesen unnötig schwer.</p>
+  <h3>Wird mein Bild hochgeladen?</h3>
+  <p>Nein. Das Bild wird nur in deinem Browser angezeigt, um die Farbe darunter auszulesen.</p>
+  <h3>Warum ist CMYK nur ungefähr?</h3>
+  <p>Weil die Umrechnung ohne Farbprofil des Druckers immer eine Näherung bleibt. Für den echten Druck sollte man die Werte aus dem Layoutprogramm mit passendem Profil nehmen — als Anhaltspunkt taugt die Angabe hier trotzdem.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Der Kontrast wird nach der WCAG-Formel für relative Leuchtdichte berechnet — dieselbe, die auch Prüfwerkzeuge wie Lighthouse verwenden.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+const BENANNT = {
+  Schwarz:'#000000', Weiß:'#FFFFFF', Rot:'#FF0000', Grün:'#008000', Blau:'#0000FF',
+  Gelb:'#FFFF00', Orange:'#FFA500', Violett:'#800080', Rosa:'#FFC0CB', Braun:'#A52A2A',
+  Grau:'#808080', Silber:'#C0C0C0', Gold:'#FFD700', Türkis:'#40E0D0', Marine:'#000080',
+  Oliv:'#808000', Beige:'#F5F5DC', Koralle:'#FF7F50', Limette:'#00FF00', Indigo:'#4B0082',
+};
+
+let rgbWert = { r:27, g:77, b:62 };
+
+/* ---------- Umrechnung ---------- */
+const zuHex = ({r,g,b}) => '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('').toUpperCase();
+
+function ausHex(t){
+  const m = t.trim().replace(/^#/,'');
+  const kurz = /^[0-9a-f]{3}$/i.test(m), lang = /^[0-9a-f]{6}$/i.test(m);
+  if(!kurz && !lang) return null;
+  const v = kurz ? m.split('').map(c => c+c).join('') : m;
+  return { r:parseInt(v.slice(0,2),16), g:parseInt(v.slice(2,4),16), b:parseInt(v.slice(4,6),16) };
+}
+
+function ausRgb(t){
+  const z = t.match(/-?\d+(\.\d+)?/g);
+  if(!z || z.length < 3) return null;
+  const [r,g,b] = z.slice(0,3).map(x => Math.max(0, Math.min(255, Math.round(+x))));
+  return { r, g, b };
+}
+
+function zuHsl({r,g,b}){
+  r/=255; g/=255; b/=255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max-min;
+  let h = 0;
+  if(d){
+    h = max === r ? ((g-b)/d + (g < b ? 6 : 0))
+      : max === g ? (b-r)/d + 2
+      : (r-g)/d + 4;
+    h *= 60;
+  }
+  const l = (max+min)/2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2*l - 1));
+  return { h: Math.round(h), s: Math.round(s*100), l: Math.round(l*100) };
+}
+
+function ausHsl(t){
+  const z = t.match(/-?\d+(\.\d+)?/g);
+  if(!z || z.length < 3) return null;
+  let [h,s,l] = z.slice(0,3).map(Number);
+  h = ((h % 360) + 360) % 360; s = Math.max(0,Math.min(100,s))/100; l = Math.max(0,Math.min(100,l))/100;
+  const c = (1 - Math.abs(2*l - 1)) * s, x = c * (1 - Math.abs((h/60) % 2 - 1)), m = l - c/2;
+  const [r1,g1,b1] = h < 60 ? [c,x,0] : h < 120 ? [x,c,0] : h < 180 ? [0,c,x]
+                   : h < 240 ? [0,x,c] : h < 300 ? [x,0,c] : [c,0,x];
+  return { r: Math.round((r1+m)*255), g: Math.round((g1+m)*255), b: Math.round((b1+m)*255) };
+}
+
+function zuCmyk({r,g,b}){
+  const R=r/255, G=g/255, B=b/255;
+  const k = 1 - Math.max(R,G,B);
+  if(k === 1) return { c:0, m:0, y:0, k:100 };
+  return {
+    c: Math.round((1-R-k)/(1-k)*100), m: Math.round((1-G-k)/(1-k)*100),
+    y: Math.round((1-B-k)/(1-k)*100), k: Math.round(k*100),
+  };
+}
+
+/* Relative Leuchtdichte nach WCAG */
+function leuchtdichte({r,g,b}){
+  const f = x => { x/=255; return x <= 0.03928 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4); };
+  return 0.2126*f(r) + 0.7152*f(g) + 0.0722*f(b);
+}
+function kontrast(a, b){
+  const [x,y] = [leuchtdichte(a), leuchtdichte(b)].sort((p,q) => q-p);
+  return (x + 0.05) / (y + 0.05);
+}
+
+/* ---------- Anzeige ---------- */
+let sperre = false;
+
+function aktualisiere(quelle){
+  if(sperre) return;
+  sperre = true;
+  const hex = zuHex(rgbWert), hsl = zuHsl(rgbWert), cmyk = zuCmyk(rgbWert);
+  if(quelle !== 'hex')  AK.$('#hex').value  = hex;
+  if(quelle !== 'rgb')  AK.$('#rgb').value  = `rgb(${rgbWert.r}, ${rgbWert.g}, ${rgbWert.b})`;
+  if(quelle !== 'hsl')  AK.$('#hsl').value  = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+  AK.$('#cmyk').value = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+  AK.$('#waehler').value = hex;
+
+  const probe = AK.$('#probe');
+  probe.style.background = hex;
+  const gegenWeiss = kontrast(rgbWert, {r:255,g:255,b:255});
+  probe.style.color = gegenWeiss >= 4.5 ? '#fff' : '#16191B';
+
+  // Abstufungen: gleiche Farbe mit anderer Helligkeit
+  const p = AK.$('#palette');
+  p.innerHTML = '';
+  [95,85,72,60,50,40,30,20,10].forEach(l => {
+    const f = zuHex(ausHsl(`${hsl.h} ${hsl.s} ${l}`));
+    const b = document.createElement('button');
+    b.type = 'button'; b.style.background = f; b.title = f + ` (Helligkeit ${l} %)`;
+    b.setAttribute('aria-label', 'Abstufung ' + f);
+    b.onclick = () => { rgbWert = ausHex(f); aktualisiere(); };
+    p.appendChild(b);
+  });
+
+  pruefeKontrast();
+  sperre = false;
+}
+
+function pruefeKontrast(){
+  const gegen = ausHex(AK.$('#gegen').value);
+  const v = kontrast(rgbWert, gegen);
+  AK.$('#kontrastwert').textContent = v.toFixed(2) + ':1';
+  const marke = (bestanden, text) =>
+    `<span class="urteil" style="color:${bestanden ? 'var(--stamp)' : 'var(--alert)'}">${bestanden ? '✓' : '✗'} ${text}</span>`;
+  AK.$('#urteile').innerHTML =
+    marke(v >= 4.5, 'Fließtext (4,5:1)') + marke(v >= 3, 'große Schrift (3:1)') + marke(v >= 7, 'streng (7:1)');
+}
+
+/* ---------- Bedienung ---------- */
+AK.$('#hex').addEventListener('input', e => { const f = ausHex(e.target.value); if(f){ rgbWert = f; aktualisiere('hex'); } });
+AK.$('#rgb').addEventListener('input', e => { const f = ausRgb(e.target.value); if(f){ rgbWert = f; aktualisiere('rgb'); } });
+AK.$('#hsl').addEventListener('input', e => { const f = ausHsl(e.target.value); if(f){ rgbWert = f; aktualisiere('hsl'); } });
+AK.$('#waehler').addEventListener('input', e => { rgbWert = ausHex(e.target.value); aktualisiere(); });
+AK.$('#gegen').addEventListener('input', pruefeKontrast);
+
+const sel = AK.$('#benannt');
+Object.entries(BENANNT).forEach(([name, hex]) => {
+  const o = document.createElement('option'); o.value = hex; o.textContent = name; sel.appendChild(o);
+});
+sel.onchange = () => { if(sel.value){ rgbWert = ausHex(sel.value); aktualisiere(); } };
+
+AK.$$('[data-kopie]').forEach(b => b.onclick = async () => {
+  await navigator.clipboard.writeText(AK.$('#' + b.dataset.kopie).value);
+  AK.log('Kopiert: ' + AK.$('#' + b.dataset.kopie).value);
+});
+
+/* Farbe aus Bild aufnehmen */
+let leinwand = null;
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/'));
+  if(!file) return;
+  const bmp = 'createImageBitmap' in window ? await createImageBitmap(file) : await new Promise((res,rej) => {
+    const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file);
+  });
+  leinwand = AK.$('#pipette');
+  const s = Math.min(1, 700 / bmp.width);
+  leinwand.width = Math.round(bmp.width * s);
+  leinwand.height = Math.round(bmp.height * s);
+  leinwand.getContext('2d', { willReadFrequently:true }).drawImage(bmp, 0, 0, leinwand.width, leinwand.height);
+  leinwand.hidden = false;
+  AK.log('Ins Bild klicken, um die Farbe zu übernehmen.');
+}
+
+AK.$('#pipette').addEventListener('click', e => {
+  if(!leinwand) return;
+  const r = leinwand.getBoundingClientRect();
+  const x = Math.round((e.clientX - r.left) * leinwand.width / r.width);
+  const y = Math.round((e.clientY - r.top) * leinwand.height / r.height);
+  const d = leinwand.getContext('2d', { willReadFrequently:true }).getImageData(x, y, 1, 1).data;
+  rgbWert = { r:d[0], g:d[1], b:d[2] };
+  aktualisiere();
+  AK.log('Farbe übernommen: ' + zuHex(rgbWert));
+});
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const hsl = zuHsl(rgbWert), cmyk = zuCmyk(rgbWert);
+  const text = [
+    'Farbwerte', '',
+    'HEX:  ' + zuHex(rgbWert),
+    `RGB:  rgb(${rgbWert.r}, ${rgbWert.g}, ${rgbWert.b})`,
+    `HSL:  hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`,
+    `CMYK: cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`, '',
+    'Kontrast gegen ' + AK.$('#gegen').value.toUpperCase() + ': ' + AK.$('#kontrastwert').textContent,
+  ].join('\n');
+  AK.offerDownload(new Blob([text], {type:'text/plain;charset=utf-8'}), 'farbwerte.txt');
+  AK.stamp(true);
+};
+
+AK.dropzone('#drop', '#picker', addFiles);
+aktualisiere();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
