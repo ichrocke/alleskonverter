@@ -42,7 +42,11 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 
 ## Nutzung
 
-`index.html` im Browser öffnen — das ist alles. Es braucht keinen Webserver und keine Installation.
+Live unter <https://alleskonverter.de>. Die Seite lässt sich über den Browser als App
+installieren („Zum Startbildschirm hinzufügen“) und funktioniert danach vollständig offline.
+
+Lokal genügt es, `index.html` im Browser zu öffnen. Ausnahmen: Audio &amp; Video und der
+QR-Code-Generator brauchen einen Webserver (siehe unten).
 
 Optional mit lokalem Server (z. B. für sauberere Browser-Umgebung):
 
@@ -64,6 +68,18 @@ python3 -m http.server 8000
 - Klassische Skripte statt ES-Module, damit alles auch über `file://` (Doppelklick) funktioniert
 - Gemeinsames Designsystem in `css/base.css` / `css/tools.css`, geteilte Helfer unter `js/` (`AK`-Namespace)
 - Jedes Werkzeug ist eine eigenständige Seite unter `tools/<name>/index.html`
+- Dunkelmodus folgt der Systemeinstellung (`prefers-color-scheme`), ohne Schalter und ohne gespeicherten Zustand
+- PWA: `manifest.webmanifest` und `sw.js`. Der Service Worker legt beim Installieren das Grundgerüst,
+  alle Bibliotheken und (über die `sitemap.xml`) sämtliche Werkzeugseiten ab. Seiten und eigener Code
+  werden „Netz zuerst“ geladen, Bibliotheken und Schriften „Cache zuerst“; ffmpeg (~32 MB) landet erst
+  im Cache, wenn das Medien-Werkzeug tatsächlich benutzt wurde.
+- `.htaccess` regelt Kompression, Cache-Zeiten, 404-Seite, www-Weiterleitung und Sicherheitskopfzeilen
+
+### Neues Werkzeug hinzufügen
+
+1. `tools/<name>/index.html` anlegen (eine bestehende Seite als Vorlage nehmen — Kopf, `<main>`, „Gut zu wissen“-Block, Footer)
+2. Karte auf der Startseite ergänzen, Eintrag in `sitemap.xml` und in dieser README
+3. Neue Bibliotheken zusätzlich in die `SHELL`-Liste in `sw.js` aufnehmen (Seiten selbst kommen automatisch über die Sitemap)
 
 ## Deployment
 
