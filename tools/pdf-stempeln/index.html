@@ -18,6 +18,7 @@
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF stempeln — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-stempeln/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Wasserzeichen und Seitenzahlen in ein PDF einfügen — kostenlos, ohne Upload, mit Live-Vorschau."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das PDF wird vollständig in deinem Browser bearbeitet — es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Lässt sich das Wasserzeichen wieder entfernen?","acceptedAnswer":{"@type":"Answer","text":"Nicht ohne Weiteres. Der Text wird fest in den Seiteninhalt geschrieben. Es ist ein sichtbarer Hinweis, kein Kopierschutz — wer das PDF als Bild abfotografiert, umgeht jedes Wasserzeichen."}},{"@type":"Question","name":"Bleibt der Text im PDF durchsuchbar?","acceptedAnswer":{"@type":"Answer","text":"Ja. Die Seiten werden nicht gerastert, sondern nur ergänzt — der vorhandene Text bleibt markierbar und durchsuchbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
 <meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
@@ -409,6 +410,13 @@ AK.$('#next').onclick = () => { if(pageNo < src.pages){ pageNo++; render(); draw
 AK.dropzone('#drop', '#picker', addFiles);
 AK.$('#go').onclick = save;
 render();
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
 </script>
 </body>
 </html>

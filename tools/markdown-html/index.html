@@ -16,6 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Markdown in HTML umwandeln (und zurück) — kostenlos | Alleskonverter">
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
 <meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
@@ -164,7 +165,14 @@ function download(){
   AK.clearDownloads(); AK.stamp(false);
   if(isMd()){
     const payload = AK.$('#fullhtml').checked
-      ? `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(fileBase)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}pre{background:#f4f4f4;padding:12px;overflow:auto}code{font-family:ui-monospace,monospace}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:1em;color:#555}</style>\n</head>\n<body>\n${current}\n</body>\n</html>\n`
+      ? `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(fileBase)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}pre{background:#f4f4f4;padding:12px;overflow:auto}code{font-family:ui-monospace,monospace}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:1em;color:#555}</style>\n</head>\n<body>\n${current}\n<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>\n</html>\n`
       : current;
     AK.offerDownload(new Blob([payload], {type:'text/html;charset=utf-8'}), fileBase + '.html', '.html herunterladen');
   }else{

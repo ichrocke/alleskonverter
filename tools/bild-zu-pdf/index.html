@@ -16,6 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Bilder in PDF umwandeln — JPG, PNG, HEIC zu PDF kostenlos | Alleskonverter">
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
 <meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
@@ -233,6 +234,13 @@ async function build(){
 
 AK.dropzone('#drop', '#picker', addFiles);
 AK.$('#go').onclick = build;
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
 </script>
 </body>
 </html>

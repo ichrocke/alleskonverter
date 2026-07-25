@@ -21,7 +21,8 @@
   <meta name="theme-color" content="#161916" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
   <link rel="icon" type="image/png" href="../../assets/favicon.png">
-  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
   <link rel="stylesheet" href="../../css/base.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/paper-theme.css">
@@ -332,5 +333,12 @@
 
 <script src="vendor/qr-code-styling.js"></script>
 <script type="module" src="js/app.js"></script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
 </body>
 </html>

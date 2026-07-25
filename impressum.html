@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
@@ -47,5 +48,12 @@
   </ul>
 </footer>
 </div>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
 </body>
 </html>

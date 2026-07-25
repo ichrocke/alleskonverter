@@ -43,6 +43,11 @@ ErrorDocument 404 /404.html
   <FilesMatch "\.(html|json|xml|webmanifest)$">
     Header set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
+  # Der Service Worker steuert alles andere — er selbst darf nie veralten
+  <Files "sw.js">
+    Header set Cache-Control "no-cache, must-revalidate"
+    Header set Service-Worker-Allowed "/"
+  </Files>
   # Unveränderliche Fremdbibliotheken und Schriften lange behalten
   <FilesMatch "\.(woff2|wasm)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
