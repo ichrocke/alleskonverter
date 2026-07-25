@@ -35,6 +35,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [QR-Code erstellen](tools/qr-code/index.html) | 12 QR-Typen (Link, WLAN, vCard, GiroCode …), Farben/Logos/Rahmen, Bild-im-Code, PNG/SVG-Export |
 | [ZIP entpacken & packen](tools/zip/index.html) | Archive öffnen, Dateien einzeln oder gebündelt herausholen; Dateien zu ZIP packen |
 
+| [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
 **Medien**
 | Werkzeug | Kann |
 |---|---|

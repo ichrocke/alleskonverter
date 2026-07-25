@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 17)
+
+### Hinzugefügt
+- Werkzeug **Text-Werkzeuge** (`tools/text-werkzeuge/`): Base64 und URL-Kodierung in beide Richtungen, Prüfsummen (SHA-256/SHA-1/SHA-512 über die Krypto-Schnittstelle des Browsers), Groß-/Kleinschreibung, Zeilen umkehren, doppelte Zeilen entfernen, Leerraum aufräumen — dazu eine Live-Zählung von Zeichen, Wörtern, Zeilen und UTF-8-Bytes. Ergebnis kopieren, zurück in die Eingabe übernehmen oder als .txt speichern.
+
 ## 2026-07-26 (Rückbau Dunkelmodus, verlässliche Updates)
 
 ### Entfernt

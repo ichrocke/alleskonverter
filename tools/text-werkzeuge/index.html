@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Base64, URL-Encode, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter</title>
+<meta name="description" content="Text kodieren und prüfen: Base64, URL-Encode, SHA-256/SHA-1-Hash, Zeichen- und Wortzähler, Groß-/Kleinschreibung. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/text-werkzeuge/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Base64, URL-Encode, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter">
+<meta property="og:description" content="Text kodieren und prüfen: Base64, URL-Encode, SHA-256-Hash, Zeichen- und Wortzähler. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/text-werkzeuge/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Base64, URL-Encode, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Text-Werkzeuge — Alleskonverter","url":"https://alleskonverter.de/tools/text-werkzeuge/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Base64, URL-Encode, Hash und Zeichenzähler — kostenlos, ohne Upload, lokal im Browser."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Eingaben übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Alles läuft im Browser — auch Hashes werden lokal über die eingebaute Krypto-Schnittstelle berechnet."}},{"@type":"Question","name":"Ist ein SHA-256-Hash eine Verschlüsselung?","acceptedAnswer":{"@type":"Answer","text":"Nein. Ein Hash ist eine Einwegfunktion: Aus dem Ergebnis lässt sich der Ausgangstext nicht zurückrechnen. Er dient dazu, Dateien oder Texte auf Unverändertheit zu prüfen."}},{"@type":"Question","name":"Ist Base64 sicher?","acceptedAnswer":{"@type":"Answer","text":"Nein, Base64 ist keine Verschlüsselung, sondern nur eine andere Schreibweise. Jeder kann sie in Sekunden zurückwandeln."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{padding:8px 13px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tabs button:hover{border-color:var(--ink)}
+.tabs button.active{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px;margin-top:4px}
+.stat{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-size:26px;line-height:1.05;font-weight:400}
+.stat span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.hashrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.hashout{font-family:var(--mono);font-size:11.5px;word-break:break-all;background:var(--card);border:1px solid var(--rule);padding:8px 10px;margin-bottom:10px}
+.hashout b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Text-<span>Werkzeuge</span></h1>
+  <p class="sub">Base64 und URL-Kodierung in beide Richtungen, Prüfsummen berechnen, Groß- und Kleinschreibung umstellen, Zeichen und Wörter zählen — alles in einem Feld, live beim Tippen.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Eingabe</h2>
+    <textarea class="pane" id="input" spellcheck="false" placeholder="Text hier eingeben oder einfügen …" style="min-height:200px"></textarea>
+
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><b id="cChars">0</b><span>Zeichen</span></div>
+      <div class="stat"><b id="cNoSpace">0</b><span>ohne Leerzeichen</span></div>
+      <div class="stat"><b id="cWords">0</b><span>Wörter</span></div>
+      <div class="stat"><b id="cLines">0</b><span>Zeilen</span></div>
+      <div class="stat"><b id="cBytes">0</b><span>Byte (UTF-8)</span></div>
+    </div>
+
+    <h2 style="margin-top:26px">Ergebnis</h2>
+    <div class="tabs" id="tabs"></div>
+    <div id="hashbox" hidden>
+      <div class="hashout"><b>SHA-256</b><span id="h256">—</span></div>
+      <div class="hashout"><b>SHA-1</b><span id="h1">—</span></div>
+      <div class="hashout"><b>SHA-512</b><span id="h512">—</span></div>
+    </div>
+    <textarea class="pane" id="output" spellcheck="false" readonly style="min-height:200px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="ghost" id="copy">In die Zwischenablage</button>
+      <button class="ghost" id="swap">Ergebnis nach oben übernehmen</button>
+      <button class="ghost" id="clear">Leeren</button>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="outlen">0<small>Zeichen Ergebnis</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="dateiname">Dateiname</label>
+      <input type="text" id="dateiname" value="text.txt">
+    </div>
+
+    <button class="primary" id="go" disabled>Als .txt speichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Eine Sammlung kleiner Helfer, die man beim Programmieren, beim Ausfüllen von Formularen oder beim Prüfen von Downloads ständig braucht: Base64 und URL-Kodierung in beide Richtungen, Prüfsummen nach SHA-256, SHA-1 und SHA-512, das Umstellen von Groß- und Kleinschreibung sowie eine Zählung von Zeichen, Wörtern und Zeilen. Alles reagiert direkt beim Tippen.</p>
+  <h3>Werden meine Eingaben übertragen?</h3>
+  <p>Nein. Alles rechnet dein Browser selbst — auch die Prüfsummen, dafür wird die eingebaute Krypto-Schnittstelle des Browsers genutzt. Es gibt keinen Server, der etwas mitlesen könnte.</p>
+  <h3>Ist Base64 eine Verschlüsselung?</h3>
+  <p>Nein, nur eine andere Schreibweise. Base64 macht aus beliebigen Daten eine reine Buchstaben-und-Zahlen-Folge, damit sie sich gefahrlos in E-Mails oder Konfigurationsdateien transportieren lässt. Zurückwandeln kann sie jeder in Sekunden — für Geheimes ist sie ungeeignet.</p>
+  <h3>Wofür brauche ich einen SHA-256-Hash?</h3>
+  <p>Um zu prüfen, ob etwas unverändert ist. Wer eine Datei zum Download anbietet, veröffentlicht oft deren Prüfsumme; stimmt sie mit der selbst berechneten überein, ist die Datei vollständig und unmanipuliert. Zurückrechnen lässt sich ein Hash nicht — er ist eine Einbahnstraße.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>SHA-1 gilt seit Jahren als gebrochen und sollte für Sicherheitszwecke nicht mehr verwendet werden — er steht hier nur bereit, weil ältere Systeme ihn noch ausgeben.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script>
+const AKTIONEN = [
+  ['Base64 kodieren',   t => btoa(String.fromCharCode(...new TextEncoder().encode(t)))],
+  ['Base64 dekodieren', t => new TextDecoder().decode(Uint8Array.from(atob(t.replace(/\s+/g,'')), c => c.charCodeAt(0)))],
+  ['URL kodieren',      t => encodeURIComponent(t)],
+  ['URL dekodieren',    t => decodeURIComponent(t)],
+  ['Prüfsummen',        null],
+  ['GROSSBUCHSTABEN',   t => t.toLocaleUpperCase('de')],
+  ['kleinbuchstaben',   t => t.toLocaleLowerCase('de')],
+  ['Zeilen umkehren',   t => t.split('\n').reverse().join('\n')],
+  ['Doppelte Zeilen entfernen', t => [...new Set(t.split('\n'))].join('\n')],
+  ['Leerraum aufräumen', t => t.split('\n').map(z => z.trim()).filter(Boolean).join('\n')],
+];
+
+let aktiv = 0;
+
+const tabs = AK.$('#tabs');
+AKTIONEN.forEach(([label], i) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.textContent = label;
+  if(i === 0) b.classList.add('active');
+  b.onclick = () => {
+    aktiv = i;
+    tabs.querySelectorAll('button').forEach((x,j) => x.classList.toggle('active', j === i));
+    lauf();
+  };
+  tabs.appendChild(b);
+});
+
+function zaehle(t){
+  AK.$('#cChars').textContent   = t.length.toLocaleString('de-DE');
+  AK.$('#cNoSpace').textContent = t.replace(/\s/g,'').length.toLocaleString('de-DE');
+  AK.$('#cWords').textContent   = (t.match(/\S+/g) || []).length.toLocaleString('de-DE');
+  AK.$('#cLines').textContent   = (t ? t.split('\n').length : 0).toLocaleString('de-DE');
+  AK.$('#cBytes').textContent   = new TextEncoder().encode(t).length.toLocaleString('de-DE');
+}
+
+async function hash(name, daten){
+  const buf = await crypto.subtle.digest(name, daten);
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function lauf(){
+  const text = AK.$('#input').value;
+  zaehle(text);
+  const istHash = AKTIONEN[aktiv][1] === null;
+  AK.$('#hashbox').hidden = !istHash;
+  AK.$('#output').hidden = istHash;
+  AK.logClear();
+
+  if(istHash){
+    if(!text){ ['#h256','#h1','#h512'].forEach(s => AK.$(s).textContent = '—'); ergebnisLaenge(''); return; }
+    const daten = new TextEncoder().encode(text);
+    const [a,b,c] = await Promise.all([hash('SHA-256',daten), hash('SHA-1',daten), hash('SHA-512',daten)]);
+    AK.$('#h256').textContent = a; AK.$('#h1').textContent = b; AK.$('#h512').textContent = c;
+    ergebnisLaenge(a);
+    return;
+  }
+
+  let out = '';
+  try{
+    out = text ? AKTIONEN[aktiv][1](text) : '';
+  }catch(err){
+    out = '';
+    AK.log('Eingabe passt nicht zu dieser Umwandlung — bei „Base64 dekodieren“ muss oben gültiges Base64 stehen.', true);
+  }
+  AK.$('#output').value = out;
+  ergebnisLaenge(out);
+}
+
+function ergebnisLaenge(s){
+  AK.$('#outlen').innerHTML = s.length.toLocaleString('de-DE') + '<small>Zeichen Ergebnis</small>';
+  AK.$('#go').disabled = !s;
+}
+
+function aktuellesErgebnis(){
+  return AKTIONEN[aktiv][1] === null ? AK.$('#h256').textContent : AK.$('#output').value;
+}
+
+AK.$('#input').addEventListener('input', lauf);
+AK.$('#copy').onclick = async () => {
+  await navigator.clipboard.writeText(aktuellesErgebnis());
+  AK.log('In die Zwischenablage kopiert.');
+};
+AK.$('#swap').onclick = () => { AK.$('#input').value = aktuellesErgebnis(); lauf(); };
+AK.$('#clear').onclick = () => { AK.$('#input').value = ''; lauf(); };
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const name = AK.ensureExt(AK.$('#dateiname').value || 'text', 'txt');
+  AK.offerDownload(new Blob([aktuellesErgebnis()], {type:'text/plain;charset=utf-8'}), name);
+  AK.stamp(true);
+};
+
+lauf();
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
