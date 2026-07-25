@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video &amp; Audio schneiden — kostenlos, ohne Upload | Alleskonverter</title>
+<meta name="description" content="Video oder Audio online schneiden: Anfang und Ende festlegen, Ausschnitt speichern — bei MP4 sekundenschnell ohne Qualitätsverlust. Ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/medien-schneiden/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Video &amp; Audio schneiden — kostenlos, ohne Upload | Alleskonverter">
+<meta property="og:description" content="Video oder Audio schneiden: Anfang und Ende festlegen, Ausschnitt speichern — ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/medien-schneiden/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Video &amp; Audio schneiden — kostenlos, ohne Upload | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Video & Audio schneiden — Alleskonverter","url":"https://alleskonverter.de/tools/medien-schneiden/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Video oder Audio schneiden — ohne Upload, direkt im Browser."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Verliert das Video beim Schneiden an Qualität?","acceptedAnswer":{"@type":"Answer","text":"Im Modus „ohne Neuberechnung“ nicht — die vorhandenen Daten werden nur kopiert. Das geht in Sekunden, der Schnitt setzt aber am nächsten Schlüsselbild an und kann daher etwas abweichen."}},{"@type":"Question","name":"Wird meine Datei hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Schnitt läuft mit ffmpeg direkt in deinem Browser. Nur das Programm selbst wird einmalig von dieser Website geladen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#buehne{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;display:none}
+#buehne.on{display:block}
+#spieler{width:100%;max-height:420px;background:#000;display:block}
+audio#spieler{max-height:none;background:transparent}
+.spanne{margin-top:14px}
+.spanne label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px}
+.spanne input[type=range]{width:100%}
+.zeitzeile{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px;font-family:var(--mono);font-size:12px}
+.zeitzeile input[type=text]{width:110px;text-align:center}
+.marke{background:var(--stamp);color:var(--stamp-text);padding:2px 8px;font-family:var(--mono);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Medien <span>schneiden</span></h1>
+  <p class="sub">Aus einem Video oder einer Tonaufnahme einen Ausschnitt herausschneiden — Anfang und Ende im Abspieler festlegen, Vorschau anhören und speichern. Bei MP4 geht das ohne Neuberechnung in Sekunden.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Datei</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Video oder Audio hierher ziehen</strong>
+      <small>MP4, WebM, MOV, MKV, MP3, WAV, M4A …</small>
+    </div>
+    <input type="file" id="picker" accept="audio/*,video/*,.mkv,.mov,.avi,.m4a,.opus" hidden>
+
+    <div id="buehne">
+      <div id="spielerhalter"></div>
+
+      <div class="spanne">
+        <label for="rAnfang">Anfang</label>
+        <input type="range" id="rAnfang" min="0" max="1000" value="0">
+        <label for="rEnde" style="margin-top:10px">Ende</label>
+        <input type="range" id="rEnde" min="0" max="1000" value="1000">
+      </div>
+
+      <div class="zeitzeile">
+        <span>von</span><input type="text" id="tAnfang" value="00:00:00.0">
+        <span>bis</span><input type="text" id="tEnde" value="00:00:00.0">
+        <span class="marke" id="dauer">Länge: —</span>
+        <button class="ghost" id="hier1" type="button">Anfang = aktuelle Stelle</button>
+        <button class="ghost" id="hier2" type="button">Ende = aktuelle Stelle</button>
+        <button class="ghost" id="probe" type="button">Ausschnitt anspielen</button>
+      </div>
+    </div>
+
+    <div class="empty" id="empty">Noch keine Datei geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="field" id="f-lib">
+      <label>Konverter-Bibliothek (ffmpeg)</label>
+      <button class="ghost" id="loadlib" style="width:100%">Bibliothek laden — einmalig ~31 MB</button>
+      <div class="hint" id="libhint">Kommt von diesem Server (kein Dritt-CDN) und wird vom Browser zwischengespeichert.</div>
+    </div>
+
+    <div class="field">
+      <label for="modus">Arbeitsweise</label>
+      <select id="modus">
+        <option value="copy" selected>Ohne Neuberechnung — sekundenschnell</option>
+        <option value="genau">Bildgenau — langsamer, rechnet neu</option>
+      </select>
+      <div class="hint" id="modushint">Der Schnitt setzt am nächsten Schlüsselbild an.</div>
+    </div>
+
+    <div class="field" id="f-nurton" hidden>
+      <label><input type="checkbox" id="nurton" style="width:auto;margin-right:6px">Nur die Tonspur speichern</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Ausschnitt speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Die ersten dreißig Sekunden Gewackel vor dem eigentlichen Motiv, ein Mitschnitt, von dem nur ein Ausschnitt interessiert, oder eine Sprachnotiz, die vorne und hinten beschnitten gehört: Hier legst du Anfang und Ende direkt am Abspieler fest, hörst dir den Ausschnitt zur Kontrolle an und speicherst ihn. Geschnitten wird mit ffmpeg — derselben Software, die auch Profi-Programme nutzen — hier aber direkt in deinem Browser.</p>
+  <h3>Wird meine Datei hochgeladen?</h3>
+  <p>Nein. Der Schnitt läuft vollständig auf deinem Gerät. Einmalig wird das Konverter-Programm von dieser Website geladen (rund 31&nbsp;MB); deine Aufnahme selbst wird nie übertragen.</p>
+  <h3>Was bedeutet „ohne Neuberechnung“?</h3>
+  <p>Dabei werden die vorhandenen Bild- und Tondaten einfach kopiert, statt sie neu zu berechnen. Das dauert nur Sekunden und kostet keinerlei Qualität. Der Haken: Ein Video lässt sich nur an sogenannten Schlüsselbildern trennen, die typischerweise alle paar Sekunden vorkommen — der Anfang kann deshalb etwas früher liegen als eingestellt. Wenn es auf das Bild genau ankommt, wähle „Bildgenau“; dann wird neu berechnet, was länger dauert.</p>
+  <h3>Welche Formate funktionieren?</h3>
+  <p>Praktisch alles Gängige: MP4, WebM, MOV, MKV, AVI beim Video, MP3, WAV, M4A, OGG und FLAC beim Ton. Das Ergebnis behält das Format der Ausgangsdatei.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Soll die Datei zusätzlich in ein anderes Format? Das erledigt <a href="../medien/index.html">Audio &amp; Video</a>. Dieses Werkzeug braucht einen Webserver — als heruntergeladene Datei per Doppelklick funktioniert es nicht.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+const FF = '../../vendor/ffmpeg';
+let ffmpeg = null, src = null, spieler = null, istVideo = false, laenge = 0;
+let probeStop = null;
+
+function skript(url){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = res;
+    s.onerror = () => rej(new Error('Download fehlgeschlagen: ' + url));
+    document.head.appendChild(s);
+  });
+}
+
+async function ladeBibliothek(){
+  const btn = AK.$('#loadlib');
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Lädt …';
+  try{
+    await skript(FF + '/ffmpeg.js');
+    await skript(FF + '/util.js');
+    const { toBlobURL } = FFmpegUtil;
+    ffmpeg = new FFmpegWASM.FFmpeg();
+    ffmpeg.on('progress', ({ progress }) => { if(progress > 0 && progress <= 1) AK.bar(progress); });
+    AK.$('#libhint').textContent = 'ffmpeg-Kern wird geladen (~31 MB) …';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(FF + '/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL(FF + '/ffmpeg-core.wasm', 'application/wasm'),
+      classWorkerURL: await toBlobURL(FF + '/814.ffmpeg.js', 'text/javascript'),
+    });
+    AK.$('#f-lib').innerHTML = '<label>Konverter-Bibliothek (ffmpeg)</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
+    AK.log('ffmpeg bereit.');
+    pruefe();
+  }catch(err){
+    console.error(err);
+    btn.disabled = false; btn.textContent = 'Bibliothek laden — einmalig ~31 MB';
+    AK.log('Bibliothek konnte nicht geladen werden: ' + (err.message || ''), true);
+  }
+}
+
+/* ---------- Datei ---------- */
+async function addFiles(list){
+  const file = list.find(f => /^(audio|video)\//.test(f.type) ||
+                              /\.(mp4|webm|mkv|avi|mov|wmv|flv|m4v|mp3|wav|ogg|m4a|flac|aac|opus|wma|aiff?)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  istVideo = /^video\//.test(file.type) || /\.(mp4|webm|mkv|avi|mov|wmv|flv|m4v)$/i.test(file.name);
+  src = { name:file.name, size:file.size, file };
+
+  const halter = AK.$('#spielerhalter');
+  halter.innerHTML = '';
+  spieler = document.createElement(istVideo ? 'video' : 'audio');
+  spieler.id = 'spieler';
+  spieler.controls = true;
+  spieler.preload = 'metadata';
+  spieler.src = URL.createObjectURL(file);
+  halter.appendChild(spieler);
+
+  AK.$('#buehne').classList.add('on');
+  AK.$('#empty').style.display = 'none';
+  AK.$('#f-nurton').hidden = !istVideo;
+
+  spieler.addEventListener('loadedmetadata', () => {
+    laenge = isFinite(spieler.duration) ? spieler.duration : 0;
+    AK.$('#rAnfang').value = 0;
+    AK.$('#rEnde').value = 1000;
+    zeigeZeiten();
+    pruefe();
+  }, { once:true });
+}
+
+/* ---------- Zeiten ---------- */
+const zuZeit = s => {
+  s = Math.max(0, s || 0);
+  const h = Math.floor(s/3600), m = Math.floor(s%3600/60), sek = s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${sek.toFixed(1).padStart(4,'0')}`;
+};
+const ausZeit = t => {
+  const teile = String(t).trim().split(':').map(parseFloat);
+  if(teile.some(isNaN)) return null;
+  return teile.length === 3 ? teile[0]*3600 + teile[1]*60 + teile[2]
+       : teile.length === 2 ? teile[0]*60 + teile[1]
+       : teile[0];
+};
+
+const anfangSek = () => laenge * (+AK.$('#rAnfang').value) / 1000;
+const endeSek   = () => laenge * (+AK.$('#rEnde').value) / 1000;
+
+function zeigeZeiten(){
+  AK.$('#tAnfang').value = zuZeit(anfangSek());
+  AK.$('#tEnde').value   = zuZeit(endeSek());
+  const d = endeSek() - anfangSek();
+  AK.$('#dauer').textContent = 'Länge: ' + (d > 0 ? zuZeit(d) : '—');
+  pruefe();
+}
+
+function setzeAusZeit(){
+  const a = ausZeit(AK.$('#tAnfang').value), e = ausZeit(AK.$('#tEnde').value);
+  if(a === null || e === null || !laenge) return;
+  AK.$('#rAnfang').value = Math.round(Math.max(0, Math.min(a, laenge)) / laenge * 1000);
+  AK.$('#rEnde').value   = Math.round(Math.max(0, Math.min(e, laenge)) / laenge * 1000);
+  zeigeZeiten();
+}
+
+function pruefe(){
+  const bereit = !!(src && ffmpeg && ffmpeg.loaded && endeSek() - anfangSek() > 0.05);
+  AK.$('#go').disabled = !bereit;
+}
+
+/* ---------- Schneiden ---------- */
+function endung(name){ return (name.match(/\.([^.]+)$/) || [,'mp4'])[1].toLowerCase(); }
+
+async function schneiden(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  const von = anfangSek(), bis = endeSek(), dauer = bis - von;
+  const nurton = istVideo && AK.$('#nurton').checked;
+  const ext = nurton ? 'm4a' : endung(src.name);
+  const ein = 'eingabe.' + endung(src.name);
+  const aus = 'ausgabe.' + ext;
+  const genau = AK.$('#modus').value === 'genau';
+
+  try{
+    AK.log(`Schneide ${zuZeit(von)} bis ${zuZeit(bis)} (${zuZeit(dauer)}) …`);
+    await ffmpeg.writeFile(ein, await FFmpegUtil.fetchFile(src.file));
+
+    let args;
+    if(nurton){
+      args = ['-ss', String(von), '-i', ein, '-t', String(dauer), '-vn', '-c:a', 'aac', '-b:a', '192k', aus];
+    }else if(genau){
+      // -ss nach -i sucht bildgenau, kostet dafür Rechenzeit
+      args = ['-i', ein, '-ss', String(von), '-t', String(dauer), '-preset', 'veryfast', aus];
+    }else{
+      // -ss vor -i springt schnell, kopiert die Daten unverändert
+      args = ['-ss', String(von), '-i', ein, '-t', String(dauer), '-c', 'copy', '-avoid_negative_ts', 'make_zero', aus];
+    }
+
+    const code = await ffmpeg.exec(args);
+    if(code !== 0) throw new Error('ffmpeg meldet Fehlercode ' + code);
+
+    const daten = await ffmpeg.readFile(aus);
+    const blob = new Blob([daten.buffer]);
+    AK.bar(1);
+    AK.offerDownload(blob, src.name.replace(/\.[^.]+$/, '') + '-ausschnitt.' + ext);
+    AK.log(`Fertig: ${AK.fmtBytes(blob.size)}`);
+    AK.stamp(true);
+    await ffmpeg.deleteFile(ein).catch(()=>{});
+    await ffmpeg.deleteFile(aus).catch(()=>{});
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler') +
+           (AK.$('#modus').value === 'copy' ? ' — versuch es mit „Bildgenau“.' : ''), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Ausschnitt speichern'; pruefe();
+  }
+}
+
+/* ---------- Bedienung ---------- */
+AK.$('#rAnfang').addEventListener('input', () => {
+  if(+AK.$('#rAnfang').value >= +AK.$('#rEnde').value) AK.$('#rAnfang').value = +AK.$('#rEnde').value - 1;
+  zeigeZeiten();
+  if(spieler) spieler.currentTime = anfangSek();
+});
+AK.$('#rEnde').addEventListener('input', () => {
+  if(+AK.$('#rEnde').value <= +AK.$('#rAnfang').value) AK.$('#rEnde').value = +AK.$('#rAnfang').value + 1;
+  zeigeZeiten();
+});
+['#tAnfang','#tEnde'].forEach(s => AK.$(s).addEventListener('change', setzeAusZeit));
+AK.$('#hier1').onclick = () => { if(spieler && laenge){ AK.$('#rAnfang').value = Math.round(spieler.currentTime/laenge*1000); zeigeZeiten(); } };
+AK.$('#hier2').onclick = () => { if(spieler && laenge){ AK.$('#rEnde').value = Math.round(spieler.currentTime/laenge*1000); zeigeZeiten(); } };
+AK.$('#probe').onclick = () => {
+  if(!spieler) return;
+  clearTimeout(probeStop);
+  spieler.currentTime = anfangSek();
+  spieler.play();
+  probeStop = setTimeout(() => spieler.pause(), (endeSek() - anfangSek()) * 1000);
+};
+AK.$('#modus').onchange = () => {
+  AK.$('#modushint').textContent = AK.$('#modus').value === 'copy'
+    ? 'Der Schnitt setzt am nächsten Schlüsselbild an.'
+    : 'Bildgenau, dafür wird neu berechnet — das dauert.';
+};
+AK.$('#loadlib').onclick = ladeBibliothek;
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = schneiden;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

@@ -45,6 +45,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 |---|---|
 | [Audio & Video](tools/medien/index.html) | MP3/WAV/OGG/M4A/FLAC/MP4/WebM/GIF via ffmpeg.wasm, Tonspur extrahieren |
 
+| [Medien schneiden](tools/medien-schneiden/index.html) | Video/Audio auf einen Ausschnitt kürzen, wahlweise ohne Neuberechnung |
 ## Nutzung
 
 Live unter <https://alleskonverter.de>. Die Seite lässt sich über den Browser als App

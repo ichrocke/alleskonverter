@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 22)
+
+### Hinzugefügt
+- Werkzeug **Medien schneiden** (`tools/medien-schneiden/`): Anfang und Ende am Abspieler festlegen (Schieberegler, Zeitfelder oder „aktuelle Stelle übernehmen“), Ausschnitt vorab anhören und speichern. Standardmäßig ohne Neuberechnung — das dauert nur Sekunden und kostet keine Qualität, setzt den Schnitt dafür am nächsten Schlüsselbild an; alternativ bildgenau mit Neuberechnung. Bei Videos lässt sich wahlweise nur die Tonspur speichern.
+
 ## 2026-07-26 (Datei wird mitgenommen)
 
 ### Hinzugefügt
