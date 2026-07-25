@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 20)
+
+### Hinzugefügt
+- Werkzeug **Bilder zusammenfügen** (`tools/bilder-zusammenfuegen/`): mehrere Bilder nebeneinander, untereinander oder als Raster zu einem einzigen verbinden — mit sortierbarer Reihenfolge, einstellbarem Abstand, wählbarem Hintergrund und Live-Vorschau samt Maßangabe. Unterschiedlich große Bilder werden auf eine gemeinsame Kante gebracht, im Raster vollständig in gleich große Zellen eingepasst; HEIC wird beim Laden umgewandelt.
+
 ## 2026-07-26 (Werkzeug 19)
 
 ### Hinzugefügt

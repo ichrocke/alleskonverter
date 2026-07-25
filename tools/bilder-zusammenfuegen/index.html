@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilder zusammenfügen — Collage erstellen, kostenlos | Alleskonverter</title>
+<meta name="description" content="Mehrere Bilder zu einem zusammenfügen: nebeneinander, untereinander oder als Raster. Mit Abstand, Hintergrund und Ecken. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bilder-zusammenfuegen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Bilder zusammenfügen — Collage erstellen, kostenlos | Alleskonverter">
+<meta property="og:description" content="Mehrere Bilder zu einem zusammenfügen: nebeneinander, untereinander oder als Raster. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bilder-zusammenfuegen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bilder zusammenfügen — Collage erstellen, kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bilder zusammenfügen — Alleskonverter","url":"https://alleskonverter.de/tools/bilder-zusammenfuegen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Mehrere Bilder nebeneinander, untereinander oder als Raster zu einem Bild zusammenfügen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Bilder hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das Zusammenfügen passiert vollständig in deinem Browser."}},{"@type":"Question","name":"Was passiert bei unterschiedlich großen Bildern?","acceptedAnswer":{"@type":"Answer","text":"Sie werden auf eine gemeinsame Höhe beziehungsweise Breite gebracht, damit die Reihe sauber aussieht. Beim Raster bekommt jedes Bild eine gleich große Zelle und wird darin vollständig eingepasst."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#buehne{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;text-align:center;display:none}
+#buehne.on{display:block}
+#leinwand{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
+.masse{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bilder <span>zusammenfügen</span></h1>
+  <p class="sub">Mehrere Bilder zu einem einzigen verbinden — nebeneinander, untereinander oder als Raster. Praktisch für Vorher-Nachher-Vergleiche, Screenshot-Reihen oder eine schnelle Collage.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bilder</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bilder hierher ziehen</strong>
+      <small>mehrere gleichzeitig — Reihenfolge unten sortierbar</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts geladen. Mindestens zwei Bilder ergeben ein sinnvolles Ergebnis.</div>
+
+    <div id="buehne">
+      <canvas id="leinwand"></canvas>
+      <div class="masse" id="masse"></div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Bilder im Stapel</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="richtung">Anordnung</label>
+      <select id="richtung">
+        <option value="h" selected>Nebeneinander (waagerecht)</option>
+        <option value="v">Untereinander (senkrecht)</option>
+        <option value="r">Raster</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-spalten" hidden>
+      <label for="spalten">Bilder pro Zeile</label>
+      <input type="number" id="spalten" value="2" min="1" max="10" style="width:100%">
+    </div>
+
+    <div class="field">
+      <label for="abstand">Abstand: <span id="abstandVal">10</span> px</label>
+      <input type="range" id="abstand" min="0" max="80" step="2" value="10" style="width:100%">
+    </div>
+
+    <div class="field">
+      <label for="grund">Hintergrund</label>
+      <select id="grund">
+        <option value="#ffffff" selected>Weiß</option>
+        <option value="#000000">Schwarz</option>
+        <option value="#E6E4DE">Papier</option>
+        <option value="transparent">Transparent (nur PNG)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="image/jpeg" selected>JPEG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WebP</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-quality">
+      <label for="quality">Qualität: <span id="qval">92</span> %</label>
+      <input type="range" id="quality" min="50" max="100" value="92" style="width:100%">
+    </div>
+
+    <button class="primary" id="go" disabled>Zusammenfügen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Zwei Screenshots nebeneinander für einen Vergleich, drei Fotos untereinander für eine Nachricht oder neun Bilder als Raster für eine Collage: Dieses Werkzeug setzt beliebig viele Bilder zu einem einzigen zusammen. Die Reihenfolge lässt sich durch Ziehen ändern, Abstand und Hintergrundfarbe sind frei wählbar, und die Vorschau zeigt jederzeit das fertige Ergebnis.</p>
+  <h3>Werden meine Bilder hochgeladen?</h3>
+  <p>Nein. Das Zusammenfügen passiert vollständig in deinem Browser — es gibt keinen Server, der Bilder annehmen könnte. Beim Speichern gehen zudem alle Metadaten der Ausgangsbilder verloren, auch der GPS-Standort.</p>
+  <h3>Was passiert bei unterschiedlich großen Bildern?</h3>
+  <p>Nebeneinander werden alle Bilder auf dieselbe Höhe gebracht, untereinander auf dieselbe Breite — so entsteht eine saubere Reihe ohne Lücken. Im Raster bekommt jedes Bild eine gleich große Zelle und wird darin vollständig eingepasst, ohne beschnitten zu werden.</p>
+  <h3>Kann ich iPhone-Fotos verwenden?</h3>
+  <p>Ja, HEIC-Dateien werden beim Laden automatisch umgewandelt.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Einzelne Bilder vorher zurechtschneiden? Dafür gibt es <a href="../bild-zuschneiden/index.html">Bild zuschneiden</a>. Sollen die Bilder stattdessen als Seiten in ein PDF, hilft <a href="../bild-zu-pdf/index.html">Bilder → PDF</a>.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/filelist.js?v=20260726"></script>
+<script>
+const bilder = [];
+let uid = 0;
+
+async function addFiles(list){
+  for(const file of list){
+    if(!file.type.startsWith('image/') && !/\.(jpe?g|png|webp|gif|bmp|avif|hei[cf])$/i.test(file.name)) continue;
+    const e = { id:++uid, name:file.name, size:file.size, mode:'pending', note:'wird gelesen …', bmp:null, w:0, h:0 };
+    bilder.push(e);
+    lade(e, file);
+  }
+  liste.render();
+}
+
+async function lade(e, file){
+  try{
+    let blob = file;
+    if(/\.(hei[cf])$/i.test(file.name) || /hei[cf]/.test(file.type)){
+      blob = await heic2any({ blob:file, toType:'image/png' });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+    e.bmp = 'createImageBitmap' in window
+      ? await createImageBitmap(blob).catch(() => ueberImg(blob))
+      : await ueberImg(blob);
+    e.w = e.bmp.width; e.h = e.bmp.height;
+    e.mode = 'ok'; e.note = '';
+  }catch(err){
+    console.error(err);
+    e.mode = 'error'; e.note = 'Bild kann nicht gelesen werden';
+  }
+  liste.render();
+  zeichne();
+}
+
+function ueberImg(blob){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img); img.onerror = rej;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+const liste = AK.filelist({
+  container:'#stack', empty:'#empty', entries:bilder,
+  rowClass: e => e.mode === 'error' ? 'locked' : '',
+  meta: e => `<div class="fname">${AK.esc(e.name)}</div>
+    <div class="finfo"><span>${AK.fmtBytes(e.size)}</span>${e.w ? `<span>${e.w} × ${e.h} px</span>` : ''}
+    ${e.note ? `<span class="pw-hint">${AK.esc(e.note)}</span>` : ''}</div>`,
+  onChange: () => { aktualisiere(); zeichne(); }
+});
+
+function aktualisiere(){
+  const ok = bilder.filter(e => e.mode === 'ok').length;
+  AK.$('#anzahl').innerHTML = ok + '<small>Bilder im Stapel</small>';
+  AK.$('#go').disabled = ok === 0 || bilder.some(e => e.mode === 'pending');
+  AK.$('#buehne').classList.toggle('on', ok > 0);
+}
+
+function einstellungen(){
+  return {
+    richtung: AK.$('#richtung').value,
+    spalten: Math.max(1, +AK.$('#spalten').value || 2),
+    abstand: +AK.$('#abstand').value,
+    grund: AK.$('#grund').value,
+  };
+}
+
+/* Bildpositionen berechnen — dieselbe Rechnung für Vorschau und Ergebnis */
+function anordnung(){
+  const { richtung, spalten, abstand } = einstellungen();
+  const fertig = bilder.filter(e => e.mode === 'ok');
+  if(!fertig.length) return null;
+
+  if(richtung === 'h'){
+    const hoehe = Math.min(...fertig.map(e => e.h));
+    let x = 0;
+    const teile = fertig.map(e => {
+      const w = Math.round(e.w * hoehe / e.h);
+      const t = { e, x, y:0, w, h:hoehe };
+      x += w + abstand;
+      return t;
+    });
+    return { teile, breite: x - abstand, hoehe };
+  }
+
+  if(richtung === 'v'){
+    const breite = Math.min(...fertig.map(e => e.w));
+    let y = 0;
+    const teile = fertig.map(e => {
+      const h = Math.round(e.h * breite / e.w);
+      const t = { e, x:0, y, w:breite, h };
+      y += h + abstand;
+      return t;
+    });
+    return { teile, breite, hoehe: y - abstand };
+  }
+
+  // Raster: gleich große Zellen, Bilder darin vollständig eingepasst
+  const zellB = Math.round(fertig.reduce((s,e) => s + e.w, 0) / fertig.length);
+  const zellH = Math.round(fertig.reduce((s,e) => s + e.h, 0) / fertig.length);
+  const zeilen = Math.ceil(fertig.length / spalten);
+  const teile = fertig.map((e, i) => {
+    const sp = i % spalten, ze = Math.floor(i / spalten);
+    const s = Math.min(zellB / e.w, zellH / e.h);
+    const w = Math.round(e.w * s), h = Math.round(e.h * s);
+    return {
+      e, w, h,
+      x: sp * (zellB + abstand) + Math.round((zellB - w)/2),
+      y: ze * (zellH + abstand) + Math.round((zellH - h)/2),
+    };
+  });
+  return {
+    teile,
+    breite: spalten * zellB + (spalten-1) * abstand,
+    hoehe: zeilen * zellH + (zeilen-1) * abstand,
+  };
+}
+
+function male(ziel, plan, maxBreite){
+  const { grund } = einstellungen();
+  const s = maxBreite ? Math.min(1, maxBreite / plan.breite) : 1;
+  ziel.width = Math.max(1, Math.round(plan.breite * s));
+  ziel.height = Math.max(1, Math.round(plan.hoehe * s));
+  const ctx = ziel.getContext('2d');
+  ctx.clearRect(0, 0, ziel.width, ziel.height);
+  if(grund !== 'transparent'){ ctx.fillStyle = grund; ctx.fillRect(0, 0, ziel.width, ziel.height); }
+  ctx.imageSmoothingQuality = 'high';
+  for(const t of plan.teile){
+    ctx.drawImage(t.e.bmp, Math.round(t.x*s), Math.round(t.y*s), Math.round(t.w*s), Math.round(t.h*s));
+  }
+}
+
+function zeichne(){
+  const plan = anordnung();
+  if(!plan) return;
+  male(AK.$('#leinwand'), plan, 760);
+  AK.$('#masse').textContent = `Ergebnis: ${plan.breite} × ${plan.hoehe} Pixel`;
+}
+
+const ENDUNG = { 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp' };
+
+async function zusammen(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.3);
+  const mime = AK.$('#format').value;
+  try{
+    const plan = anordnung();
+    const c = document.createElement('canvas');
+    // JPEG kennt keine Transparenz — dann sicherheitshalber weiß hinterlegen
+    if(mime === 'image/jpeg' && AK.$('#grund').value === 'transparent') AK.$('#grund').value = '#ffffff';
+    male(c, plan, 0);
+    const blob = await new Promise(r => c.toBlob(r, mime, +AK.$('#quality').value/100));
+    c.width = c.height = 0;
+    if(!blob) throw new Error('Format wird nicht unterstützt');
+    AK.bar(1);
+    AK.offerDownload(blob, 'zusammengefuegt.' + ENDUNG[mime]);
+    AK.log(`Fertig: ${plan.breite} × ${plan.hoehe} px, ${AK.fmtBytes(blob.size)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Zusammenfügen'; aktualisiere();
+  }
+}
+
+AK.$('#richtung').onchange = () => { AK.$('#f-spalten').hidden = AK.$('#richtung').value !== 'r'; zeichne(); };
+AK.$('#abstand').oninput = e => { AK.$('#abstandVal').textContent = e.target.value; zeichne(); };
+AK.$('#quality').oninput = e => AK.$('#qval').textContent = e.target.value;
+AK.$('#format').onchange = () => AK.$('#f-quality').style.display = AK.$('#format').value === 'image/png' ? 'none' : '';
+['#spalten','#grund'].forEach(s => AK.$(s).addEventListener('input', zeichne));
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = zusammen;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
