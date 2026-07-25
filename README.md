@@ -18,6 +18,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Text auslesen](tools/pdf-text/index.html) | Textextraktion, Zwischenablage oder .txt |
 
 | [PDF-Passwort](tools/pdf-passwort/index.html) | PDF mit AES-128 verschlüsseln oder bekannten Schutz entfernen, Rechte einstellen |
+| [PDF-Formular ausfüllen](tools/pdf-formular/index.html) | Formularfelder auslesen, ausfüllen und speichern, optional festschreiben |
 **Bilder**
 | Werkzeug | Kann |
 |---|---|
@@ -57,6 +58,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 
 | [Medien schneiden](tools/medien-schneiden/index.html) | Video/Audio auf einen Ausschnitt kürzen, wahlweise ohne Neuberechnung |
 | [GIF erstellen](tools/gif-erstellen/index.html) | Animiertes GIF aus Bildern, mit eigener Farbtabelle für bessere Farben |
+| [Ton verbessern](tools/ton-verbessern/index.html) | Normalisieren nach EBU R128, Stille abschneiden, Rauschdämpfung |
 ## Nutzung
 
 Live unter <https://alleskonverter.de>. Die Seite lässt sich über den Browser als App

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio normalisieren &amp; Stille entfernen — kostenlos | Alleskonverter</title>
+<meta name="description" content="Tonaufnahmen auf gleichmäßige Lautstärke bringen, Stille am Anfang und Ende abschneiden und Rauschen dämpfen — ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/ton-verbessern/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Audio normalisieren &amp; Stille entfernen — kostenlos | Alleskonverter">
+<meta property="og:description" content="Tonaufnahmen auf gleichmäßige Lautstärke bringen und Stille abschneiden — ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/ton-verbessern/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Audio normalisieren &amp; Stille entfernen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Ton verbessern — Alleskonverter","url":"https://alleskonverter.de/tools/ton-verbessern/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Audio normalisieren, Stille entfernen und Rauschen dämpfen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was bedeutet Normalisieren?","acceptedAnswer":{"@type":"Answer","text":"Die Lautstärke wird auf ein einheitliches Niveau gebracht — leise Stellen werden angehoben, laute gebändigt. Verwendet wird der Rundfunkstandard EBU R128, an dem sich auch Streamingdienste orientieren."}},{"@type":"Question","name":"Wird meine Aufnahme hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Bearbeitung läuft mit ffmpeg direkt im Browser."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#hoerprobe{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;display:none}
+#hoerprobe.on{display:block}
+#hoerprobe audio{width:100%;margin-top:6px}
+#hoerprobe h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:12px 0 0}
+#hoerprobe h3:first-child{margin-top:0}
+.check{display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:8px}
+.check input{width:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Ton <span>verbessern</span></h1>
+  <p class="sub">Aufnahmen auf gleichmäßige Lautstärke bringen, Stille am Anfang und Ende abschneiden und gleichmäßiges Rauschen dämpfen — nützlich für Sprachnotizen, Interviews und Podcast-Rohmaterial.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Aufnahme</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Audio- oder Videodatei hierher ziehen</strong>
+      <small>MP3, WAV, M4A, OGG, FLAC — bei Video wird die Tonspur genommen</small>
+    </div>
+    <input type="file" id="picker" accept="audio/*,video/*,.m4a,.opus,.mkv,.mov" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch keine Datei geladen.</div>
+
+    <div id="hoerprobe">
+      <h3>Vorher</h3>
+      <audio id="vorher" controls></audio>
+      <h3>Nachher</h3>
+      <audio id="nachher" controls></audio>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="field" id="f-lib">
+      <label>Konverter-Bibliothek (ffmpeg)</label>
+      <button class="ghost" id="loadlib" style="width:100%">Bibliothek laden — einmalig ~31 MB</button>
+      <div class="hint" id="libhint">Kommt von diesem Server, wird danach zwischengespeichert.</div>
+    </div>
+
+    <label class="check"><input type="checkbox" id="normalisieren" checked> Lautstärke angleichen</label>
+    <div class="field" id="f-ziel">
+      <label for="ziel">Ziel-Lautheit</label>
+      <select id="ziel">
+        <option value="-16">−16 LUFS — Podcast, Sprache</option>
+        <option value="-14" selected>−14 LUFS — Streaming, Musik</option>
+        <option value="-23">−23 LUFS — Rundfunk (EBU R128)</option>
+      </select>
+    </div>
+
+    <label class="check"><input type="checkbox" id="stille" checked> Stille am Anfang und Ende abschneiden</label>
+    <label class="check"><input type="checkbox" id="rauschen"> Gleichmäßiges Rauschen dämpfen</label>
+    <label class="check"><input type="checkbox" id="mono"> In Mono zusammenlegen</label>
+
+    <div class="field">
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="mp3" selected>MP3</option>
+        <option value="m4a">M4A (AAC)</option>
+        <option value="wav">WAV — verlustfrei</option>
+        <option value="flac">FLAC — verlustfrei</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Ton verbessern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Eine Sprachnotiz ist mal zu leise, mal übersteuert, vorne und hinten hängen Sekunden Stille dran, und im Hintergrund rauscht die Lüftung. Dieses Werkzeug bringt solche Aufnahmen in Form: Es gleicht die Lautstärke über die ganze Aufnahme an, schneidet Stille weg und kann gleichmäßige Störgeräusche dämpfen. Danach lässt sich vorher und nachher direkt vergleichen.</p>
+  <h3>Was bedeutet „Lautstärke angleichen“?</h3>
+  <p>Nicht einfach lauter drehen, sondern die wahrgenommene Lautheit auf ein einheitliches Niveau bringen — gemessen in LUFS nach dem Rundfunkstandard EBU R128. Leise Passagen kommen hoch, zu laute werden gebändigt, und das Ergebnis klingt durchgehend gleichmäßig. Streamingdienste normalisieren nach demselben Prinzip.</p>
+  <h3>Welchen Zielwert soll ich nehmen?</h3>
+  <p>−16 LUFS ist für gesprochenes Wort und Podcasts üblich, −14 LUFS entspricht dem, was Musik-Streamingdienste verwenden, −23 LUFS ist der klassische Rundfunkwert und damit deutlich leiser.</p>
+  <h3>Wie gut ist die Rauschdämpfung?</h3>
+  <p>Sie hilft bei <em>gleichmäßigen</em> Geräuschen wie Lüftungsrauschen oder Netzbrummen. Gegen Straßenlärm, Stimmengewirr oder Windgeräusche richtet sie wenig aus — dort hilft nur eine bessere Aufnahme. Bei zu starker Dämpfung klingen Stimmen leicht blechern, deshalb ist sie standardmäßig aus.</p>
+  <h3>Wird meine Aufnahme hochgeladen?</h3>
+  <p>Nein. Einmalig wird das Konverter-Programm von dieser Website geladen; die Aufnahme selbst bleibt auf deinem Gerät.</p>
+</section>
+
+<footer>
+  <p>Soll die Aufnahme zusätzlich gekürzt werden, hilft <a href="../medien-schneiden/index.html">Medien schneiden</a>. Dieses Werkzeug braucht einen Webserver.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+const FF = '../../vendor/ffmpeg';
+let ffmpeg = null, src = null;
+
+function skript(url){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = res; s.onerror = () => rej(new Error('Download fehlgeschlagen'));
+    document.head.appendChild(s);
+  });
+}
+
+async function ladeBibliothek(){
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  const btn = AK.$('#loadlib');
+  btn.disabled = true; btn.textContent = 'Lädt …';
+  try{
+    await skript(FF + '/ffmpeg.js');
+    await skript(FF + '/util.js');
+    const { toBlobURL } = FFmpegUtil;
+    ffmpeg = new FFmpegWASM.FFmpeg();
+    ffmpeg.on('progress', ({ progress }) => { if(progress > 0 && progress <= 1) AK.bar(progress); });
+    AK.$('#libhint').textContent = 'ffmpeg-Kern wird geladen (~31 MB) …';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(FF + '/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL(FF + '/ffmpeg-core.wasm', 'application/wasm'),
+      classWorkerURL: await toBlobURL(FF + '/814.ffmpeg.js', 'text/javascript'),
+    });
+    AK.$('#f-lib').innerHTML = '<label>Konverter-Bibliothek (ffmpeg)</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
+    AK.log('ffmpeg bereit.');
+    pruefe();
+  }catch(err){
+    console.error(err);
+    btn.disabled = false; btn.textContent = 'Bibliothek laden — einmalig ~31 MB';
+    AK.log('Bibliothek konnte nicht geladen werden: ' + (err.message || ''), true);
+  }
+}
+
+function addFiles(list){
+  const file = list.find(f => /^(audio|video)\//.test(f.type) ||
+    /\.(mp3|wav|ogg|m4a|flac|aac|opus|wma|aiff?|mp4|mkv|mov|webm)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  src = file;
+  AK.$('#vorher').src = URL.createObjectURL(file);
+  AK.$('#nachher').removeAttribute('src');
+  AK.$('#hoerprobe').classList.add('on');
+  render();
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">♪</div>
+        <div class="meta"><div class="fname">${AK.esc(src.name)}</div>
+        <div class="finfo"><span>${AK.fmtBytes(src.size)}</span></div></div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => {
+      src = null; AK.$('#hoerprobe').classList.remove('on'); render();
+    };
+  }
+  pruefe();
+}
+
+function pruefe(){
+  AK.$('#go').disabled = !(src && ffmpeg && ffmpeg.loaded);
+}
+
+/* Filterkette aus den Einstellungen zusammensetzen */
+function filter(){
+  const teile = [];
+  if(AK.$('#stille').checked){
+    // vorne und hinten trimmen: einmal vorwärts, einmal rückwärts
+    teile.push('silenceremove=start_periods=1:start_duration=0.1:start_threshold=-50dB:detection=peak');
+    teile.push('areverse');
+    teile.push('silenceremove=start_periods=1:start_duration=0.1:start_threshold=-50dB:detection=peak');
+    teile.push('areverse');
+  }
+  if(AK.$('#rauschen').checked) teile.push('afftdn=nf=-25');
+  if(AK.$('#mono').checked) teile.push('pan=mono|c0=0.5*c0+0.5*c1');
+  if(AK.$('#normalisieren').checked) teile.push(`loudnorm=I=${AK.$('#ziel').value}:TP=-1.5:LRA=11`);
+  return teile.join(',');
+}
+
+const KODIERUNG = {
+  mp3:  ['-c:a','libmp3lame','-b:a','192k'],
+  m4a:  ['-c:a','aac','-b:a','192k'],
+  wav:  [],
+  flac: [],
+};
+
+async function verbessern(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  const endung = (src.name.match(/\.([^.]+)$/) || [,'dat'])[1].toLowerCase();
+  const ein = 'eingabe.' + endung;
+  const format = AK.$('#format').value;
+  const aus = 'ausgabe.' + format;
+  const kette = filter();
+
+  try{
+    const was = [];
+    if(AK.$('#stille').checked) was.push('Stille wird abgeschnitten');
+    if(AK.$('#rauschen').checked) was.push('Rauschen wird gedämpft');
+    if(AK.$('#normalisieren').checked) was.push(`Lautstärke auf ${AK.$('#ziel').value} LUFS`);
+    if(AK.$('#mono').checked) was.push('auf Mono zusammengelegt');
+    AK.log(was.length ? was.join(', ') + ' …' : 'Wird umgewandelt …');
+
+    await ffmpeg.writeFile(ein, await FFmpegUtil.fetchFile(src));
+    const args = ['-i', ein, '-vn'];
+    if(kette) args.push('-af', kette);
+    args.push(...KODIERUNG[format], aus);
+
+    const code = await ffmpeg.exec(args);
+    if(code !== 0) throw new Error('ffmpeg meldet Fehlercode ' + code);
+
+    const daten = await ffmpeg.readFile(aus);
+    const blob = new Blob([daten.buffer], { type: format === 'mp3' ? 'audio/mpeg' : 'audio/' + format });
+    AK.bar(1);
+
+    AK.$('#nachher').src = URL.createObjectURL(blob);
+    AK.offerDownload(blob, src.name.replace(/\.[^.]+$/,'') + '-verbessert.' + format);
+    AK.log(`Fertig: ${AK.fmtBytes(src.size)} → ${AK.fmtBytes(blob.size)}. Oben lässt sich vorher und nachher vergleichen.`);
+    AK.stamp(true);
+
+    await ffmpeg.deleteFile(ein).catch(()=>{});
+    await ffmpeg.deleteFile(aus).catch(()=>{});
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Ton verbessern'; pruefe();
+  }
+}
+
+AK.$('#normalisieren').onchange = e => AK.$('#f-ziel').hidden = !e.target.checked;
+AK.$('#loadlib').onclick = ladeBibliothek;
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = verbessern;
+render();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

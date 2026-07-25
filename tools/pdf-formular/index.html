@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF-Formular ausfüllen und speichern — kostenlos | Alleskonverter</title>
+<meta name="description" content="Ausfüllbare PDF-Formulare im Browser ausfüllen und speichern — auf Wunsch schreibgeschützt festschreiben. Ohne Upload, ohne Anmeldung.">
+<link rel="canonical" href="https://alleskonverter.de/tools/pdf-formular/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="PDF-Formular ausfüllen und speichern — kostenlos | Alleskonverter">
+<meta property="og:description" content="Ausfüllbare PDF-Formulare im Browser ausfüllen und speichern — ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/pdf-formular/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF-Formular ausfüllen und speichern — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF-Formular ausfüllen — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-formular/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Ausfüllbare PDF-Formulare im Browser ausfüllen und speichern — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Eingaben übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Formulare enthalten oft sehr persönliche Angaben — hier bleibt alles im Browser."}},{"@type":"Question","name":"Warum findet das Werkzeug keine Felder?","acceptedAnswer":{"@type":"Answer","text":"Weil nicht jedes PDF ein echtes Formular ist. Viele Behördenformulare sind nur eingescannte Seiten ohne Felder — die lassen sich hier nicht ausfüllen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.felder{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+.feld{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:11px 13px}
+.feld label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:5px}
+.feld input[type=text],.feld select{width:100%}
+.feld .art{float:right;font-size:9.5px;border:1px solid var(--rule);padding:0 5px;color:var(--ink-soft)}
+.feld .check{display:flex;align-items:center;gap:8px;font-size:14px}
+.feld .check input{width:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF-<span>Formular</span></h1>
+  <p class="sub">Ausfüllbare PDF-Formulare hier ausfüllen und speichern — ohne Acrobat und ohne dass die Angaben irgendwo hingeschickt werden. Auf Wunsch werden die Felder beim Speichern festgeschrieben.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Formular</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>PDF-Formular hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Formular geladen.</div>
+
+    <div class="felder" id="felder"></div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Felder gefunden</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label><input type="checkbox" id="festschreiben" style="width:auto;margin-right:6px">Felder festschreiben</label>
+      <div class="hint">Eingaben werden Teil der Seite und lassen sich nicht mehr ändern</div>
+    </div>
+
+    <div class="field">
+      <label for="dateiname">Dateiname</label>
+      <input type="text" id="dateiname" value="formular-ausgefuellt.pdf">
+    </div>
+
+    <button class="primary" id="go" disabled>Ausgefüllt speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Viele Anträge, Anmeldungen und Verträge kommen als ausfüllbares PDF. Ohne passendes Programm bleibt oft nur: ausdrucken, per Hand ausfüllen, wieder einscannen. Dieses Werkzeug liest die Formularfelder aus, zeigt sie als normale Eingabefelder an und schreibt die Angaben zurück ins PDF — Textfelder, Ankreuzfelder, Auswahllisten und Optionsfelder.</p>
+  <h3>Werden meine Eingaben übertragen?</h3>
+  <p>Nein, und das ist hier besonders wichtig: In Formularen stehen Name, Anschrift, Geburtsdatum, manchmal Konto- oder Sozialversicherungsnummern. All das bleibt in deinem Browser — es gibt keinen Server, der es entgegennehmen könnte.</p>
+  <h3>Warum findet das Werkzeug bei meinem PDF keine Felder?</h3>
+  <p>Weil nicht jedes PDF ein echtes Formular ist. Viele Behördenformulare sind nur eingescannte oder gedruckte Seiten ohne hinterlegte Felder. Dann hilft dieses Werkzeug nicht — wohl aber <a href="../pdf-stempeln/index.html">PDF stempeln</a>, um wenigstens Text darüberzulegen.</p>
+  <h3>Was bedeutet „Felder festschreiben“?</h3>
+  <p>Die Eingaben werden fest in die Seite gezeichnet, die Formularfelder verschwinden. Das ist sinnvoll, wenn niemand die Angaben nachträglich ändern soll — etwa bevor man das Formular verschickt. Ohne diese Einstellung bleibt das PDF weiterhin ausfüllbar.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Umlaute und Sonderzeichen funktionieren, solange das Formular eine passende Schrift mitbringt — bei sehr alten PDFs kann es vorkommen, dass einzelne Zeichen fehlen.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+const { PDFDocument, PDFTextField, PDFCheckBox, PDFDropdown,
+        PDFRadioGroup, PDFOptionList, PDFButton, PDFSignature } = PDFLib;
+let src = null, felder = [];
+
+/* Feldart bestimmen. Nicht über constructor.name — in der minimierten
+   Bibliothek sind die Klassennamen verkürzt und damit unbrauchbar. */
+function artVon(f){
+  if(f instanceof PDFTextField)   return 'text';
+  if(f instanceof PDFCheckBox)    return 'haken';
+  if(f instanceof PDFDropdown)    return 'auswahl';
+  if(f instanceof PDFRadioGroup)  return 'optionen';
+  if(f instanceof PDFOptionList)  return 'liste';
+  if(f instanceof PDFButton)      return 'knopf';
+  if(f instanceof PDFSignature)   return 'unterschrift';
+  return 'unbekannt';
+}
+
+async function addFiles(list){
+  const file = list.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const doc = await PDFDocument.load(bytes.slice(), { ignoreEncryption:false });
+    const formular = doc.getForm();
+    felder = formular.getFields().map(f => {
+      const art = artVon(f);
+      const eintrag = { name: f.getName(), art, wert:null, auswahl:null };
+      try{
+        if(art === 'text')          eintrag.wert = f.getText() || '';
+        else if(art === 'haken')    eintrag.wert = f.isChecked();
+        else if(art === 'auswahl')  { eintrag.wert = (f.getSelected()||[])[0] || ''; eintrag.auswahl = f.getOptions(); }
+        else if(art === 'optionen') { eintrag.wert = f.getSelected() || ''; eintrag.auswahl = f.getOptions(); }
+        else if(art === 'liste')    { eintrag.wert = (f.getSelected()||[])[0] || ''; eintrag.auswahl = f.getOptions(); }
+      }catch(_){ }
+      return eintrag;
+    });
+    src = { name:file.name, size:file.size, bytes };
+    AK.$('#dateiname').value = file.name.replace(/\.pdf$/i,'') + '-ausgefuellt.pdf';
+    render();
+    if(!felder.length)
+      AK.log('Dieses PDF enthält keine ausfüllbaren Felder — vermutlich ein Scan oder ein reines Druckformular.', true);
+  }catch(err){
+    console.error(err);
+    src = null; felder = []; render();
+    AK.log('Datei kann nicht gelesen werden — vermutlich verschlüsselt oder beschädigt.', true);
+  }
+}
+
+const ARTNAME = {
+  text:'Text', haken:'Ankreuzfeld', auswahl:'Auswahl', optionen:'Optionen',
+  liste:'Liste', knopf:'Schaltfläche', unterschrift:'Unterschrift', unbekannt:'unbekannt',
+};
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta"><div class="fname">${AK.esc(src.name)}</div>
+        <div class="finfo"><span>${AK.fmtBytes(src.size)}</span>
+        <span class="badge ${felder.length ? 'b-ok' : 'b-lock'}">${felder.length ? felder.length + ' Felder' : 'kein Formular'}</span></div></div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => { src = null; felder = []; render(); };
+  }
+
+  const wrap = AK.$('#felder');
+  wrap.innerHTML = '';
+  felder.forEach((f, i) => {
+    if(f.art === 'knopf' || f.art === 'unterschrift') return;
+    const div = document.createElement('div');
+    div.className = 'feld';
+    const id = 'f' + i;
+    const marke = `<span class="art">${ARTNAME[f.art] || f.art}</span>`;
+    const bez = AK.esc(f.name);
+
+    if(f.art === 'haken'){
+      div.innerHTML = `<label class="check" for="${id}">
+        <input type="checkbox" id="${id}" ${f.wert ? 'checked' : ''}> <span>${bez}</span></label>${marke}`;
+      div.querySelector('input').onchange = e => f.wert = e.target.checked;
+    }else if(f.auswahl && f.auswahl.length){
+      div.innerHTML = `<label for="${id}">${marke}<span>${bez}</span></label>
+        <select id="${id}"><option value="">— nicht ausgewählt —</option>${
+          f.auswahl.map(o => `<option value="${AK.esc(o)}"${o === f.wert ? ' selected' : ''}>${AK.esc(o)}</option>`).join('')
+        }</select>`;
+      div.querySelector('select').onchange = e => f.wert = e.target.value;
+    }else{
+      div.innerHTML = `<label for="${id}">${marke}<span>${bez}</span></label>
+        <input type="text" id="${id}" value="${AK.esc(f.wert || '')}">`;
+      div.querySelector('input').oninput = e => f.wert = e.target.value;
+    }
+    wrap.appendChild(div);
+  });
+
+  const nutzbar = felder.filter(f => f.art !== 'knopf' && f.art !== 'unterschrift').length;
+  AK.$('#anzahl').innerHTML = nutzbar + '<small>Felder gefunden</small>';
+  AK.$('#go').disabled = !src || !nutzbar;
+}
+
+async function speichern(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.3);
+  try{
+    const doc = await PDFDocument.load(src.bytes.slice(), { ignoreEncryption:false });
+    const formular = doc.getForm();
+    let gesetzt = 0, uebersprungen = 0;
+
+    for(const f of felder){
+      try{
+        if(f.art === 'text'){ formular.getTextField(f.name).setText(String(f.wert ?? '')); gesetzt++; }
+        else if(f.art === 'haken'){
+          const c = formular.getCheckBox(f.name);
+          f.wert ? c.check() : c.uncheck(); gesetzt++;
+        }
+        else if(f.art === 'auswahl'){
+          const d = formular.getDropdown(f.name);
+          f.wert ? d.select(f.wert) : d.clear(); gesetzt++;
+        }
+        else if(f.art === 'optionen'){
+          const r = formular.getRadioGroup(f.name);
+          if(f.wert) r.select(f.wert); else r.clear();
+          gesetzt++;
+        }
+        else if(f.art === 'liste'){
+          const o = formular.getOptionList(f.name);
+          f.wert ? o.select(f.wert) : o.clear(); gesetzt++;
+        }
+      }catch(err){
+        uebersprungen++;
+        console.warn('Feld übersprungen:', f.name, err.message);
+      }
+    }
+
+    AK.bar(0.7);
+    if(AK.$('#festschreiben').checked) formular.flatten();
+    doc.setProducer('Alleskonverter');
+    const bytes = await doc.save();
+    AK.bar(1);
+    AK.offerDownload(new Blob([bytes], {type:'application/pdf'}),
+                     AK.ensureExt(AK.$('#dateiname').value || 'formular-ausgefuellt', 'pdf'));
+    AK.log(`Fertig: ${gesetzt} Felder gefüllt` +
+           (uebersprungen ? `, ${uebersprungen} übersprungen (nicht unterstützt)` : '') +
+           (AK.$('#festschreiben').checked ? ', festgeschrieben' : '') + `, ${AK.fmtBytes(bytes.length)}.`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Ausgefüllt speichern'; render();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = speichern;
+render();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

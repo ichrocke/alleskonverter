@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeuge 34 und 35)
+
+### Hinzugefügt
+- Werkzeug **PDF-Formular ausfüllen** (`tools/pdf-formular/`): liest die Formularfelder eines PDFs aus und zeigt sie als normale Eingabefelder — Text, Ankreuzfelder, Auswahllisten und Optionsfelder. Die Angaben werden ins PDF zurückgeschrieben, auf Wunsch festgeschrieben, sodass sie sich nicht mehr ändern lassen. Enthält ein PDF gar keine Felder, sagt das Werkzeug das klar statt still nichts zu tun.
+- Werkzeug **Ton verbessern** (`tools/ton-verbessern/`): gleicht die Lautheit nach dem Rundfunkstandard EBU R128 an (drei Zielwerte für Podcast, Streaming und Rundfunk), schneidet Stille am Anfang und Ende ab, dämpft gleichmäßiges Rauschen und legt auf Wunsch auf Mono zusammen. Mit direktem Hörvergleich vorher/nachher.
+
+### Behoben
+- PDF-Formular: Die Feldart wurde zunächst über `constructor.name` bestimmt — in der minimierten pdf-lib sind die Klassennamen jedoch verkürzt, sodass kein einziges Feld gefüllt wurde. Jetzt über `instanceof` gegen die exportierten Klassen.
+
 ## 2026-07-26 (Werkzeuge 32 und 33)
 
 ### Hinzugefügt
