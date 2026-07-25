@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audio &amp; Video — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Audio &amp; <span>Video</span></h1>
+  <p class="sub">MP3, WAV, OGG, M4A, FLAC, MP4, WebM, GIF — konvertieren oder die Tonspur aus einem Video ziehen. Die Umwandlung läuft komplett lokal; nur die Konverter-Bibliothek kommt einmalig aus dem Netz.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Datei</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Audio- oder Videodatei auswählen">
+      <strong>Audio- oder Videodatei hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="audio/*,video/*,.mkv,.avi,.mov,.wmv,.flv,.opus,.aiff,.wma" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch keine Datei geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="field" id="f-lib">
+      <label>Konverter-Bibliothek (ffmpeg)</label>
+      <button class="ghost" id="loadlib" style="width:100%">Bibliothek laden — einmalig ~31 MB</button>
+      <div class="hint" id="libhint">Wird vom CDN geladen und vom Browser zwischengespeichert.</div>
+    </div>
+
+    <div class="field">
+      <label for="target">Zielformat</label>
+      <select id="target">
+        <optgroup label="Audio">
+          <option value="mp3" selected>MP3</option>
+          <option value="wav">WAV</option>
+          <option value="ogg">OGG (Vorbis)</option>
+          <option value="m4a">M4A (AAC)</option>
+          <option value="flac">FLAC — verlustfrei</option>
+        </optgroup>
+        <optgroup label="Video">
+          <option value="mp4">MP4 (H.264)</option>
+          <option value="webm">WebM (VP8)</option>
+          <option value="gif">GIF — kurze Clips</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field" id="f-abr">
+      <label for="abr">Audio-Bitrate</label>
+      <select id="abr">
+        <option value="128k">128 kbit/s — klein</option>
+        <option value="192k" selected>192 kbit/s — gut</option>
+        <option value="256k">256 kbit/s — sehr gut</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-scale" hidden>
+      <label for="scale">Videogröße</label>
+      <select id="scale">
+        <option value="0" selected>Original</option>
+        <option value="1280">max. 1280 px breit — 720p</option>
+        <option value="854">max. 854 px breit — 480p</option>
+        <option value="480">max. 480 px breit — GIF/Web</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Konvertieren</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p><strong>So funktioniert es:</strong> Das Werkzeug nutzt ffmpeg als WebAssembly — dieselbe Software, die auch Profi-Tools verwenden, nur im Browser. Deine Datei bleibt trotzdem lokal: Heruntergeladen wird nur das Programm, nie deine Daten hochgeladen. Videokonvertierung ist spürbar langsamer als am Rechner installierte Programme — für Alltagsdateien reicht es gut. Wird ein Video als Audioformat (z.&nbsp;B. MP3) ausgegeben, wird automatisch nur die Tonspur übernommen.</p>
+</footer>
+</div>
+
+<script>
+const CDN_FFMPEG = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd';
+const CDN_UTIL   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd';
+const CDN_CORE   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+
+let ffmpeg = null, src = null;
+
+function script(url){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = res;
+    s.onerror = () => rej(new Error('Download fehlgeschlagen: ' + url));
+    document.head.appendChild(s);
+  });
+}
+
+async function loadLib(){
+  const btn = AK.$('#loadlib');
+  btn.disabled = true; btn.textContent = 'Lädt …';
+  try{
+    await script(CDN_FFMPEG + '/ffmpeg.js');
+    await script(CDN_UTIL + '/index.js');
+    const { toBlobURL } = FFmpegUtil;
+
+    ffmpeg = new FFmpegWASM.FFmpeg();
+    ffmpeg.on('log', ({ message }) => { if(/error|invalid/i.test(message)) AK.log(message, true); });
+    ffmpeg.on('progress', ({ progress }) => { if(progress > 0 && progress <= 1) AK.bar(progress); });
+
+    AK.$('#libhint').textContent = 'ffmpeg-Kern wird geladen (~31 MB) …';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(CDN_CORE + '/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL(CDN_CORE + '/ffmpeg-core.wasm', 'application/wasm'),
+      classWorkerURL: await toBlobURL(CDN_FFMPEG + '/814.ffmpeg.js', 'text/javascript'),
+    });
+
+    AK.$('#f-lib').innerHTML = '<label>Konverter-Bibliothek (ffmpeg)</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
+    AK.log('ffmpeg bereit.');
+    update();
+  }catch(err){
+    console.error(err);
+    btn.disabled = false; btn.textContent = 'Bibliothek laden — einmalig ~31 MB';
+    AK.log('Bibliothek konnte nicht geladen werden — besteht eine Internetverbindung? ' + (err.message || ''), true);
+  }
+}
+
+function addFiles(files){
+  const file = files[0];
+  if(!file) return;
+  src = file;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const isVideo = /^video\//.test(file.type) || /\.(mp4|mkv|avi|mov|wmv|flv|webm|m4v)$/i.test(file.name);
+  render(isVideo);
+  if(isVideo && ['mp3','wav','ogg','m4a','flac'].includes(AK.$('#target').value) === false){
+    AK.$('#target').value = 'mp4';
+  }
+  if(!isVideo) AK.$('#target').value = ['mp3','wav','ogg','m4a','flac'].includes(AK.$('#target').value) ? AK.$('#target').value : 'mp3';
+  targetChanged();
+}
+
+function render(isVideo){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">${isVideo ? 'AV' : 'A'}</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(src.name)}</div>
+          <div class="finfo"><span>${AK.fmtBytes(src.size)}</span><span>${isVideo ? 'Video' : 'Audio'}</span></div>
+        </div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => { src = null; render(false); update(); };
+  }
+  update();
+}
+
+function targetChanged(){
+  const t = AK.$('#target').value;
+  AK.$('#f-scale').hidden = !['mp4','webm','gif'].includes(t);
+  AK.$('#f-abr').hidden = ['wav','flac','gif'].includes(t);
+}
+
+function update(){
+  AK.$('#go').disabled = !src || !ffmpeg || !ffmpeg.loaded;
+}
+
+function buildArgs(target, inName, outName){
+  const abr = AK.$('#abr').value;
+  const maxW = +AK.$('#scale').value;
+  const vf = maxW ? [`-vf`, `scale='min(${maxW},iw)':-2${target === 'gif' ? ':flags=lanczos,fps=12' : ''}`]
+                  : (target === 'gif' ? ['-vf', 'fps=12'] : []);
+  switch(target){
+    case 'mp3':  return ['-i', inName, '-vn', '-c:a', 'libmp3lame', '-b:a', abr, outName];
+    case 'wav':  return ['-i', inName, '-vn', outName];
+    case 'ogg':  return ['-i', inName, '-vn', '-c:a', 'libvorbis', '-b:a', abr, outName];
+    case 'm4a':  return ['-i', inName, '-vn', '-c:a', 'aac', '-b:a', abr, outName];
+    case 'flac': return ['-i', inName, '-vn', outName];
+    case 'mp4':  return ['-i', inName, ...vf, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-c:a', 'aac', '-b:a', abr, outName];
+    case 'webm': return ['-i', inName, ...vf, '-c:v', 'libvpx', '-crf', '10', '-b:v', '1M', '-c:a', 'libvorbis', '-b:a', abr, outName];
+    case 'gif':  return ['-i', inName, ...vf, '-an', outName];
+  }
+}
+
+const MIME = { mp3:'audio/mpeg', wav:'audio/wav', ogg:'audio/ogg', m4a:'audio/mp4', flac:'audio/flac',
+               mp4:'video/mp4', webm:'video/webm', gif:'image/gif' };
+
+async function run(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  const target = AK.$('#target').value;
+  const ext = (src.name.match(/\.([^.]+)$/) || [,'dat'])[1].toLowerCase();
+  const inName = 'eingabe.' + ext;
+  const outName = 'ausgabe.' + target;
+
+  try{
+    AK.log(`${src.name} wird konvertiert → ${target.toUpperCase()} …`);
+    AK.log('Bei Videos kann das je nach Länge einige Minuten dauern.');
+    await ffmpeg.writeFile(inName, await FFmpegUtil.fetchFile(src));
+    const code = await ffmpeg.exec(buildArgs(target, inName, outName));
+    if(code !== 0) throw new Error('ffmpeg meldet Fehlercode ' + code);
+
+    const data = await ffmpeg.readFile(outName);
+    const blob = new Blob([data.buffer], { type: MIME[target] });
+    AK.offerDownload(blob, AK.withExt(src.name, target));
+    AK.log(`Fertig: ${AK.fmtBytes(blob.size)}`);
+    AK.bar(1); AK.stamp(true);
+
+    await ffmpeg.deleteFile(inName).catch(()=>{});
+    await ffmpeg.deleteFile(outName).catch(()=>{});
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Konvertieren'; update();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#loadlib').onclick = loadLib;
+AK.$('#target').onchange = targetChanged;
+AK.$('#go').onclick = run;
+targetChanged();
+</script>
+</body>
+</html>
