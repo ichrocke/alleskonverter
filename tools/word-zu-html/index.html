@@ -92,6 +92,7 @@
 <script src="../../vendor/mammoth.browser.min.js"></script>
 <script src="../../js/ui.js?v=20260726"></script>
 <script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
 <script src="../../js/dropzone.js?v=20260726"></script>
 <script>
 let src = null; // { name, buffer }
@@ -132,14 +133,7 @@ async function run(){
 
       const payload = mode === 'fragment'
         ? result.value
-        : `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(base)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}</style>\n</head>\n<body>\n${result.value}\n<script>
-/* Website als App installierbar machen und offline verfügbar halten.
-   Über file:// gibt es keine Service Worker — dort still überspringen. */
-if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
-}
-</script>
-</body>\n</html>\n`;
+        : `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(base)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}</style>\n</head>\n<body>\n${result.value}\n</body>\n</html>\n`;
       AK.offerDownload(new Blob([payload], {type:'text/html;charset=utf-8'}), base + '.html', '.html herunterladen');
     }
     AK.bar(1);
@@ -162,6 +156,11 @@ function count(text){
 AK.dropzone('#drop', '#picker', addFiles);
 AK.$('#go').onclick = run;
 AK.$('#mode').onchange = run;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
 </script>
 </body>
 </html>

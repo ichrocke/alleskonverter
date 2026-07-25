@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Tests, Einstellungen, wichtiger Fehler behoben)
+
+### Behoben
+- **Word → HTML und Markdown ↔ HTML waren seit dem PWA-Einbau kaputt.** Das Skript, das die Service-Worker-Registrierung auf allen Seiten ergänzt hat, setzte sie beim *ersten* `</body>` ein — und das steht in diesen beiden Werkzeugen mitten in einem Textbaustein. Dadurch riss der Browser das Seitenskript an dieser Stelle ab, und keine der Funktionen wurde geladen. Aufgefallen ist es erst durch die neue Testsuite. Beide Seiten sind repariert, die Registrierung sitzt jetzt an der richtigen Stelle.
+
+### Hinzugefügt
+- **Automatische Tests** (`tests/`, `npm test`) und eine GitHub Action, die bei jedem Push läuft: Ein kleiner Webserver liefert die Website aus, ein echter Browser öffnet jedes der 24 Werkzeuge, schiebt eine passende Testdatei hinein und prüft, ob ein Download entsteht — dazu werden Konsolenfehler und Fehlermeldungen im Protokoll überwacht. Die Testdateien (PDF, PNG, DOCX, CSV, SRT) erzeugt das Skript selbst, ganz ohne zusätzliche Abhängigkeiten. Werkzeuge mit großen Modellen (ffmpeg, Texterkennung, Freistellen) werden auf Ladefähigkeit geprüft, statt jedes Mal 30 MB zu ziehen.
+- **Werkzeuge merken sich ihre Einstellungen** (`js/einstellungen.js`): Zielformat, Qualität, Auflösung und Häkchen stehen beim nächsten Besuch wieder so, wie man sie zuletzt hatte — gespeichert nur lokal im Browser. Ausdrücklich ausgenommen sind Passwortfelder, Dateinamen, Texteingaben und Seitenbereiche; das ist über eine Sperrliste geregelt und im Test abgesichert. Datenschutzerklärung entsprechend präzisiert.
+
 ## 2026-07-26 (Werkzeug 24)
 
 ### Hinzugefügt
