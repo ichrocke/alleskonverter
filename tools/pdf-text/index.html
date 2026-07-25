@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Text auslesen — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Text <span>auslesen</span></h1>
+  <p class="sub">Den kompletten Text eines PDFs extrahieren — zum Kopieren oder als .txt-Datei. Funktioniert bei allen PDFs mit echtem Text (keine reinen Scans).</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Ergebnis</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF auswählen">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <textarea class="pane" id="out" style="margin-top:18px" placeholder="Der extrahierte Text erscheint hier …" readonly></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="ghost" id="copy" disabled>In die Zwischenablage</button>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="charcount">0<small>Zeichen extrahiert</small></div>
+
+    <div class="field" style="margin-top:16px" id="f-pw" hidden>
+      <label for="pw">Öffnungspasswort</label>
+      <input type="password" id="pw" placeholder="Passwort eingeben, dann erneut laden">
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="ranges">Seiten</label>
+      <input type="text" id="ranges" placeholder="z. B. 1-3, 8 — leer = alle">
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="marks" checked style="width:auto;margin-right:6px">Seitenmarkierungen einfügen</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Auslesen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>Bleibt das Ergebnis leer, besteht das PDF nur aus gescannten Bildern ohne Textebene — dafür bräuchte es eine Texterkennung (OCR), die dieses Werkzeug bewusst nicht mitbringt.</p>
+</footer>
+</div>
+
+<script>
+let src = null; // { name, bytes, pages, password }
+
+async function addFiles(files){
+  const file = files.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  try{
+    const doc = await AK.openWithPdfjs(bytes, AK.$('#pw').value);
+    src = { name:file.name, bytes, pages:doc.numPages, password:AK.$('#pw').value };
+    doc.destroy();
+    AK.$('#f-pw').hidden = true;
+    AK.$('#go').disabled = false;
+    AK.log(`${file.name}: ${src.pages} Seiten geladen.`);
+  }catch(err){
+    src = null; AK.$('#go').disabled = true;
+    if(err && err.name === 'PasswordException'){
+      AK.$('#f-pw').hidden = false;
+      AK.log('Dieses PDF braucht ein Öffnungspasswort — eingeben und Datei erneut hineinziehen.', true);
+    }else{
+      AK.log('Datei kann nicht gelesen werden.', true);
+    }
+  }
+}
+
+async function run(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const marks = AK.$('#marks').checked;
+
+  try{
+    const idx = AK.parseRanges(AK.$('#ranges').value, src.pages);
+    const doc = await AK.openWithPdfjs(src.bytes, src.password);
+    const parts = [];
+
+    for(let n = 0; n < idx.length; n++){
+      const page = await doc.getPage(idx[n]+1);
+      const content = await page.getTextContent();
+      let text = '', lastY = null;
+      for(const item of content.items){
+        if(lastY !== null && Math.abs(item.transform[5] - lastY) > 2) text += '\n';
+        else if(text && !text.endsWith('\n')) text += item.hasEOL ? '\n' : ' ';
+        text += item.str;
+        lastY = item.transform[5];
+      }
+      page.cleanup();
+      parts.push((marks ? `───── Seite ${idx[n]+1} ─────\n\n` : '') + text.trim());
+      AK.bar((n+1)/idx.length);
+    }
+    await doc.destroy();
+
+    const full = parts.join('\n\n');
+    AK.$('#out').value = full;
+    AK.$('#charcount').innerHTML = full.length.toLocaleString('de-DE') + '<small>Zeichen extrahiert</small>';
+    AK.$('#copy').disabled = !full;
+
+    if(full.trim()){
+      AK.offerDownload(new Blob([full], {type:'text/plain;charset=utf-8'}), src.name.replace(/\.pdf$/i,'') + '.txt', '.txt herunterladen');
+      AK.log(`Fertig: ${idx.length} Seiten ausgelesen.`);
+      AK.stamp(true);
+    }else{
+      AK.log('Kein Text gefunden — vermutlich ein reiner Scan ohne Textebene.', true);
+    }
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !src; go.textContent = 'Auslesen';
+  }
+}
+
+AK.$('#copy').onclick = async () => {
+  await navigator.clipboard.writeText(AK.$('#out').value);
+  AK.log('In die Zwischenablage kopiert.');
+};
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = run;
+</script>
+</body>
+</html>
