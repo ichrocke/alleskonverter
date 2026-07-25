@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF aufteilen — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF <span>aufteilen</span></h1>
+  <p class="sub">Seitenbereiche als neues PDF herausziehen, das Dokument in Einzelseiten zerlegen oder in gleich große Blöcke schneiden.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF auswählen">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="pagecount">0<small>Seiten im Dokument</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="mode">Was soll passieren?</label>
+      <select id="mode">
+        <option value="range">Seitenbereich extrahieren</option>
+        <option value="single">Jede Seite als eigene Datei (ZIP)</option>
+        <option value="chunk">In Blöcke zu N Seiten teilen (ZIP)</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-range">
+      <label for="ranges">Seiten</label>
+      <input type="text" id="ranges" placeholder="z. B. 1-3, 8, 11-12">
+      <div class="hint">leer = alle Seiten</div>
+    </div>
+
+    <div class="field" id="f-chunk" hidden>
+      <label for="chunksize">Seiten pro Block</label>
+      <input type="number" id="chunksize" value="10" min="1" style="width:100%">
+    </div>
+
+    <button class="primary" id="go" disabled>Aufteilen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>Die Seiten werden verlustfrei übernommen — Text und Vektoren bleiben scharf. Passwortgeschützte PDFs bitte zuerst mit dem Werkzeug <a href="../pdf-zusammenfuegen/index.html">PDF zusammenfügen</a> entsperren und neu speichern.</p>
+</footer>
+</div>
+
+<script>
+const { PDFDocument } = PDFLib;
+let src = null; // { name, bytes, pages, doc }
+
+async function addFiles(files){
+  const file = files.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const doc = await PDFDocument.load(bytes, { ignoreEncryption:false });
+    src = { name:file.name, size:file.size, bytes, pages:doc.getPageCount() };
+    render();
+  }catch(err){
+    src = null; render();
+    AK.log('Datei kann nicht gelesen werden — vermutlich verschlüsselt oder beschädigt.', true);
+  }
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(src.name)}</div>
+          <div class="finfo"><span>${AK.fmtBytes(src.size)}</span><span>${src.pages} Seiten</span><span class="badge b-ok">verlustfrei</span></div>
+        </div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => { src = null; render(); };
+  }
+  AK.$('#pagecount').innerHTML = (src ? src.pages : 0) + '<small>Seiten im Dokument</small>';
+  AK.$('#go').disabled = !src;
+}
+
+AK.$('#mode').onchange = () => {
+  const m = AK.$('#mode').value;
+  AK.$('#f-range').hidden = m !== 'range';
+  AK.$('#f-chunk').hidden = m !== 'chunk';
+};
+
+async function extract(indices){
+  const out = await PDFDocument.create();
+  const doc = await PDFDocument.load(src.bytes, { ignoreEncryption:false });
+  const copied = await out.copyPages(doc, indices);
+  copied.forEach(p => out.addPage(p));
+  out.setProducer('Alleskonverter');
+  return out.save();
+}
+
+const baseName = () => src.name.replace(/\.pdf$/i, '');
+
+async function run(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const mode = AK.$('#mode').value;
+
+  try{
+    if(mode === 'range'){
+      const idx = AK.parseRanges(AK.$('#ranges').value, src.pages);
+      const bytes = await extract(idx);
+      AK.bar(1);
+      AK.offerDownload(new Blob([bytes], {type:'application/pdf'}), baseName() + '-auszug.pdf');
+      AK.log(`Fertig: ${idx.length} Seiten extrahiert.`);
+    }else{
+      const chunk = mode === 'single' ? 1 : Math.max(1, +AK.$('#chunksize').value || 1);
+      const files = [];
+      const all = Array.from({length:src.pages}, (_,i)=>i);
+      const digits = String(src.pages).length;
+      for(let start = 0; start < all.length; start += chunk){
+        const part = all.slice(start, start + chunk);
+        const bytes = await extract(part);
+        const label = chunk === 1
+          ? String(start+1).padStart(digits,'0')
+          : `${String(start+1).padStart(digits,'0')}-${String(Math.min(start+chunk, src.pages)).padStart(digits,'0')}`;
+        files.push({ name:`${baseName()}-seite-${label}.pdf`, data:bytes });
+        AK.bar(Math.min(1, (start+chunk) / all.length));
+      }
+      await AK.offerZip(files, baseName() + '-aufgeteilt.zip');
+      AK.log(`Fertig: ${files.length} Dateien im ZIP.`);
+    }
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !src; go.textContent = 'Aufteilen';
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = run;
+render();
+</script>
+</body>
+</html>
