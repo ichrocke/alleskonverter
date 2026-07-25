@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF → Bild — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF <span>→ Bild</span></h1>
+  <p class="sub">Seiten eines PDFs als PNG oder JPEG exportieren — eine Seite als einzelnes Bild, mehrere als ZIP. Auflösung frei wählbar.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF auswählen">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="pagecount">0<small>Seiten im Dokument</small></div>
+
+    <div class="field" style="margin-top:16px" id="f-pw" hidden>
+      <label for="pw">Öffnungspasswort</label>
+      <input type="password" id="pw" placeholder="Passwort eingeben, dann erneut laden">
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="ranges">Seiten</label>
+      <input type="text" id="ranges" placeholder="z. B. 1-3, 8 — leer = alle">
+    </div>
+
+    <div class="field">
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="image/png">PNG — verlustfrei</option>
+        <option value="image/jpeg" selected>JPEG — kleine Dateien</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="dpi">Auflösung</label>
+      <select id="dpi">
+        <option value="96">96 dpi — Bildschirm</option>
+        <option value="150" selected>150 dpi — gut lesbar</option>
+        <option value="200">200 dpi — fein</option>
+        <option value="300">300 dpi — Druckqualität</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-quality">
+      <label for="quality">JPEG-Qualität: <span id="qval">90</span> %</label>
+      <input type="range" id="quality" min="50" max="100" value="90" style="width:100%">
+    </div>
+
+    <button class="primary" id="go" disabled>Exportieren</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>PNG ist verlustfrei und ideal für Text und Grafik, JPEG deutlich kleiner und gut für Fotos und Scans. 150&nbsp;dpi reichen fürs Ansehen am Bildschirm, 300&nbsp;dpi für den Druck.</p>
+</footer>
+</div>
+
+<script>
+let src = null; // { name, bytes, pages, password }
+
+async function addFiles(files){
+  const file = files.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  await tryOpen(file.name, file.size, bytes, AK.$('#pw').value);
+}
+
+async function tryOpen(name, size, bytes, password){
+  try{
+    const doc = await AK.openWithPdfjs(bytes, password);
+    src = { name, size, bytes, pages:doc.numPages, password };
+    doc.destroy();
+    AK.$('#f-pw').hidden = true;
+    render();
+  }catch(err){
+    src = null; render();
+    if(err && err.name === 'PasswordException'){
+      AK.$('#f-pw').hidden = false;
+      AK.log(password ? 'Passwort stimmt nicht.' : 'Dieses PDF braucht ein Öffnungspasswort — eingeben und Datei erneut hineinziehen.', true);
+    }else{
+      AK.log('Datei kann nicht gelesen werden.', true);
+    }
+  }
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(src.name)}</div>
+          <div class="finfo"><span>${AK.fmtBytes(src.size)}</span><span>${src.pages} Seiten</span></div>
+        </div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => { src = null; render(); };
+  }
+  AK.$('#pagecount').innerHTML = (src ? src.pages : 0) + '<small>Seiten im Dokument</small>';
+  AK.$('#go').disabled = !src;
+}
+
+AK.$('#quality').oninput = e => AK.$('#qval').textContent = e.target.value;
+AK.$('#format').onchange = () => AK.$('#f-quality').style.display = AK.$('#format').value === 'image/jpeg' ? '' : 'none';
+
+async function run(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  const mime = AK.$('#format').value;
+  const ext = mime === 'image/png' ? 'png' : 'jpg';
+  const dpi = +AK.$('#dpi').value;
+  const quality = +AK.$('#quality').value / 100;
+
+  try{
+    const idx = AK.parseRanges(AK.$('#ranges').value, src.pages);
+    const doc = await AK.openWithPdfjs(src.bytes, src.password);
+    const digits = String(src.pages).length;
+    const files = [];
+
+    for(let n = 0; n < idx.length; n++){
+      const { canvas } = await AK.renderPage(doc, idx[n], dpi/72);
+      const blob = await new Promise(r => canvas.toBlob(r, mime, quality));
+      AK.freeCanvas(canvas);
+      files.push({ name:`${src.name.replace(/\.pdf$/i,'')}-seite-${String(idx[n]+1).padStart(digits,'0')}.${ext}`, data:blob });
+      AK.bar((n+1)/idx.length);
+      AK.log(`Seite ${idx[n]+1} gerendert (${AK.fmtBytes(blob.size)})`);
+    }
+    await doc.destroy();
+
+    if(files.length === 1){
+      AK.offerDownload(files[0].data, files[0].name);
+    }else{
+      await AK.offerZip(files, src.name.replace(/\.pdf$/i,'') + '-bilder.zip');
+    }
+    AK.log(`Fertig: ${files.length} ${files.length === 1 ? 'Bild' : 'Bilder'}.`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !src; go.textContent = 'Exportieren';
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = run;
+render();
+</script>
+</body>
+</html>
