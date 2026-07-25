@@ -18,12 +18,11 @@
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
-<meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E6E4DE">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "PDF zusammenfügen — Alleskonverter", "url": "https://alleskonverter.de/tools/pdf-zusammenfuegen/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Mehrere PDFs online zu einer Datei zusammenfügen — kostenlos, ohne Upload, ohne Anmeldung. Läuft 100 % lokal im Browser, auch mit passwortgeschützten PDFs."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Funktioniert das auch mit geschützten PDFs?", "acceptedAnswer": {"@type": "Answer", "text": "Ja. Schreibgeschützte oder verschlüsselte PDFs, die sich nicht direkt kopieren lassen, werden automatisch gerendert und als Bild eingebettet — im Druck sieht das identisch aus. Bei PDFs mit Öffnungspasswort fragt die Zeile nach dem Passwort."}}, {"@type": "Question", "name": "Bleibt die Qualität erhalten?", "acceptedAnswer": {"@type": "Answer", "text": "Bei normalen PDFs ja: Seiten werden verlustfrei übernommen, Text und Vektoren bleiben gestochen scharf und durchsuchbar. Nur geschützte PDFs werden gerastert (Auflösung wählbar bis 300 dpi)."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../css/base.css">
-<link rel="stylesheet" href="../../css/tools.css">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
 </head>
 <body>
 <div class="wrap">
@@ -98,10 +97,10 @@
 
 <script src="../../vendor/pdf-lib.min.js"></script>
 <script src="../../vendor/pdf.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
-<script src="../../js/filelist.js"></script>
-<script src="../../js/pdf-common.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/filelist.js?v=20260726"></script>
+<script src="../../js/pdf-common.js?v=20260726"></script>
 <script>
 const { PDFDocument } = PDFLib;
 const entries = [];

@@ -38,7 +38,23 @@ ErrorDocument 404 /404.html
   ExpiresByType application/manifest+json "access plus 1 day"
 </IfModule>
 
+# ----- Was sich ändern kann, muss geprüft werden -----
+# mod_expires setzt oben pauschale Zeiten; eigener Code darf davon nicht erfasst
+# werden, sonst sehen wiederkehrende Besucher nach einem Deploy altes CSS/JS.
+<IfModule mod_setenvif.c>
+  SetEnvIf Request_URI "^/(css|js)/"                 EIGENER_CODE
+  SetEnvIf Request_URI "^/tools/[^/]+/(css|js)/"     EIGENER_CODE
+  SetEnvIf Request_URI "^/(sw\.js|manifest\.webmanifest)$" EIGENER_CODE
+  SetEnvIf Request_URI "^/assets/"                   EIGENE_BILDER
+</IfModule>
+
 <IfModule mod_headers.c>
+  # Eigener Code: nie ungeprüft aus dem Cache. Der Browser fragt mit ETag nach und
+  # bekommt in aller Regel ein winziges „304 unverändert“ zurück.
+  Header set Cache-Control "no-cache, must-revalidate" env=EIGENER_CODE
+  # Eigene Bilder ändern sich selten, sollen aber nicht monatelang festhängen
+  Header set Cache-Control "public, max-age=86400, must-revalidate" env=EIGENE_BILDER
+
   # HTML immer frisch holen, damit Änderungen sofort ankommen
   <FilesMatch "\.(html|json|xml|webmanifest)$">
     Header set Cache-Control "no-cache, must-revalidate"

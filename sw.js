@@ -6,7 +6,7 @@
    • Bibliotheken, Schriften, Bilder → Cache zuerst (unveränderlich, spart Ladezeit)
    • ffmpeg (~32 MB)       → nur bei Bedarf, wird nach dem ersten Einsatz behalten
 */
-const VERSION = '2026-07-26';
+const VERSION = '2026-07-26b';
 const CACHE = 'alleskonverter-' + VERSION;
 
 /* Beim Installieren: Grundgerüst und alle Bibliotheken mitnehmen (~5 MB).
@@ -86,18 +86,23 @@ self.addEventListener('activate', event => {
   })());
 });
 
-/* Antwort im Hintergrund auffrischen */
+/* Beim Suchen im Cache die Versionskennung (?v=…) ignorieren —
+   sonst gilt base.css?v=1 als andere Datei als base.css. */
+const SUCHE = { ignoreSearch: true };
+
 async function netzZuerst(request, cache){
   try{
-    const res = await fetch(request);
+    // 'no-cache' erzwingt eine Rückfrage beim Server, selbst wenn der
+    // Browser-Cache die Datei noch für frisch hält.
+    const res = await fetch(request, { cache: 'no-cache' });
     if(res && res.ok) cache.put(request, res.clone());
     return res;
   }catch(err){
-    const treffer = await cache.match(request);
+    const treffer = await cache.match(request, SUCHE);
     if(treffer) return treffer;
     // Bei Seitenaufrufen ohne Netz und ohne Cache: Startseite anbieten
     if(request.mode === 'navigate'){
-      const start = await cache.match('/');
+      const start = await cache.match('/', SUCHE);
       if(start) return start;
     }
     throw err;
@@ -105,7 +110,7 @@ async function netzZuerst(request, cache){
 }
 
 async function cacheZuerst(request, cache){
-  const treffer = await cache.match(request);
+  const treffer = await cache.match(request, SUCHE);
   if(treffer) return treffer;
   const res = await fetch(request);
   if(res && res.ok) cache.put(request, res.clone());

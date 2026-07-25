@@ -18,12 +18,11 @@
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
-<meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E6E4DE">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Bilder → PDF — Alleskonverter", "url": "https://alleskonverter.de/tools/bild-zu-pdf/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "JPG, PNG, WebP oder iPhone-HEIC in ein PDF umwandeln — Reihenfolge sortierbar, A4 oder randlos. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Kann ich iPhone-Fotos (HEIC) verwenden?", "acceptedAnswer": {"@type": "Answer", "text": "Ja. HEIC-Dateien werden direkt im Browser dekodiert und als JPEG ins PDF eingebettet — ohne Umweg über eine andere App und ohne dass das Foto dein Gerät verlässt."}}, {"@type": "Question", "name": "Verlieren meine Bilder an Qualität?", "acceptedAnswer": {"@type": "Answer", "text": "JPG- und PNG-Dateien werden 1:1 übernommen, ohne Neukompression. Nur andere Formate (HEIC, WebP, GIF) werden einmal umgewandelt — HEIC zu hochwertigem JPEG, der Rest verlustfrei zu PNG."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../css/base.css">
-<link rel="stylesheet" href="../../css/tools.css">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
 </head>
 <body>
 <div class="wrap">
@@ -98,9 +97,9 @@
 
 <script src="../../vendor/pdf-lib.min.js"></script>
 <script src="../../vendor/heic2any.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
-<script src="../../js/filelist.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/filelist.js?v=20260726"></script>
 <script>
 const { PDFDocument } = PDFLib;
 const A4 = [595.28, 841.89];

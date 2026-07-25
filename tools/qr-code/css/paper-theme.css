@@ -10,7 +10,7 @@
   --font: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-:root[data-theme="light"], :root {
+:root, :root[data-theme="light"] {
   --bg: #E6E4DE;
   --card: #F3F2ED;
   --card-2: #ECEAE3;
@@ -60,9 +60,3 @@ body {
 #typeForm { min-height: 76px; }
 #presetGrid { min-height: 188px; }
 .preview-stage { min-height: 296px; display: grid; place-items: center; }
-
-/* Auf hellem Grün im Dunkelmodus muss die Schrift dunkel sein (Kontrast) */
-:root[data-theme="dark"] .chip.active,
-:root[data-theme="dark"] .seg-btn.active,
-:root[data-theme="dark"] .btn-primary,
-:root[data-theme="dark"] .fab { color: #101410; }

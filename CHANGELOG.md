@@ -3,6 +3,16 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Rückbau Dunkelmodus, verlässliche Updates)
+
+### Entfernt
+- **Dunkelmodus** wieder ausgebaut: keine `prefers-color-scheme`-Palette mehr, einheitliche theme-color-Angabe, QR-Werkzeug wieder fest auf die helle Papier-Darstellung gesetzt. Die dabei entstandenen Farbvariablen (`--stamp-text`, `--field`, `--grain`) bleiben — sie ersetzen fest verdrahtete Farbwerte und machen das CSS einheitlicher.
+
+### Behoben
+- **Nach einem Deploy konnten Besucher altes CSS und JavaScript behalten**: `.htaccess` gab für alle Dateitypen ein Jahr Cache-Zeit vor, also auch für eigenen Code. Eigener Code (`/css/`, `/js/`, die Werkzeug-eigenen Dateien, `sw.js`, Manifest) wird jetzt bei jedem Aufruf beim Server rückgefragt — dank ETag antwortet der in aller Regel mit einem winzigen „304 unverändert“. Fremdbibliotheken und Schriften behalten die lange Cache-Zeit, da sie sich nie an Ort und Stelle ändern; eigene Bilder werden täglich geprüft.
+- Einmalige Versionskennung (`?v=20260726`) an allen eigenen CSS- und JS-Verweisen — nötig, damit auch Besucher mit der bereits ein Jahr lang gespeicherten alten Fassung die neue Datei bekommen.
+- Service Worker: Anfragen für eigenen Code laufen jetzt mit `cache: 'no-cache'`, damit ein veralteter Browser-Cache die „Netz zuerst“-Strategie nicht unterläuft; beim Nachschlagen im Cache wird die Versionskennung ignoriert.
+
 ## 2026-07-26 (PWA)
 
 ### Hinzugefügt

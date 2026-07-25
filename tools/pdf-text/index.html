@@ -18,12 +18,11 @@
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
-<meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E6E4DE">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Text auslesen — Alleskonverter", "url": "https://alleskonverter.de/tools/pdf-text/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Kompletten Text aus einem PDF extrahieren — kopieren oder als .txt speichern, mit Seitenauswahl. Kostenlos, ohne Upload, direkt im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Warum bleibt das Ergebnis bei meinem Scan leer?", "acceptedAnswer": {"@type": "Answer", "text": "Reine Scans enthalten keine Textebene, sondern nur Bilder der Seiten. Dafür bräuchte es eine Texterkennung (OCR), die dieses Werkzeug bewusst nicht mitbringt — bei digital erstellten PDFs (Word-Export, Rechnungen, E-Books) funktioniert die Extraktion dagegen zuverlässig."}}, {"@type": "Question", "name": "Bleibt die Formatierung erhalten?", "acceptedAnswer": {"@type": "Answer", "text": "Absätze und Zeilen werden so gut wie möglich rekonstruiert; Layout, Schriften und Tabellen gehen naturgemäß verloren — es ist reiner Text."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../css/base.css">
-<link rel="stylesheet" href="../../css/tools.css">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
 </head>
 <body>
 <div class="wrap">
@@ -99,9 +98,9 @@
 </div>
 
 <script src="../../vendor/pdf.min.js"></script>
-<script src="../../js/ui.js"></script>
-<script src="../../js/dropzone.js"></script>
-<script src="../../js/pdf-common.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/pdf-common.js?v=20260726"></script>
 <script>
 let src = null; // { name, bytes, pages, password }
 
