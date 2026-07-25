@@ -20,6 +20,7 @@ const SHELL = [
   '/js/filelist.js',
   '/js/pdf-common.js',
   '/js/hub.js',
+  '/js/uebergabe.js',
   '/manifest.webmanifest',
   '/assets/favicon.png',
   '/assets/apple-touch-icon.png',

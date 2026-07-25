@@ -98,7 +98,10 @@
       tools: ['text-werkzeuge','untertitel','tabellen'] },
   ];
 
-  function vorschlagen(namen){
+  /* Werkzeuge, die eine Datei entgegennehmen können (das QR-Werkzeug erzeugt nur) */
+  const NIMMT_DATEI = t => t !== 'qr-code';
+
+  function vorschlagen(namen, dateien){
     const arten = new Map();
     for(const name of namen){
       const regel = REGELN.find(r => r.test(name));
@@ -110,6 +113,7 @@
     if(!arten.size){
       treffer.hidden = false;
       treffer.innerHTML = '<h3>Dateityp unbekannt</h3><p>Zu dieser Datei gibt es hier (noch) kein passendes Werkzeug. Sieh dich unten in der Liste um.</p>';
+      if(AK.uebergabeHolen) AK.uebergabeHolen();   // nichts liegen lassen
       treffer.scrollIntoView({ behavior:'smooth', block:'nearest' });
       return;
     }
@@ -120,11 +124,13 @@
         const li = karten.find(k => k.dataset.tool === t);
         if(!li) return '';
         const name = li.querySelector('.name').textContent;
-        const href = li.querySelector('a').getAttribute('href');
+        let href = li.querySelector('a').getAttribute('href');
+        // Kennzeichnung, damit das Werkzeug die hinterlegte Datei abholt
+        if(dateien && NIMMT_DATEI(t)) href += '?datei=1';
         return `<li><a href="${href}">${name}</a></li>`;
       }).join('');
       const wieviele = dateien.length === 1 ? `„${dateien[0]}“` : `${dateien.length} Dateien`;
-      bloecke.push(`<h3>${art} erkannt</h3><p>Für ${wieviele} passen diese Werkzeuge:</p><ul>${liste}</ul>`);
+      bloecke.push(`<h3>${art} erkannt</h3><p>Für ${wieviele} passen diese Werkzeuge — die Datei wird beim Klick gleich mitgenommen:</p><ul>${liste}</ul>`);
     }
     treffer.hidden = false;
     treffer.innerHTML = bloecke.join('<div style="height:14px"></div>');
@@ -140,9 +146,12 @@
     if(Array.from(e.dataTransfer?.types||[]).includes('Files')) e.preventDefault();
   });
   addEventListener('dragleave', () => { if(--tiefe <= 0){ tiefe = 0; document.body.classList.remove('ablage'); } });
-  addEventListener('drop', e => {
+  addEventListener('drop', async e => {
     if(!e.dataTransfer?.files?.length) return;
     e.preventDefault(); tiefe = 0; document.body.classList.remove('ablage');
-    vorschlagen(Array.from(e.dataTransfer.files).map(f => f.name));
+    const dateien = Array.from(e.dataTransfer.files);
+    // Datei kurz lokal hinterlegen, damit das Werkzeug sie direkt übernehmen kann
+    const gemerkt = AK.uebergabeSetzen ? await AK.uebergabeSetzen(dateien) : false;
+    vorschlagen(dateien.map(f => f.name), gemerkt);
   });
 })();

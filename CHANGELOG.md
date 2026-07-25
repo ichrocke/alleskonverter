@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Datei wird mitgenommen)
+
+### Hinzugefügt
+- **Dateiübergabe von der Startseite ans Werkzeug** (`js/uebergabe.js`): Wer eine Datei auf die Startseite zieht, bekommt nicht nur Vorschläge — die Datei wird beim Klick gleich mitgenommen und ist im Werkzeug sofort geladen. Dafür liegt sie kurz in der lokalen Datenbank des Browsers (IndexedDB) und wird beim Übernehmen sofort wieder gelöscht; die Adresszeile wird anschließend aufgeräumt, damit ein Neuladen nichts Altes zeigt. Übertragen wird selbstverständlich nichts. Datenschutzerklärung entsprechend ergänzt.
+
 ## 2026-07-26 (Werkzeug 21)
 
 ### Hinzugefügt
