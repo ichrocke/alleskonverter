@@ -13,6 +13,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [PDF → Bild](tools/pdf-zu-bild/index.html) | Seiten als PNG/JPEG, 96–300 dpi, einzeln oder ZIP |
 | [Bilder → PDF](tools/bild-zu-pdf/index.html) | JPG/PNG/WebP/HEIC/GIF → ein PDF, A4 oder randlos |
 | [PDF komprimieren](tools/pdf-komprimieren/index.html) | Neuaufbau mit dpi/Qualität, Vorher-/Nachher-Größe |
+| [PDF stempeln](tools/pdf-stempeln/index.html) | Wasserzeichen und Seitenzahlen einfügen, mit Live-Vorschau |
 | [Text auslesen](tools/pdf-text/index.html) | Textextraktion, Zwischenablage oder .txt |
 
 **Bilder**

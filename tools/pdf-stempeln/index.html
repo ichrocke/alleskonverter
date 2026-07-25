@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Wasserzeichen &amp; Seitenzahlen einfügen — kostenlos | Alleskonverter</title>
+<meta name="description" content="Wasserzeichen und Seitenzahlen in ein PDF einfügen — kostenlos, ohne Upload, ohne Anmeldung. Mit Live-Vorschau, läuft 100 % lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/pdf-stempeln/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="PDF Wasserzeichen &amp; Seitenzahlen einfügen — kostenlos | Alleskonverter">
+<meta property="og:description" content="Wasserzeichen und Seitenzahlen in ein PDF einfügen — kostenlos, ohne Upload, ohne Anmeldung. Mit Live-Vorschau, läuft 100 % lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/pdf-stempeln/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF Wasserzeichen &amp; Seitenzahlen einfügen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF stempeln — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-stempeln/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Wasserzeichen und Seitenzahlen in ein PDF einfügen — kostenlos, ohne Upload, mit Live-Vorschau."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das PDF wird vollständig in deinem Browser bearbeitet — es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Lässt sich das Wasserzeichen wieder entfernen?","acceptedAnswer":{"@type":"Answer","text":"Nicht ohne Weiteres. Der Text wird fest in den Seiteninhalt geschrieben. Es ist ein sichtbarer Hinweis, kein Kopierschutz — wer das PDF als Bild abfotografiert, umgeht jedes Wasserzeichen."}},{"@type":"Question","name":"Bleibt der Text im PDF durchsuchbar?","acceptedAnswer":{"@type":"Answer","text":"Ja. Die Seiten werden nicht gerastert, sondern nur ergänzt — der vorhandene Text bleibt markierbar und durchsuchbar."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<style>
+#preview{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;text-align:center;display:none}
+#preview.on{display:block}
+#pcanvas{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
+.pnav{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+.posgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:150px}
+.posgrid button{aspect-ratio:1.4;border:1px solid var(--rule);background:var(--card);cursor:pointer;font-size:0}
+.posgrid button::after{content:"";display:block;width:7px;height:7px;background:var(--ink-soft);margin:auto}
+.posgrid button:hover{border-color:var(--ink)}
+.posgrid button.active{background:var(--stamp);border-color:var(--stamp)}
+.posgrid button.active::after{background:#fff}
+fieldset{border:1px solid var(--rule);padding:12px;margin:0 0 14px}
+legend{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:0 6px}
+.check{display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:10px}
+.check input{width:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF <span>stempeln</span></h1>
+  <p class="sub">Wasserzeichen wie „Entwurf“ oder „Vertraulich“ quer über die Seiten legen und Seitenzahlen einfügen — mit Vorschau, bevor gespeichert wird. Der Text im PDF bleibt durchsuchbar.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+
+    <div id="preview">
+      <canvas id="pcanvas"></canvas>
+      <div class="pnav">
+        <button class="icon" id="prev" title="Vorherige Seite">←</button>
+        <span id="pinfo">Seite 1</span>
+        <button class="icon" id="next" title="Nächste Seite">→</button>
+        <span style="margin-left:10px">Vorschau</span>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <fieldset>
+      <legend>Wasserzeichen</legend>
+      <label class="check"><input type="checkbox" id="wmOn" checked> Wasserzeichen einfügen</label>
+      <div id="wmOpts">
+        <div class="field">
+          <label for="wmText">Text</label>
+          <input type="text" id="wmText" value="ENTWURF" maxlength="40">
+        </div>
+        <div class="field">
+          <label for="wmAngle">Ausrichtung</label>
+          <select id="wmAngle">
+            <option value="45" selected>Diagonal aufwärts</option>
+            <option value="-45">Diagonal abwärts</option>
+            <option value="0">Waagerecht</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="wmSize">Größe: <span id="wmSizeVal">60</span> pt</label>
+          <input type="range" id="wmSize" min="20" max="140" step="5" value="60" style="width:100%">
+        </div>
+        <div class="field">
+          <label for="wmOpacity">Deckkraft: <span id="wmOpacityVal">15</span> %</label>
+          <input type="range" id="wmOpacity" min="5" max="60" step="5" value="15" style="width:100%">
+        </div>
+        <div class="field">
+          <label for="wmColor">Farbe</label>
+          <select id="wmColor">
+            <option value="grau" selected>Grau</option>
+            <option value="rot">Rot</option>
+            <option value="blau">Blau</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Seitenzahlen</legend>
+      <label class="check"><input type="checkbox" id="pnOn"> Seitenzahlen einfügen</label>
+      <div id="pnOpts" hidden>
+        <div class="field">
+          <label for="pnFormat">Format</label>
+          <select id="pnFormat">
+            <option value="n" selected>1, 2, 3 …</option>
+            <option value="n/N">1 / 12</option>
+            <option value="Seite n">Seite 1</option>
+            <option value="Seite n von N">Seite 1 von 12</option>
+            <option value="- n -">- 1 -</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Position</label>
+          <div class="posgrid" id="pnPos"></div>
+        </div>
+        <div class="field">
+          <label for="pnSize">Schriftgröße: <span id="pnSizeVal">10</span> pt</label>
+          <input type="range" id="pnSize" min="7" max="18" value="10" style="width:100%">
+        </div>
+        <div class="field">
+          <label for="pnStart">Erste Seite mit Nummer</label>
+          <input type="number" id="pnStart" value="1" min="1" style="width:100%">
+        </div>
+      </div>
+    </fieldset>
+
+    <button class="primary" id="go" disabled>Speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Angebote als „Entwurf“ kennzeichnen, Unterlagen mit „Vertraulich“ versehen oder ein langes Dokument endlich mit Seitenzahlen ausdrucken: Dieses Werkzeug schreibt beides direkt ins PDF. Die Vorschau zeigt jede Seite so, wie sie später aussieht — Größe, Deckkraft, Farbe und Position lassen sich vorher in Ruhe einstellen.</p>
+  <h3>Werden meine Dateien hochgeladen?</h3>
+  <p>Nein. Das PDF wird vollständig in deinem Browser bearbeitet — es gibt keinen Server, der Dateien annehmen könnte. Deine Unterlagen verlassen dein Gerät zu keinem Zeitpunkt.</p>
+  <h3>Bleibt der Text im PDF durchsuchbar?</h3>
+  <p>Ja. Die Seiten werden nicht in Bilder umgewandelt, sondern nur ergänzt — vorhandener Text bleibt markierbar, kopierbar und durchsuchbar.</p>
+  <h3>Lässt sich das Wasserzeichen wieder entfernen?</h3>
+  <p>Nicht ohne Weiteres — der Text wird fest in den Seiteninhalt geschrieben. Verstehe es als sichtbaren Hinweis, nicht als Kopierschutz: Wer eine Seite abfotografiert oder neu setzt, umgeht jedes Wasserzeichen.</p>
+  <h3>Warum sehen Umlaute manchmal seltsam aus?</h3>
+  <p>Für Wasserzeichen und Seitenzahlen wird die eingebaute Standardschrift Helvetica verwendet. Deutsche Umlaute beherrscht sie vollständig; exotische Zeichen wie Emoji oder kyrillische Schrift dagegen nicht — die werden übersprungen.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Passwortgeschützte PDFs bitte zuerst mit <a href="../pdf-zusammenfuegen/index.html">PDF zusammenfügen</a> entsperren und neu speichern.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
+<script>
+const { PDFDocument, StandardFonts, rgb, degrees } = PDFLib;
+const FARBEN = { grau:[0.45,0.45,0.45], rot:[0.66,0.21,0.13], blau:[0.13,0.28,0.55] };
+const POSITIONEN = [
+  ['ol','Oben links'], ['om','Oben Mitte'], ['or','Oben rechts'],
+  ['ul','Unten links'], ['um','Unten Mitte'], ['ur','Unten rechts']
+];
+
+let src = null;          // { name, size, bytes, pages }
+let pdfjsDoc = null;
+let pageNo = 1;
+let pnPos = 'um';
+let renderToken = 0;
+
+/* ---------- Laden ---------- */
+async function addFiles(list){
+  const file = list.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    await PDFDocument.load(bytes.slice(), { ignoreEncryption:false });   // Kopierbarkeit prüfen
+    if(pdfjsDoc) await pdfjsDoc.destroy();
+    pdfjsDoc = await AK.openWithPdfjs(bytes);
+    src = { name:file.name, size:file.size, bytes, pages:pdfjsDoc.numPages };
+    pageNo = 1;
+    render();
+    drawPreview();
+  }catch(err){
+    console.error(err);
+    src = null; render();
+    AK.log('Datei kann nicht gelesen werden — vermutlich verschlüsselt oder beschädigt.', true);
+  }
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  AK.$('#preview').classList.toggle('on', !!src);
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(src.name)}</div>
+          <div class="finfo"><span>${AK.fmtBytes(src.size)}</span><span>${src.pages} Seiten</span><span class="badge b-ok">bleibt durchsuchbar</span></div>
+        </div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = async () => {
+      if(pdfjsDoc){ await pdfjsDoc.destroy(); pdfjsDoc = null; }
+      src = null; render();
+    };
+  }
+  AK.$('#go').disabled = !src;
+  AK.$('#pinfo').textContent = src ? `Seite ${pageNo} von ${src.pages}` : 'Seite 1';
+  AK.$('#prev').disabled = !src || pageNo <= 1;
+  AK.$('#next').disabled = !src || pageNo >= src.pages;
+}
+
+/* ---------- Einstellungen einsammeln ---------- */
+function settings(){
+  return {
+    wm: AK.$('#wmOn').checked,
+    wmText: AK.$('#wmText').value,
+    wmAngle: +AK.$('#wmAngle').value,
+    wmSize: +AK.$('#wmSize').value,
+    wmOpacity: +AK.$('#wmOpacity').value / 100,
+    wmColor: FARBEN[AK.$('#wmColor').value],
+    pn: AK.$('#pnOn').checked,
+    pnFormat: AK.$('#pnFormat').value,
+    pnSize: +AK.$('#pnSize').value,
+    pnStart: Math.max(1, +AK.$('#pnStart').value || 1),
+    pnPos
+  };
+}
+
+function pageLabel(fmt, n, total){
+  return fmt.replace(/\bn\b/g, n).replace(/\bN\b/g, total);
+}
+
+/* Verkleinert das Wasserzeichen so weit, dass es gedreht noch auf die Seite passt.
+   `width` ist die Textbreite bei `size`; die Breite wächst linear mit der Größe. */
+function fitWatermark(width, size, pw, ph, angleDeg){
+  const rad = Math.abs(angleDeg) * Math.PI/180;
+  const c = Math.abs(Math.cos(rad)), s = Math.abs(Math.sin(rad));
+  const halfW = width/2, halfH = size/2, margin = 20;
+  const needX = halfW * c + halfH * s;
+  const needY = halfW * s + halfH * c;
+  const factor = Math.min(1, (pw/2 - margin) / needX, (ph/2 - margin) / needY);
+  return { size: size * factor, width: width * factor };
+}
+
+/* Position in Punkten, gibt zusätzlich die Ausrichtung zurück */
+function stampXY(pos, pw, ph, textWidth, size){
+  const m = 34;
+  const x = pos.endsWith('l') ? m
+          : pos.endsWith('r') ? pw - m - textWidth
+          : (pw - textWidth) / 2;
+  const y = pos.startsWith('o') ? ph - m - size * 0.8 : m;
+  return { x, y };
+}
+
+/* ---------- Vorschau ---------- */
+async function drawPreview(){
+  if(!src || !pdfjsDoc) return;
+  const token = ++renderToken;
+  const s = settings();
+  const canvas = AK.$('#pcanvas');
+  const { canvas:base, width, height } = await AK.renderPage(pdfjsDoc, pageNo - 1, 1.4);
+  if(token !== renderToken) return;                 // neuere Anfrage läuft bereits
+
+  canvas.width = base.width; canvas.height = base.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(base, 0, 0);
+  AK.freeCanvas(base);
+
+  const k = canvas.width / width;                   // Punkte → Vorschaupixel
+  ctx.textBaseline = 'alphabetic';
+
+  if(s.wm && s.wmText.trim()){
+    const [r,g,b] = s.wmColor;
+    ctx.save();
+    ctx.font = `bold ${s.wmSize}px Helvetica, Arial, sans-serif`;   // Breite in Punkten messen
+    const fit = fitWatermark(ctx.measureText(s.wmText).width, s.wmSize, width, height, s.wmAngle);
+    ctx.globalAlpha = s.wmOpacity;
+    ctx.fillStyle = `rgb(${r*255|0},${g*255|0},${b*255|0})`;
+    ctx.font = `bold ${fit.size * k}px Helvetica, Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.translate(canvas.width/2, canvas.height/2);
+    ctx.rotate(-s.wmAngle * Math.PI/180);
+    ctx.fillText(s.wmText, 0, fit.size * k * 0.35);
+    ctx.restore();
+  }
+
+  if(s.pn){
+    const label = pageLabel(s.pnFormat, pageNo + s.pnStart - 1, src.pages + s.pnStart - 1);
+    ctx.save();
+    ctx.fillStyle = '#16191B';
+    ctx.font = `${s.pnSize * k}px Helvetica, Arial, sans-serif`;
+    const tw = ctx.measureText(label).width / k;
+    const { x, y } = stampXY(s.pnPos, width, height, tw, s.pnSize);
+    ctx.fillText(label, x * k, canvas.height - y * k);
+    ctx.restore();
+  }
+}
+
+/* ---------- Speichern ---------- */
+async function save(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const s = settings();
+  try{
+    const doc = await PDFDocument.load(src.bytes.slice(), { ignoreEncryption:false });
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+    const pages = doc.getPages();
+    const total = pages.length;
+
+    // Helvetica kennt kein Emoji & Co. — unbekannte Zeichen entfernen
+    const clean = t => t.replace(/[^\u0020-\u00FF\u20AC]/g, '');
+    const wmText = clean(s.wmText.trim());
+
+    pages.forEach((page, i) => {
+      const { width, height } = page.getSize();
+
+      if(s.wm && wmText){
+        const fit = fitWatermark(bold.widthOfTextAtSize(wmText, s.wmSize),
+                                 s.wmSize, width, height, s.wmAngle);
+        const rad = s.wmAngle * Math.PI/180;
+        // Textmitte auf Seitenmitte legen (pdf-lib dreht um den Startpunkt)
+        const x = width/2  - Math.cos(rad) * fit.width/2;
+        const y = height/2 - Math.sin(rad) * fit.width/2 - fit.size * 0.35;
+        page.drawText(wmText, {
+          x, y, size:fit.size, font:bold,
+          color: rgb(...s.wmColor), opacity: s.wmOpacity,
+          rotate: degrees(s.wmAngle)
+        });
+      }
+
+      if(s.pn){
+        const label = clean(pageLabel(s.pnFormat, i + s.pnStart, total + s.pnStart - 1));
+        const tw = font.widthOfTextAtSize(label, s.pnSize);
+        const { x, y } = stampXY(s.pnPos, width, height, tw, s.pnSize);
+        page.drawText(label, { x, y, size:s.pnSize, font, color: rgb(0.09,0.1,0.11) });
+      }
+
+      AK.bar((i+1)/total);
+    });
+
+    doc.setProducer('Alleskonverter');
+    const bytes = await doc.save();
+    AK.offerDownload(new Blob([bytes], {type:'application/pdf'}),
+                     src.name.replace(/\.pdf$/i,'') + '-gestempelt.pdf');
+    AK.log(`Fertig: ${total} Seiten, ${AK.fmtBytes(bytes.length)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Speichern'; render();
+  }
+}
+
+/* ---------- Bedienung ---------- */
+const posEl = AK.$('#pnPos');
+POSITIONEN.forEach(([key, title]) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.title = title; b.setAttribute('aria-label', title);
+  if(key === pnPos) b.classList.add('active');
+  b.onclick = () => {
+    pnPos = key;
+    posEl.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    drawPreview();
+  };
+  posEl.appendChild(b);
+});
+
+AK.$('#wmOn').onchange = e => { AK.$('#wmOpts').hidden = !e.target.checked; drawPreview(); };
+AK.$('#pnOn').onchange = e => { AK.$('#pnOpts').hidden = !e.target.checked; drawPreview(); };
+AK.$('#wmSize').oninput = e => { AK.$('#wmSizeVal').textContent = e.target.value; drawPreview(); };
+AK.$('#wmOpacity').oninput = e => { AK.$('#wmOpacityVal').textContent = e.target.value; drawPreview(); };
+AK.$('#pnSize').oninput = e => { AK.$('#pnSizeVal').textContent = e.target.value; drawPreview(); };
+['#wmText','#wmAngle','#wmColor','#pnFormat','#pnStart'].forEach(sel =>
+  AK.$(sel).addEventListener('input', drawPreview));
+
+AK.$('#prev').onclick = () => { if(pageNo > 1){ pageNo--; render(); drawPreview(); } };
+AK.$('#next').onclick = () => { if(pageNo < src.pages){ pageNo++; render(); drawPreview(); } };
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = save;
+render();
+</script>
+</body>
+</html>
