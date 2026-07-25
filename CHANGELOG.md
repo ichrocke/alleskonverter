@@ -6,6 +6,14 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 ## 2026-07-25
 
 ### Behoben
+- Hub-Karten: Nummer, Titel und Beschreibung stehen jetzt untereinander statt ineinander zu fließen
+
+### Geprüft
+- Alle 12 Werkzeuge automatisiert end-to-end getestet (headless Chrome über `file://`): Dateien laden, konvertieren, Download entsteht — inklusive ffmpeg-Ladevorgang und WAV → MP3
+- Responsive Ansicht (390 px und 1440 px) ohne horizontales Überlaufen, Konsolen aller Seiten fehlerfrei
+
+### Hinzugefügt (Doku)
+- README mit Werkzeugübersicht, Nutzungs-, Datenschutz- und Technikabschnitt
 - Audio & Video: ffmpeg-Core wird jetzt als ESM-Variante geladen — der Module-Worker importiert den Core per `import()`, mit dem UMD-Core schlug das Laden fehl
 
 ### Geändert
