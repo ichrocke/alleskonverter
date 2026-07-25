@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markdown ↔ HTML — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/marked.min.js"></script>
+<script src="../../vendor/turndown.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Markdown <span>↔ HTML</span></h1>
+  <p class="sub">In beide Richtungen umwandeln, mit Live-Vorschau beim Tippen. Datei hineinziehen oder direkt lostippen.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Editor</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Datei auswählen">
+      <strong>.md- oder .html-Datei hierher ziehen</strong>
+      <small>oder klicken — oder einfach unten lostippen</small>
+    </div>
+    <input type="file" id="picker" accept=".md,.markdown,.txt,.html,.htm" hidden>
+
+    <div class="twocol" style="margin-top:18px">
+      <div>
+        <h2 id="in-label">Markdown</h2>
+        <textarea class="pane" id="input" spellcheck="false" placeholder="# Überschrift&#10;&#10;Hier Markdown eingeben …"></textarea>
+      </div>
+      <div>
+        <h2 id="out-label">Vorschau</h2>
+        <div class="preview" id="preview"></div>
+        <textarea class="pane" id="outcode" spellcheck="false" readonly hidden></textarea>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="charcount">0<small>Zeichen Ausgabe</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="mode">Richtung</label>
+      <select id="mode">
+        <option value="md2html" selected>Markdown → HTML</option>
+        <option value="html2md">HTML → Markdown</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-view">
+      <label for="view">Rechte Seite zeigt</label>
+      <select id="view">
+        <option value="preview" selected>Gerenderte Vorschau</option>
+        <option value="code">HTML-Code</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="fullhtml" checked style="width:auto;margin-right:6px">Komplette HTML-Datei erzeugen</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Herunterladen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>Markdown → HTML nutzt <code>marked</code>, die Gegenrichtung <code>turndown</code>. Bei HTML → Markdown gehen Dinge verloren, die Markdown nicht kennt (Formulare, Skripte, komplexe Layouts) — der Textinhalt bleibt vollständig erhalten.</p>
+</footer>
+</div>
+
+<script>
+const td = new TurndownService({ headingStyle:'atx', codeBlockStyle:'fenced', bulletListMarker:'-' });
+let fileBase = 'umgewandelt';
+let current = '';
+
+function isMd(){ return AK.$('#mode').value === 'md2html'; }
+
+function refresh(){
+  const input = AK.$('#input').value;
+  const md = isMd();
+
+  AK.$('#in-label').textContent = md ? 'Markdown' : 'HTML';
+  AK.$('#f-view').style.display = md ? '' : 'none';
+
+  if(md){
+    current = marked.parse(input);
+    const showCode = AK.$('#view').value === 'code';
+    AK.$('#out-label').textContent = showCode ? 'HTML-Code' : 'Vorschau';
+    AK.$('#preview').hidden = showCode;
+    AK.$('#outcode').hidden = !showCode;
+    if(showCode) AK.$('#outcode').value = current;
+    else AK.$('#preview').innerHTML = current;
+  }else{
+    try{ current = td.turndown(input); }
+    catch(_){ current = ''; }
+    AK.$('#out-label').textContent = 'Markdown';
+    AK.$('#preview').hidden = true;
+    AK.$('#outcode').hidden = false;
+    AK.$('#outcode').value = current;
+  }
+
+  AK.$('#charcount').innerHTML = current.length.toLocaleString('de-DE') + '<small>Zeichen Ausgabe</small>';
+  AK.$('#go').disabled = !current.trim();
+}
+
+async function addFiles(files){
+  const file = files.find(f => /\.(md|markdown|txt|html?)$/i.test(f.name));
+  if(!file) return;
+  fileBase = file.name.replace(/\.[^.]+$/, '');
+  AK.$('#mode').value = /\.html?$/i.test(file.name) ? 'html2md' : 'md2html';
+  AK.$('#input').value = await file.text();
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+  AK.log(`${file.name} geladen.`);
+  refresh();
+}
+
+function download(){
+  AK.clearDownloads(); AK.stamp(false);
+  if(isMd()){
+    const payload = AK.$('#fullhtml').checked
+      ? `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(fileBase)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}pre{background:#f4f4f4;padding:12px;overflow:auto}code{font-family:ui-monospace,monospace}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:1em;color:#555}</style>\n</head>\n<body>\n${current}\n</body>\n</html>\n`
+      : current;
+    AK.offerDownload(new Blob([payload], {type:'text/html;charset=utf-8'}), fileBase + '.html', '.html herunterladen');
+  }else{
+    AK.offerDownload(new Blob([current], {type:'text/markdown;charset=utf-8'}), fileBase + '.md', '.md herunterladen');
+  }
+  AK.stamp(true);
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#input').addEventListener('input', refresh);
+AK.$('#mode').onchange = refresh;
+AK.$('#view').onchange = refresh;
+AK.$('#go').onclick = download;
+refresh();
+</script>
+</body>
+</html>
