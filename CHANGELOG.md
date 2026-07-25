@@ -5,6 +5,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
 ## 2026-07-25
 
+### Behoben
+- Audio & Video: ffmpeg-Core wird jetzt als ESM-Variante geladen — der Module-Worker importiert den Core per `import()`, mit dem UMD-Core schlug das Laden fehl
+
 ### Geändert
 - PDF-Stapler (`tools/pdf-zusammenfuegen/`) auf gemeinsame Module umgestellt: geteilte CSS, `AK.filelist`/`AK.dropzone`/`AK.pdf`-Helfer, lokale Bibliotheken statt CDN, Rückweg-Navigation zum Hub — Funktionalität unverändert
 

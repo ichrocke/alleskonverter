@@ -94,7 +94,8 @@
 <script>
 const CDN_FFMPEG = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd';
 const CDN_UTIL   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd';
-const CDN_CORE   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+/* Wichtig: ESM-Core, weil der Worker (Module-Worker) den Core per import() lädt */
+const CDN_CORE   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
 
 let ffmpeg = null, src = null;
 
