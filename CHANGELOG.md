@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-25 (vierter Wurf: Livegang-Vorbereitung)
+
+### Hinzugefügt
+- `robots.txt` (Impressum/Datenschutz vom Indexieren ausgenommen) und `sitemap.xml` mit allen Werkzeugseiten
+- `favicon.ico` (16/32/48 px) und `assets/apple-touch-icon.png` (180 px, Papier-Hintergrund); Theme-Color-Meta auf der Startseite
+- `404.html` im Site-Design (Hoster muss sie als Fehlerseite eingerichtet haben)
+
 ## 2026-07-25 (dritter Wurf: Feinschliff)
 
 ### Hinzugefügt
