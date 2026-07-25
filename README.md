@@ -49,12 +49,14 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Farbwerte umrechnen](tools/farben/index.html) | HEX/RGB/HSL/CMYK, Pipette für Bilder, Abstufungen, WCAG-Kontrastprüfung |
 | [Passwort-Generator](tools/passwort/index.html) | Zeichenfolgen, Passphrasen und PINs mit echtem Zufall, Stärke- und Zeitschätzung |
 | [Einheiten &amp; Zeitzonen](tools/einheiten/index.html) | Neun Größenarten umrechnen, Uhrzeit in 20 Zeitzonen |
+| [Dateien umbenennen](tools/bilder-umbenennen/index.html) | Stapelweise umbenennen mit Muster, Zähler und Datum, Ausgabe als ZIP |
 **Medien**
 | Werkzeug | Kann |
 |---|---|
 | [Audio & Video](tools/medien/index.html) | MP3/WAV/OGG/M4A/FLAC/MP4/WebM/GIF via ffmpeg.wasm, Tonspur extrahieren |
 
 | [Medien schneiden](tools/medien-schneiden/index.html) | Video/Audio auf einen Ausschnitt kürzen, wahlweise ohne Neuberechnung |
+| [GIF erstellen](tools/gif-erstellen/index.html) | Animiertes GIF aus Bildern, mit eigener Farbtabelle für bessere Farben |
 ## Nutzung
 
 Live unter <https://alleskonverter.de>. Die Seite lässt sich über den Browser als App

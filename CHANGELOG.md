@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeuge 32 und 33)
+
+### Hinzugefügt
+- Werkzeug **Dateien umbenennen** (`tools/bilder-umbenennen/`): benennt einen ganzen Stapel nach einem Muster um — Bausteine für fortlaufende Nummer, Originalname, Datum und Uhrzeit, dazu Suchen-und-Ersetzen, Schreibweise und das Ersetzen von Umlauten. Live-Vorschau jedes alten und neuen Namens, Namensdubletten werden automatisch durchnummeriert, Ergebnis als ZIP (die Originale bleiben unangetastet).
+- Werkzeug **GIF erstellen** (`tools/gif-erstellen/`): animiertes GIF aus mehreren Bildern, Reihenfolge sortierbar, Tempo und Breite einstellbar, wahlweise vor und zurück abspielend. Erzeugt mit ffmpeg in zwei Durchgängen samt eigener Farbtabelle — das sieht deutlich besser aus als die Standardumwandlung — und zeigt das Ergebnis direkt animiert an.
+
 ## 2026-07-26 (Werkzeuge 30 und 31)
 
 ### Hinzugefügt

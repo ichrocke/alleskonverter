@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dateien stapelweise umbenennen und nummerieren — kostenlos | Alleskonverter</title>
+<meta name="description" content="Viele Dateien auf einmal umbenennen: Muster mit Zähler, Datum und Originalname, Suchen und Ersetzen — Ergebnis als ZIP. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bilder-umbenennen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Dateien stapelweise umbenennen und nummerieren — kostenlos | Alleskonverter">
+<meta property="og:description" content="Viele Dateien auf einmal umbenennen und nummerieren, Ergebnis als ZIP — ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bilder-umbenennen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dateien stapelweise umbenennen und nummerieren — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Dateien umbenennen — Alleskonverter","url":"https://alleskonverter.de/tools/bilder-umbenennen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Dateien stapelweise umbenennen und nummerieren, Ergebnis als ZIP — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Originaldateien verändert?","acceptedAnswer":{"@type":"Answer","text":"Nein. Es entsteht ein ZIP mit Kopien unter den neuen Namen; die Dateien auf deiner Festplatte bleiben unangetastet."}},{"@type":"Question","name":"Kann ich Fotos nach Aufnahmedatum benennen?","acceptedAnswer":{"@type":"Answer","text":"Ja, über den Platzhalter für das Änderungsdatum der Datei. Das entspricht bei Fotos meist dem Aufnahmezeitpunkt."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.bausteine{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.bausteine button{padding:5px 9px;border:1px solid var(--rule);background:var(--card);color:var(--ink);
+  font-family:var(--mono);font-size:11px;cursor:pointer}
+.bausteine button:hover{background:var(--ink);color:var(--paper)}
+.neu{color:var(--stamp);font-family:var(--mono);font-size:12px}
+.alt{color:var(--ink-soft);text-decoration:line-through}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Dateien <span>umbenennen</span></h1>
+  <p class="sub">Einen ganzen Stapel Dateien auf einmal neu benennen — mit fortlaufender Nummer, Datum oder Textbausteinen. Vorschau vor dem Speichern, Ergebnis als ZIP.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dateien</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Dateien hierher ziehen</strong>
+      <small>beliebig viele, beliebiger Art — Reihenfolge unten sortierbar</small>
+    </div>
+    <input type="file" id="picker" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Dateien im Stapel</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="muster">Namensmuster</label>
+      <input type="text" id="muster" value="Bild-{nr}">
+      <div class="bausteine" id="bausteine"></div>
+    </div>
+
+    <div class="field">
+      <label for="start">Erste Nummer</label>
+      <input type="number" id="start" value="1" min="0" style="width:100%">
+    </div>
+
+    <div class="field">
+      <label for="stellen">Stellen der Nummer</label>
+      <select id="stellen">
+        <option value="0">automatisch</option>
+        <option value="2">2 (01, 02 …)</option>
+        <option value="3" selected>3 (001, 002 …)</option>
+        <option value="4">4 (0001, 0002 …)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="suchen">Im Originalnamen ersetzen</label>
+      <input type="text" id="suchen" placeholder="Suchen nach …">
+      <input type="text" id="ersetzen" placeholder="… ersetzen durch" style="margin-top:6px">
+    </div>
+
+    <div class="field">
+      <label for="schreibweise">Schreibweise</label>
+      <select id="schreibweise">
+        <option value="" selected>unverändert</option>
+        <option value="klein">alles klein</option>
+        <option value="gross">ALLES GROSS</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="sauber" checked style="width:auto;margin-right:6px">Umlaute und Sonderzeichen ersetzen</label>
+      <div class="hint">macht Namen für Web und alte Systeme tauglich</div>
+    </div>
+
+    <button class="primary" id="go" disabled>Als ZIP speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Hunderte Fotos aus der Kamera heißen <code>DSC_4821.JPG</code> und sagen damit gar nichts. Dieses Werkzeug benennt einen ganzen Stapel auf einmal um — mit fortlaufender Nummer, dem Datum, Textbausteinen oder Teilen des ursprünglichen Namens. Die Vorschau zeigt vor dem Speichern jeden alten und neuen Namen, das Ergebnis kommt als ZIP.</p>
+  <h3>Werden meine Originaldateien verändert?</h3>
+  <p>Nein. Ein Browser darf keine Dateien auf deiner Festplatte umbenennen — stattdessen entsteht ein ZIP mit Kopien unter den neuen Namen. Deine Originale bleiben unangetastet, was hier sogar ein Vorteil ist: Geht etwas schief, hast du sie noch.</p>
+  <h3>Welche Bausteine gibt es?</h3>
+  <p><code>{nr}</code> für die fortlaufende Nummer, <code>{name}</code> für den ursprünglichen Namen ohne Endung, <code>{datum}</code> und <code>{zeit}</code> für das Änderungsdatum der Datei, <code>{jahr}</code>, <code>{monat}</code>, <code>{tag}</code> für einzelne Bestandteile sowie <code>{endung}</code>. Alles andere im Muster bleibt, wie es ist.</p>
+  <h3>Werden Dateien hochgeladen?</h3>
+  <p>Nein, auch hier nicht. Das ZIP wird vollständig in deinem Browser zusammengesetzt.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Sollen die Bilder zusätzlich verkleinert oder umgewandelt werden, erledigt das <a href="../bild-konvertieren/index.html">Bilder konvertieren</a> — ebenfalls stapelweise.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/filelist.js?v=20260726"></script>
+<script>
+const dateien = [];
+let uid = 0;
+
+const BAUSTEINE = [
+  ['{nr}','fortlaufende Nummer'], ['{name}','ursprünglicher Name'],
+  ['{datum}','Datum (2026-07-26)'], ['{zeit}','Uhrzeit (14-30)'],
+  ['{jahr}','Jahr'], ['{monat}','Monat'], ['{tag}','Tag'],
+];
+
+function addFiles(list){
+  for(const f of list) dateien.push({ id:++uid, datei:f, name:f.name, size:f.size });
+  liste.render();
+}
+
+const liste = AK.filelist({
+  container:'#stack', empty:'#empty', entries:dateien,
+  meta: e => `<div class="fname"><span class="alt">${AK.esc(e.name)}</span></div>
+              <div class="finfo"><span class="neu">→ ${AK.esc(e.neu || '…')}</span><span>${AK.fmtBytes(e.size)}</span></div>`,
+  onChange: () => { benenne(); }
+});
+
+function saeubere(t){
+  return t
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/Ä/g,'Ae').replace(/Ö/g,'Oe').replace(/Ü/g,'Ue')
+    .replace(/[^\w.\- ]+/g,'').replace(/\s+/g,'-').replace(/-{2,}/g,'-');
+}
+
+function benenne(still){
+  const muster = AK.$('#muster').value || '{name}';
+  const start = +AK.$('#start').value || 0;
+  const stellenWahl = +AK.$('#stellen').value;
+  const stellen = stellenWahl || String(start + dateien.length - 1).length;
+  const suchen = AK.$('#suchen').value;
+  const ersetzen = AK.$('#ersetzen').value;
+  const schreibweise = AK.$('#schreibweise').value;
+  const vergeben = new Map();
+
+  dateien.forEach((e, i) => {
+    const punkt = e.name.lastIndexOf('.');
+    let stamm = punkt > 0 ? e.name.slice(0, punkt) : e.name;
+    const endung = punkt > 0 ? e.name.slice(punkt + 1) : '';
+    if(suchen) stamm = stamm.split(suchen).join(ersetzen);
+
+    const d = new Date(e.datei.lastModified || Date.now());
+    const p = n => String(n).padStart(2, '0');
+    let neu = muster
+      .replace(/\{nr\}/g,     String(start + i).padStart(stellen, '0'))
+      .replace(/\{name\}/g,   stamm)
+      .replace(/\{datum\}/g,  `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`)
+      .replace(/\{zeit\}/g,   `${p(d.getHours())}-${p(d.getMinutes())}`)
+      .replace(/\{jahr\}/g,   String(d.getFullYear()))
+      .replace(/\{monat\}/g,  p(d.getMonth()+1))
+      .replace(/\{tag\}/g,    p(d.getDate()))
+      .replace(/\{endung\}/g, endung);
+
+    if(schreibweise === 'klein') neu = neu.toLocaleLowerCase('de');
+    if(schreibweise === 'gross') neu = neu.toLocaleUpperCase('de');
+    if(AK.$('#sauber').checked) neu = saeubere(neu);
+    if(endung && !neu.toLowerCase().endsWith('.' + endung.toLowerCase())) neu += '.' + endung;
+
+    // Namensdubletten durchnummerieren, sonst überschreiben sie sich im ZIP
+    if(vergeben.has(neu)){
+      const n = vergeben.get(neu) + 1;
+      vergeben.set(neu, n);
+      neu = neu.replace(/(\.[^.]+)?$/, ` (${n})$1`);
+    }else vergeben.set(neu, 0);
+
+    e.neu = neu;
+  });
+
+  AK.$('#anzahl').innerHTML = dateien.length + '<small>Dateien im Stapel</small>';
+  AK.$('#go').disabled = !dateien.length;
+  if(!still && dateien.length) zeichneListe();
+}
+
+/* Nur die Namen in der Liste auffrischen, ohne alles neu aufzubauen */
+function zeichneListe(){
+  AK.$$('#stack .row').forEach((li, i) => {
+    const neu = li.querySelector('.neu');
+    if(neu && dateien[i]) neu.textContent = '→ ' + dateien[i].neu;
+  });
+}
+
+async function packe(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  benenne(true);
+  try{
+    const zip = new JSZip();
+    dateien.forEach(e => zip.file(e.neu, e.datei));
+    const blob = await zip.generateAsync({ type:'blob', compression:'STORE' },
+      meta => AK.bar(meta.percent / 100));
+    AK.offerDownload(blob, 'umbenannt.zip');
+    AK.log(`Fertig: ${dateien.length} Dateien umbenannt, ${AK.fmtBytes(blob.size)}.`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Als ZIP speichern'; benenne();
+  }
+}
+
+const wrap = AK.$('#bausteine');
+BAUSTEINE.forEach(([b, titel]) => {
+  const el = document.createElement('button');
+  el.type = 'button'; el.textContent = b; el.title = titel;
+  el.onclick = () => {
+    const f = AK.$('#muster');
+    const p = f.selectionStart ?? f.value.length;
+    f.value = f.value.slice(0, p) + b + f.value.slice(f.selectionEnd ?? p);
+    f.focus(); f.setSelectionRange(p + b.length, p + b.length);
+    benenne();
+  };
+  wrap.appendChild(el);
+});
+
+['#muster','#start','#suchen','#ersetzen'].forEach(s => AK.$(s).addEventListener('input', () => benenne()));
+['#stellen','#schreibweise','#sauber'].forEach(s => AK.$(s).addEventListener('change', () => benenne()));
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = packe;
+benenne();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GIF aus Bildern erstellen — kostenlos, ohne Upload | Alleskonverter</title>
+<meta name="description" content="Animiertes GIF aus mehreren Bildern erstellen: Reihenfolge sortieren, Tempo und Größe einstellen, Vorschau ansehen. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/gif-erstellen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="GIF aus Bildern erstellen — kostenlos, ohne Upload | Alleskonverter">
+<meta property="og:description" content="Animiertes GIF aus mehreren Bildern erstellen — Tempo und Größe einstellbar, ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/gif-erstellen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GIF aus Bildern erstellen — kostenlos, ohne Upload | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"GIF erstellen — Alleskonverter","url":"https://alleskonverter.de/tools/gif-erstellen/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Animiertes GIF aus mehreren Bildern erstellen — ohne Upload, im Browser."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Bilder hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das GIF wird mit ffmpeg direkt in deinem Browser erzeugt; nur das Programm selbst kommt einmalig von dieser Website."}},{"@type":"Question","name":"Warum ist mein GIF so groß?","acceptedAnswer":{"@type":"Answer","text":"GIF ist ein altes Format ohne moderne Kompression. Kleinere Bildmaße, weniger Bilder pro Sekunde und weniger Einzelbilder helfen deutlich."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#ergebnis{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;text-align:center;display:none}
+#ergebnis.on{display:block}
+#gif{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>GIF <span>erstellen</span></h1>
+  <p class="sub">Aus mehreren Bildern eine kleine Animation machen — Reihenfolge frei sortierbar, Tempo und Größe einstellbar. Alles auf deinem Gerät.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bilder</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bilder hierher ziehen</strong>
+      <small>mindestens zwei — die Reihenfolge unten ist die Abspielreihenfolge</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts geladen.</div>
+
+    <div id="ergebnis">
+      <img id="gif" alt="Erzeugtes GIF">
+      <div class="hint" id="gifinfo" style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--ink-soft)"></div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Bilder im Stapel</small></div>
+
+    <div class="field" id="f-lib" style="margin-top:16px">
+      <label>Konverter-Bibliothek (ffmpeg)</label>
+      <button class="ghost" id="loadlib" style="width:100%">Bibliothek laden — einmalig ~31 MB</button>
+      <div class="hint" id="libhint">Kommt von diesem Server, wird danach zwischengespeichert.</div>
+    </div>
+
+    <div class="field">
+      <label for="tempo">Bilder pro Sekunde: <span id="tempoVal">4</span></label>
+      <input type="range" id="tempo" min="1" max="24" value="4" style="width:100%">
+      <div class="hint">niedrig = Diaschau, hoch = flüssige Bewegung</div>
+    </div>
+
+    <div class="field">
+      <label for="breite">Breite</label>
+      <select id="breite">
+        <option value="0">Original behalten</option>
+        <option value="800">800 px</option>
+        <option value="480" selected>480 px — gut für Chat</option>
+        <option value="320">320 px — klein</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="pendeln" style="width:auto;margin-right:6px">Vor und zurück abspielen</label>
+      <div class="hint">hängt die Bilder rückwärts an — wirkt runder bei Schleifen</div>
+    </div>
+
+    <button class="primary" id="go" disabled>GIF erstellen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein paar Fotos zu einer kleinen Animation machen — für eine Nachricht, eine Anleitung Schritt für Schritt oder einen Vorher-Nachher-Vergleich. Die Bilder werden in der gewählten Reihenfolge aneinandergehängt, das Tempo bestimmst du. Gerechnet wird mit ffmpeg, das eine eigens erzeugte Farbtabelle verwendet — dadurch sehen die Farben deutlich besser aus als bei der Standardumwandlung.</p>
+  <h3>Werden meine Bilder hochgeladen?</h3>
+  <p>Nein. Einmalig wird das Konverter-Programm von dieser Website geladen (rund 31&nbsp;MB); die Bilder selbst bleiben auf deinem Gerät.</p>
+  <h3>Warum wird das GIF so groß?</h3>
+  <p>GIF stammt aus den Achtzigern und kennt keine moderne Kompression. Jedes Einzelbild kostet Platz. Wirksam sind: kleinere Breite, weniger Bilder pro Sekunde und insgesamt weniger Einzelbilder. Für längere Sequenzen ist ein MP4 oder WebM um ein Vielfaches kleiner — das erzeugt <a href="../medien/index.html">Audio &amp; Video</a>.</p>
+  <h3>Wie viele Bilder sind sinnvoll?</h3>
+  <p>Für eine flüssige kurze Schleife etwa 10 bis 30. Bei mehr als 50 wird die Datei schnell mehrere Megabyte groß.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Dieses Werkzeug braucht einen Webserver — als heruntergeladene Datei per Doppelklick funktioniert es nicht.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/filelist.js?v=20260726"></script>
+<script>
+const FF = '../../vendor/ffmpeg';
+const bilder = [];
+let ffmpeg = null, uid = 0;
+
+function skript(url){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = res; s.onerror = () => rej(new Error('Download fehlgeschlagen'));
+    document.head.appendChild(s);
+  });
+}
+
+async function ladeBibliothek(){
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  const btn = AK.$('#loadlib');
+  btn.disabled = true; btn.textContent = 'Lädt …';
+  try{
+    await skript(FF + '/ffmpeg.js');
+    await skript(FF + '/util.js');
+    const { toBlobURL } = FFmpegUtil;
+    ffmpeg = new FFmpegWASM.FFmpeg();
+    ffmpeg.on('progress', ({ progress }) => { if(progress > 0 && progress <= 1) AK.bar(0.3 + progress*0.7); });
+    AK.$('#libhint').textContent = 'ffmpeg-Kern wird geladen (~31 MB) …';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(FF + '/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL(FF + '/ffmpeg-core.wasm', 'application/wasm'),
+      classWorkerURL: await toBlobURL(FF + '/814.ffmpeg.js', 'text/javascript'),
+    });
+    AK.$('#f-lib').innerHTML = '<label>Konverter-Bibliothek (ffmpeg)</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
+    AK.log('ffmpeg bereit.');
+    pruefe();
+  }catch(err){
+    console.error(err);
+    btn.disabled = false; btn.textContent = 'Bibliothek laden — einmalig ~31 MB';
+    AK.log('Bibliothek konnte nicht geladen werden: ' + (err.message || ''), true);
+  }
+}
+
+async function addFiles(list){
+  for(const file of list){
+    if(!file.type.startsWith('image/') && !/\.(jpe?g|png|webp|gif|bmp|avif|hei[cf])$/i.test(file.name)) continue;
+    const e = { id:++uid, name:file.name, size:file.size, mode:'pending', note:'wird gelesen …', bmp:null, w:0, h:0 };
+    bilder.push(e);
+    lade(e, file);
+  }
+  liste.render();
+}
+
+async function lade(e, file){
+  try{
+    let blob = file;
+    if(/\.(hei[cf])$/i.test(file.name) || /hei[cf]/.test(file.type)){
+      blob = await heic2any({ blob:file, toType:'image/png' });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+    e.bmp = 'createImageBitmap' in window ? await createImageBitmap(blob) : await new Promise((res,rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(blob);
+    });
+    e.w = e.bmp.width; e.h = e.bmp.height;
+    e.mode = 'ok'; e.note = '';
+  }catch(err){
+    e.mode = 'error'; e.note = 'Bild kann nicht gelesen werden';
+  }
+  liste.render();
+}
+
+const liste = AK.filelist({
+  container:'#stack', empty:'#empty', entries:bilder,
+  rowClass: e => e.mode === 'error' ? 'locked' : '',
+  meta: e => `<div class="fname">${AK.esc(e.name)}</div>
+    <div class="finfo"><span>${AK.fmtBytes(e.size)}</span>${e.w ? `<span>${e.w} × ${e.h} px</span>` : ''}
+    ${e.note ? `<span class="pw-hint">${AK.esc(e.note)}</span>` : ''}</div>`,
+  onChange: pruefe
+});
+
+function pruefe(){
+  const ok = bilder.filter(e => e.mode === 'ok').length;
+  AK.$('#anzahl').innerHTML = ok + '<small>Bilder im Stapel</small>';
+  AK.$('#go').disabled = !(ok >= 1 && ffmpeg && ffmpeg.loaded);
+}
+
+/* Alle Bilder auf dieselbe Größe bringen — ffmpeg braucht gleich große Einzelbilder */
+async function einzelbild(e, breite, hoehe){
+  const c = document.createElement('canvas');
+  c.width = breite; c.height = hoehe;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, breite, hoehe);
+  const s = Math.min(breite / e.w, hoehe / e.h);
+  const w = e.w * s, h = e.h * s;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(e.bmp, (breite-w)/2, (hoehe-h)/2, w, h);
+  const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  c.width = c.height = 0;
+  return new Uint8Array(await blob.arrayBuffer());
+}
+
+async function erstelle(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.05);
+
+  const fertig = bilder.filter(e => e.mode === 'ok');
+  const zielBreite = +AK.$('#breite').value;
+  const erstes = fertig[0];
+  let breite = zielBreite || erstes.w;
+  if(breite % 2) breite++;                       // gerade Maße sind für ffmpeg sicherer
+  let hoehe = Math.round(breite * erstes.h / erstes.w);
+  if(hoehe % 2) hoehe++;
+
+  const reihe = AK.$('#pendeln').checked && fertig.length > 1
+    ? [...fertig, ...fertig.slice(1, -1).reverse()]
+    : fertig;
+
+  try{
+    AK.log(`${reihe.length} Einzelbilder werden vorbereitet …`);
+    for(let i = 0; i < reihe.length; i++){
+      await ffmpeg.writeFile(`b${String(i).padStart(4,'0')}.png`, await einzelbild(reihe[i], breite, hoehe));
+      AK.bar(0.05 + 0.25 * (i+1)/reihe.length);
+    }
+
+    const tempo = +AK.$('#tempo').value;
+    AK.log('GIF wird berechnet — mit eigener Farbtabelle für bessere Farben …');
+    // Zwei Durchgänge: erst Farbtabelle bestimmen, dann damit das GIF bauen
+    let code = await ffmpeg.exec(['-framerate', String(tempo), '-i', 'b%04d.png',
+      '-vf', 'palettegen=stats_mode=diff', '-y', 'palette.png']);
+    if(code !== 0) throw new Error('Farbtabelle fehlgeschlagen (Code ' + code + ')');
+    code = await ffmpeg.exec(['-framerate', String(tempo), '-i', 'b%04d.png', '-i', 'palette.png',
+      '-lavfi', 'paletteuse=dither=bayer:bayer_scale=3', '-loop', '0', '-y', 'ausgabe.gif']);
+    if(code !== 0) throw new Error('GIF-Erstellung fehlgeschlagen (Code ' + code + ')');
+
+    const daten = await ffmpeg.readFile('ausgabe.gif');
+    const blob = new Blob([daten.buffer], { type:'image/gif' });
+    AK.bar(1);
+
+    AK.$('#gif').src = URL.createObjectURL(blob);
+    AK.$('#ergebnis').classList.add('on');
+    AK.$('#gifinfo').textContent =
+      `${reihe.length} Einzelbilder · ${breite} × ${hoehe} px · ${tempo} Bilder/s · ${(reihe.length/tempo).toFixed(1)} Sekunden`;
+    AK.offerDownload(blob, 'animation.gif');
+    AK.log(`Fertig: ${AK.fmtBytes(blob.size)}` + (blob.size > 5e6 ? ' — recht groß, probier eine kleinere Breite.' : ''));
+    AK.stamp(true);
+
+    for(let i = 0; i < reihe.length; i++) await ffmpeg.deleteFile(`b${String(i).padStart(4,'0')}.png`).catch(()=>{});
+    await ffmpeg.deleteFile('palette.png').catch(()=>{});
+    await ffmpeg.deleteFile('ausgabe.gif').catch(()=>{});
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'GIF erstellen'; pruefe();
+  }
+}
+
+AK.$('#tempo').oninput = e => AK.$('#tempoVal').textContent = e.target.value;
+AK.$('#loadlib').onclick = ladeBibliothek;
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = erstelle;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
