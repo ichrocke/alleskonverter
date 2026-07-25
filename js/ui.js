@@ -12,7 +12,10 @@ AK.base = (function(){
 AK.$ = s => document.querySelector(s);
 AK.$$ = s => Array.from(document.querySelectorAll(s));
 
-AK.fmtBytes = n => n < 1024*1024 ? (n/1024).toFixed(0)+' KB' : (n/1048576).toFixed(1)+' MB';
+AK.fmtBytes = n =>
+  n < 1024 ? n + ' B' :
+  n < 1024*1024 ? (n/1024).toFixed(0) + ' KB' :
+  (n/1048576).toFixed(1) + ' MB';
 
 AK.esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 

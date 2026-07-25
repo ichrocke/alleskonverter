@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZIP entpacken &amp; erstellen — kostenlos &amp; ohne Upload | Alleskonverter</title>
+<meta name="description" content="ZIP-Archive online entpacken oder Dateien zu einem ZIP packen — kostenlos, ohne Upload, ohne Anmeldung. Läuft 100 % lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/zip/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="ZIP entpacken &amp; erstellen — kostenlos &amp; ohne Upload | Alleskonverter">
+<meta property="og:description" content="ZIP-Archive online entpacken oder Dateien zu einem ZIP packen — kostenlos, ohne Upload, ohne Anmeldung. Läuft 100 % lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/zip/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ZIP entpacken &amp; erstellen — kostenlos &amp; ohne Upload | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"ZIP-Werkzeug — Alleskonverter","url":"https://alleskonverter.de/tools/zip/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"ZIP-Archive online entpacken oder Dateien zu einem ZIP packen — kostenlos, ohne Upload, ohne Anmeldung."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das Archiv wird vollständig in deinem Browser gelesen und geschrieben — es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Kann das Werkzeug passwortgeschützte ZIPs öffnen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Verschlüsselte Archive werden nicht unterstützt; dafür braucht es ein Programm auf dem Rechner wie 7-Zip oder das Archivierungsprogramm des Betriebssystems."}},{"@type":"Question","name":"Wie groß darf das Archiv sein?","acceptedAnswer":{"@type":"Answer","text":"Es gibt kein festes Limit, aber alles läuft im Arbeitsspeicher des Browsers. Bis etwa 500 MB ist es unproblematisch, darüber kann es je nach Gerät eng werden."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>ZIP <span>entpacken &amp; packen</span></h1>
+  <p class="sub">Ein Archiv hineinziehen und den Inhalt einzeln oder komplett herausholen — oder umgekehrt beliebige Dateien zu einem ZIP schnüren. Alles auf deinem Gerät.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2 id="listhead">Inhalt</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong id="dropline">ZIP-Datei hierher ziehen</strong>
+      <small id="drophint">oder klicken zum Auswählen — zum Packen einfach mehrere Dateien wählen</small>
+    </div>
+    <input type="file" id="picker" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts geladen. Ziehe ein ZIP-Archiv herein, um es zu öffnen — oder mehrere beliebige Dateien, um daraus ein Archiv zu packen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="count">0<small id="countlabel">Dateien</small></div>
+
+    <div class="field" style="margin-top:16px" id="f-name" hidden>
+      <label for="outname">Dateiname des Archivs</label>
+      <input type="text" id="outname" value="archiv.zip">
+    </div>
+
+    <div class="field" id="f-level" hidden>
+      <label for="level">Kompression</label>
+      <select id="level">
+        <option value="0">Keine — nur zusammenfassen (schnell)</option>
+        <option value="6" selected>Normal — empfohlen</option>
+        <option value="9">Maximal — kleinste Datei</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Datei wählen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Dieses Werkzeug arbeitet in beide Richtungen: Ziehst du ein ZIP-Archiv herein, siehst du sofort dessen Inhalt und kannst einzelne Dateien oder alles auf einmal herausholen. Ziehst du stattdessen mehrere gewöhnliche Dateien herein, werden sie zu einem neuen Archiv gepackt — praktisch, um einen Stapel Bilder oder Dokumente in einer E-Mail zu verschicken. Der Kompressionsgrad ist wählbar; bei bereits komprimierten Inhalten wie JPEG oder MP4 bringt „keine Kompression“ dasselbe Ergebnis in einem Bruchteil der Zeit.</p>
+  <h3>Werden meine Dateien hochgeladen?</h3>
+  <p>Nein. Das Archiv wird vollständig in deinem Browser gelesen und geschrieben — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt.</p>
+  <h3>Kann das Werkzeug passwortgeschützte ZIPs öffnen?</h3>
+  <p>Nein. Verschlüsselte Archive werden nicht unterstützt — dafür brauchst du ein Programm auf dem Rechner, etwa 7-Zip oder das eingebaute Archivierungsprogramm deines Betriebssystems.</p>
+  <h3>Welche Archivformate werden gelesen?</h3>
+  <p>ZIP (auch die von Windows, macOS und Linux erzeugten Varianten). RAR und 7z lassen sich nicht öffnen, da es sich um andere, patentbelastete beziehungsweise deutlich komplexere Formate handelt.</p>
+  <h3>Wie groß darf das Archiv sein?</h3>
+  <p>Es gibt kein festes Limit, aber alles läuft im Arbeitsspeicher des Browsers. Bis etwa 500 MB ist es unproblematisch, darüber kann es je nach Gerät eng werden.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar.</p>
+</section>
+
+<footer>
+  <p>Ordnerstrukturen im Archiv bleiben beim Entpacken als Teil des Dateinamens erhalten (z.&nbsp;B. <code>bilder/urlaub.jpg</code>), da Browser aus Sicherheitsgründen keine Ordner anlegen dürfen. Beim „Alle entpacken“ bekommst du deshalb die Dateien einzeln.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/filelist.js"></script>
+<script>
+/* Zwei Betriebsarten: 'entpacken' (ein ZIP geladen) und 'packen' (beliebige Dateien) */
+let mode = null;
+let archive = null;          // { name, size, entries: [{path, size, dir, zipObj}] }
+const files = [];            // zu packende Dateien
+let uid = 0;
+
+const isZip = f => /\.zip$/i.test(f.name) || f.type === 'application/zip' || f.type === 'application/x-zip-compressed';
+
+async function addFiles(list){
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  // Genau ein ZIP und noch nichts zum Packen geladen → Archiv öffnen
+  if(list.length === 1 && isZip(list[0]) && !files.length){
+    return openArchive(list[0]);
+  }
+
+  // sonst: Dateien sammeln, um sie zu packen
+  if(mode === 'entpacken'){ archive = null; }
+  mode = 'packen';
+  for(const f of list) files.push({ id:++uid, file:f, name:f.name, size:f.size });
+  render();
+}
+
+async function openArchive(file){
+  mode = 'entpacken';
+  files.length = 0;
+  AK.log(`${file.name} wird gelesen …`);
+  try{
+    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    const entries = [];
+    zip.forEach((path, obj) => {
+      if(obj.dir) return;
+      if(/^__MACOSX\//.test(path) || /(^|\/)\.DS_Store$/.test(path)) return;
+      entries.push({ id:++uid, path, name:path.split('/').pop(), obj,
+                     size:(obj._data && obj._data.uncompressedSize) || 0 });
+    });
+    entries.sort((a,b) => a.path.localeCompare(b.path, 'de'));
+    archive = { name:file.name, size:file.size, entries };
+    if(!entries.length) AK.log('Das Archiv enthält keine Dateien.', true);
+    else AK.logClear();
+    render();
+  }catch(err){
+    console.error(err);
+    archive = null; mode = null; render();
+    AK.log('Archiv kann nicht gelesen werden — beschädigt, passwortgeschützt oder kein ZIP.', true);
+  }
+}
+
+/* ---------- Anzeige ---------- */
+function render(){
+  const stack = AK.$('#stack');
+  stack.innerHTML = '';
+  const has = mode === 'entpacken' ? !!archive : files.length > 0;
+  AK.$('#empty').style.display = has ? 'none' : '';
+  AK.$('#f-name').hidden = mode !== 'packen';
+  AK.$('#f-level').hidden = mode !== 'packen';
+  AK.$('#listhead').firstChild.textContent = mode === 'entpacken' ? 'Inhalt des Archivs' : (mode === 'packen' ? 'Zu packende Dateien' : 'Inhalt');
+  AK.$('#dropline').textContent = mode === 'packen' ? 'Weitere Dateien hierher ziehen' : 'ZIP-Datei hierher ziehen';
+
+  if(mode === 'entpacken' && archive){
+    archive.entries.forEach(e => {
+      const li = document.createElement('li');
+      li.className = 'row';
+      const dir = e.path.includes('/') ? e.path.slice(0, e.path.lastIndexOf('/') + 1) : '';
+      li.innerHTML = `
+        <div class="tab" style="cursor:default">↓</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(e.name)}</div>
+          <div class="finfo">${dir ? `<span>${AK.esc(dir)}</span>` : ''}${e.size ? `<span>${AK.fmtBytes(e.size)}</span>` : ''}</div>
+        </div>
+        <div class="tools"><button class="icon save" title="Diese Datei speichern">↓</button></div>`;
+      li.querySelector('.save').onclick = () => saveOne(e);
+      stack.appendChild(li);
+    });
+    AK.$('#count').innerHTML = archive.entries.length + '<small>Dateien im Archiv</small>';
+    AK.$('#go').disabled = !archive.entries.length;
+    AK.$('#go').textContent = 'Alle entpacken';
+  }else if(mode === 'packen'){
+    list.render();
+    AK.$('#count').innerHTML = files.length + '<small>Dateien zum Packen</small>';
+    AK.$('#go').disabled = !files.length;
+    AK.$('#go').textContent = 'ZIP erstellen';
+  }else{
+    AK.$('#count').innerHTML = '0<small>Dateien</small>';
+    AK.$('#go').disabled = true;
+    AK.$('#go').textContent = 'Datei wählen';
+  }
+}
+
+const list = AK.filelist({
+  container:'#stack', entries:files,
+  meta: e => `<div class="fname">${AK.esc(e.name)}</div>
+              <div class="finfo"><span>${AK.fmtBytes(e.size)}</span></div>`,
+  onChange: () => {
+    if(mode !== 'packen') return;
+    AK.$('#count').innerHTML = files.length + '<small>Dateien zum Packen</small>';
+    AK.$('#go').disabled = !files.length;
+    if(!files.length){ mode = null; render(); }
+  }
+});
+
+/* ---------- Entpacken ---------- */
+async function saveOne(entry){
+  AK.clearDownloads();
+  const blob = await entry.obj.async('blob');
+  const a = AK.offerDownload(blob, entry.name, `„${entry.name}“ herunterladen`);
+  a.click();
+  AK.log(`${entry.path} entpackt (${AK.fmtBytes(blob.size)})`);
+}
+
+async function unpackAll(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const out = [];
+    for(let i = 0; i < archive.entries.length; i++){
+      const e = archive.entries[i];
+      out.push({ name: e.path.replace(/\//g, '_'), data: await e.obj.async('blob') });
+      AK.bar((i+1)/archive.entries.length);
+    }
+    if(out.length === 1){
+      AK.offerDownload(out[0].data, out[0].name);
+    }else{
+      // Als flache ZIP-Sammlung anbieten wäre unsinnig — Dateien einzeln bündeln
+      const zip = new JSZip();
+      out.forEach(f => zip.file(f.name, f.data));
+      const blob = await zip.generateAsync({ type:'blob', compression:'STORE' });
+      AK.offerDownload(blob, archive.name.replace(/\.zip$/i,'') + '-entpackt.zip', 'Alle als Sammlung laden');
+      AK.log('Hinweis: Browser dürfen keine Ordner anlegen — die entpackten Dateien kommen deshalb ohne Ordnerstruktur gebündelt.');
+    }
+    AK.log(`Fertig: ${out.length} Dateien entpackt.`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    render();
+  }
+}
+
+/* ---------- Packen ---------- */
+async function pack(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const level = +AK.$('#level').value;
+  try{
+    const zip = new JSZip();
+    const seen = new Map();
+    for(const f of files){
+      let name = f.name;
+      if(seen.has(name)){                      // gleiche Namen nicht überschreiben
+        const n = seen.get(name) + 1; seen.set(name, n);
+        name = name.replace(/(\.[^.]+)?$/, ` (${n})$1`);
+      }else seen.set(name, 0);
+      zip.file(name, f.file);
+    }
+    const blob = await zip.generateAsync(
+      { type:'blob',
+        compression: level === 0 ? 'STORE' : 'DEFLATE',
+        compressionOptions:{ level: level || 1 } },
+      meta => AK.bar(meta.percent / 100)
+    );
+    const name = AK.ensureExt(AK.$('#outname').value || 'archiv', 'zip');
+    AK.offerDownload(blob, name);
+    const before = files.reduce((s,f) => s + f.size, 0);
+    AK.log(`Fertig: ${files.length} Dateien, ${AK.fmtBytes(before)} → ${AK.fmtBytes(blob.size)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    render();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = () => mode === 'entpacken' ? unpackAll() : pack();
+render();
+</script>
+</body>
+</html>
