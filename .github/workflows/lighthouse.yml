@@ -22,9 +22,9 @@ jobs:
       - name: Lighthouse installieren
         run: npm install -g lighthouse@12
 
-      - name: Seite ausliefern
+      - name: Seite ausliefern (mit gzip wie auf dem echten Server)
         run: |
-          npx --yes http-server . -p 8080 --silent &
+          node tests/server.js 8080 &
           for i in $(seq 1 20); do
             curl -sf http://localhost:8080/ >/dev/null && break
             sleep 1
@@ -42,7 +42,12 @@ jobs:
             node -e '
               const r = require("./bericht.json");
               // Die Messung im CI-Container schwankt; unter 90 ist ein echtes Problem
-              const grenze = { performance: 80, accessibility: 95, "best-practices": 90, seo: 95 };
+              // Gemessen wird gegen den lokalen Testserver: mit gzip, aber ohne HTTP/2
+              // und ohne Cache-Kopfzeilen. Die Werkzeugseiten landen dort bei etwa 81–84,
+              // live dagegen bei 100. Die Schwelle liegt deshalb bewusst darunter — sie
+              // soll echte Rückschritte fangen (etwa eine neu eingebundene Riesenbibliothek),
+              // nicht die bekannte Lücke zwischen Testaufbau und echtem Server.
+              const grenze = { performance: 75, accessibility: 100, "best-practices": 95, seo: 100 };
               let schlecht = false;
               for (const [schluessel, kategorie] of Object.entries(r.categories)) {
                 const wert = Math.round(kategorie.score * 100);
