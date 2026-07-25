@@ -54,3 +54,9 @@ body {
 .seotext h3 { font-size: 15px; margin: 20px 0 4px; }
 .seotext p { margin: 6px 0 0; color: var(--ink-soft); }
 .seotext > p:first-of-type { color: var(--ink); }
+
+/* Platz reservieren, damit beim Aufbau nichts springt (CLS) */
+#typeChips { min-height: 46px; }
+#typeForm { min-height: 76px; }
+#presetGrid { min-height: 188px; }
+.preview-stage { min-height: 296px; display: grid; place-items: center; }
