@@ -166,6 +166,18 @@ function render(){
     const canvas = document.createElement('canvas');
     drawThumb(canvas, p.thumb, p.delta);
     canvas.draggable = true;
+    canvas.tabIndex = 0;
+    canvas.setAttribute('role', 'button');
+    canvas.setAttribute('aria-label', `Seite ${p.srcIndex+1}, Position ${i+1} von ${pages.length}. Mit den Pfeiltasten verschieben, R zum Drehen, Entfernen zum Löschen.`);
+    canvas.addEventListener('keydown', ev => {
+      const tausche = j => { if(j >= 0 && j < pages.length){ [pages[j], pages[i]] = [pages[i], pages[j]]; render();
+        const neu = AK.$$('.tile canvas')[j]; if(neu) neu.focus(); } };
+      if(ev.key === 'ArrowLeft'){ ev.preventDefault(); tausche(i-1); }
+      else if(ev.key === 'ArrowRight'){ ev.preventDefault(); tausche(i+1); }
+      else if(ev.key.toLowerCase() === 'r'){ ev.preventDefault(); p.delta += ev.shiftKey ? -90 : 90; render();
+        const gleich = AK.$$('.tile canvas')[i]; if(gleich) gleich.focus(); }
+      else if(ev.key === 'Delete' || ev.key === 'Backspace'){ ev.preventDefault(); p.removed = !p.removed; render(); }
+    });
     li.appendChild(canvas);
 
     const no = document.createElement('span');
@@ -177,14 +189,22 @@ function render(){
     tools.className = 'ttools';
     tools.innerHTML = p.removed
       ? `<button class="icon undel" title="Wiederherstellen">↩</button>`
-      : `<button class="icon rl" title="90° links">↺</button>
+      : `<button class="icon vor" title="Nach vorne" ${i === 0 ? 'disabled' : ''}>←</button>
+         <button class="icon rl" title="90° links">↺</button>
          <button class="icon rr" title="90° rechts">↻</button>
+         <button class="icon zurueck" title="Nach hinten" ${i === pages.length-1 ? 'disabled' : ''}>→</button>
          <button class="icon del" title="Seite löschen">✕</button>`;
     li.appendChild(tools);
 
     if(p.removed){
       tools.querySelector('.undel').onclick = () => { p.removed = false; render(); };
     }else{
+      tools.querySelector('.vor').onclick = () => {
+        if(i > 0){ [pages[i-1], pages[i]] = [pages[i], pages[i-1]]; render(); }
+      };
+      tools.querySelector('.zurueck').onclick = () => {
+        if(i < pages.length-1){ [pages[i+1], pages[i]] = [pages[i], pages[i+1]]; render(); }
+      };
       tools.querySelector('.rl').onclick = () => { p.delta -= 90; render(); };
       tools.querySelector('.rr').onclick = () => { p.delta += 90; render(); };
       tools.querySelector('.del').onclick = () => { p.removed = true; render(); };

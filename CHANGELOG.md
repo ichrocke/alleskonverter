@@ -3,6 +3,22 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Verkettung, Tastatur, Wartung)
+
+### Hinzugefügt
+- **Werkzeuge verketten** (`js/weiter.js`): Nach jedem fertigen Ergebnis erscheint ein „Weiter zu …“ mit passenden nächsten Schritten — nach dem Freistellen etwa Zuschneiden, nach der Texterkennung die Text-Werkzeuge. Ein Klick nimmt das eben erzeugte Ergebnis direkt mit, ohne Umweg über die Festplatte. Angedockt an `AK.offerDownload`, deshalb ohne Änderung an den einzelnen Werkzeugen.
+- **Tastaturbedienung in den Miniaturen-Ansichten**: In „PDF bearbeiten“ lassen sich Seiten jetzt auch ohne Maus umsortieren (Pfeiltasten oder neue ←/→-Schaltflächen), drehen (R, mit Umschalt rückwärts) und löschen (Entfernen). Im Zuschnitt-Werkzeug bewegen die Pfeiltasten den Rahmen, mit Umschalt ändert sich die Größe, mit Alt in Ein-Pixel-Schritten. Der Rahmen ist anspringbar und hat einen sichtbaren Fokusrahmen.
+- **Randfall-Tests**: beschädigte PDFs, kaputtes JSON, defekte ZIPs, leere DOCX, unlesbare Bilder und falsche Dateitypen — geprüft wird, dass eine verständliche Meldung erscheint statt eines stillen Absturzes. Die Suite umfasst jetzt 44 Prüfungen.
+- **Lighthouse in der GitHub Action** (`.github/workflows/lighthouse.yml`): misst Startseite und drei Werkzeugseiten bei jedem Push und schlägt an, wenn eine Wertung unter die festgelegte Schwelle fällt.
+
+### Behoben
+- **Der Bildkonverter verschluckte unpassende Dateien kommentarlos.** Zieht man etwa eine Tabelle hinein, passierte schlicht nichts. Jetzt prüft die Ablagefläche zentral gegen das, was das Werkzeug laut Auswahlfeld annimmt, und sagt in verständlichen Worten, was erwartet wird — für alle Werkzeuge auf einmal. Gefunden hat das die neue Randfall-Prüfung.
+
+### Geändert (Wartung)
+- Bibliotheken gegen die Registry geprüft: mammoth und turndown aktualisiert. **pdf.js bleibt bewusst auf der letzten 3er-Fassung** — ab 4.0 gibt es nur noch ES-Module, was den Betrieb über `file://` beenden würde; Begründung in `vendor/VERSIONEN.md`, jährlich neu zu bewerten. **ffmpeg wurde zurückgerollt**, weil die neuere Fassung sich im Browser nicht mehr laden ließ.
+- **Texterkennung um 9,5 MB verschlankt**: Die beiden Kernfassungen ohne LSTM wurden entfernt — die verwendeten schnellen Sprachmodelle sind LSTM-only, die Dateien wurden also nie angefordert. Erkennung danach unverändert.
+- `ideen.txt` aufgeräumt und neu gefüllt
+
 ## 2026-07-26 (Werkzeug 36)
 
 ### Hinzugefügt

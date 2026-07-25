@@ -35,6 +35,7 @@
 #crop::before{border-left:1px solid rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.45);left:33.33%;right:33.33%}
 #crop::after{border-top:1px solid rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.45);top:33.33%;bottom:33.33%}
 .hnd{position:absolute;width:16px;height:16px;background:#fff;border:1.5px solid #16191B;z-index:2}
+#crop:focus-visible{outline:3px solid var(--stamp);outline-offset:3px}
 .hnd[data-h=nw]{left:-8px;top:-8px;cursor:nwse-resize}
 .hnd[data-h=ne]{right:-8px;top:-8px;cursor:nesw-resize}
 .hnd[data-h=sw]{left:-8px;bottom:-8px;cursor:nesw-resize}
@@ -70,7 +71,7 @@
     <div id="stage">
       <div class="canvaswrap" id="wrap">
         <canvas id="view"></canvas>
-        <div id="crop">
+        <div id="crop" tabindex="0" role="group" aria-label="Zuschnittrahmen — mit den Pfeiltasten verschieben, mit Umschalt größer und kleiner ziehen">
           <span class="hnd" data-h="nw"></span><span class="hnd" data-h="ne"></span>
           <span class="hnd" data-h="sw"></span><span class="hnd" data-h="se"></span>
         </div>
@@ -327,6 +328,24 @@ function onUp(){ drag = null; }
 window.addEventListener('pointermove', onMove);
 window.addEventListener('pointerup', onUp);
 window.addEventListener('pointercancel', onUp);
+
+/* Bedienung ohne Maus: Pfeiltasten verschieben, mit Umschalt wird die Größe geändert */
+box.addEventListener('keydown', ev => {
+  if(!src) return;
+  const schritt = ev.altKey ? 1 : 10;
+  const richtung = { ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1] }[ev.key];
+  if(!richtung) return;
+  ev.preventDefault();
+  const [dx, dy] = richtung;
+  if(ev.shiftKey){
+    crop.w += dx * schritt;
+    crop.h += ratio ? (dx * schritt) / ratio : dy * schritt;
+  }else{
+    crop.x += dx * schritt;
+    crop.y += dy * schritt;
+  }
+  clampCrop(); paintBox();
+});
 
 /* ---------- Drehen und Spiegeln ---------- */
 function turn(deg){

@@ -239,6 +239,72 @@ const FAELLE = [
     } },
 ];
 
+/* ---------- Randfälle ----------
+   Kaputte Dateien, falsche Formate und geschützte PDFs dürfen nicht in einem
+   stillen Absturz enden, sondern müssen eine verständliche Meldung zeigen. */
+async function randfaelle(browser){
+  const KAPUTT = Buffer.from('%PDF-1.4\nDas ist gar kein gueltiges PDF, nur Text.\n').toString('base64');
+  const LEER   = Buffer.from('').toString('base64');
+
+  const faelle = [
+    { werkzeug:'pdf-zusammenfuegen', datei:['kaputt.pdf', KAPUTT, 'application/pdf'],
+      erwartet:/kann nicht|nicht lesbar|Fehler/i, was:'beschädigtes PDF' },
+    { werkzeug:'pdf-aufteilen', datei:['kaputt.pdf', KAPUTT, 'application/pdf'],
+      erwartet:/kann nicht gelesen|verschlüsselt|beschädigt/i, was:'beschädigtes PDF' },
+    { werkzeug:'tabellen', datei:['kaputt.json', Buffer.from('{das ist kein json').toString('base64'), 'application/json'],
+      erwartet:/kann nicht gelesen|unbekannt/i, was:'kaputtes JSON' },
+    { werkzeug:'zip', datei:['kaputt.zip', KAPUTT, 'application/zip'],
+      erwartet:/kann nicht gelesen|beschädigt|passwortgeschützt|kein ZIP/i, was:'kaputtes ZIP' },
+    { werkzeug:'word-zu-html', datei:['leer.docx', LEER, ''],
+      erwartet:/Abgebrochen|kann nicht gelesen/i, was:'leere DOCX' },
+    { werkzeug:'bild-konvertieren', datei:['kaputt.png', KAPUTT, 'image/png'],
+      erwartet:/kann nicht gelesen/i, was:'kaputtes Bild' },
+    { werkzeug:'bild-konvertieren', datei:['tabelle.csv', Buffer.from('a;b').toString('base64'), 'text/csv'],
+      erwartet:/passt nicht zu diesem Werkzeug/i, was:'falscher Dateityp', ueber_ablage:true },
+  ];
+
+  let fehler = 0;
+  for(const fall of faelle){
+    const page = await browser.newPage();
+    const abstuerze = [];
+    page.on('pageerror', e => abstuerze.push(e.message.split('\n')[0]));
+    try{
+      await page.goto(`http://localhost:${PORT}/tools/${fall.werkzeug}/`, { waitUntil:'load', timeout:30000 });
+      await page.waitForFunction(() => typeof window.addFiles === 'function', { timeout:20000 });
+      await page.evaluate(async ([name, daten, typ, echteAblage]) => {
+        const bin = atob(daten);
+        const arr = new Uint8Array(bin.length);
+        for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        const datei = new File([arr], name, { type: typ });
+        if(echteAblage){
+          // Über die Ablagefläche, damit auch die Typprüfung dort mitgetestet wird
+          const dt = new DataTransfer();
+          dt.items.add(datei);
+          document.querySelector('#drop').dispatchEvent(
+            new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+        }else{
+          await window.addFiles([datei]);
+        }
+      }, [...fall.datei, !!fall.ueber_ablage]);
+      await new Promise(r => setTimeout(r, 1200));
+
+      // Die Meldung darf im Protokoll oder in der Dateiliste stehen — beides ist gut
+      const sichtbar = await page.$eval('main', e => e.textContent).catch(() => '');
+      if(abstuerze.length) throw new Error('Skriptfehler statt Meldung: ' + abstuerze[0].slice(0,80));
+      if(!fall.erwartet.test(sichtbar)){
+        const protokoll = await page.$eval('#log', e => e.textContent).catch(() => '');
+        throw new Error('keine verständliche Meldung, sondern: ' + (protokoll.trim().slice(0,70) || '(nichts)'));
+      }
+      console.log(`  ok    Randfall ${fall.was} in ${fall.werkzeug}`);
+    }catch(err){
+      fehler++;
+      console.log(`  FEHLT Randfall ${fall.was} in ${fall.werkzeug} — ${err.message.slice(0,110)}`);
+    }
+    await page.close();
+  }
+  return fehler;
+}
+
 /* ---------- Bleibt die Oberfläche bedienbar? ----------
    Gemessen wird, ob der Hauptstrang blockiert: Ein Zeitgeber im Sekundentakt
    müsste bei einer eingefrorenen Seite große Lücken zeigen. Solange die
@@ -333,10 +399,12 @@ async function bedienbarkeit(browser){
     await page.close();
   }
 
+  fehler += await randfaelle(browser);
   if(!await bedienbarkeit(browser)) fehler++;
 
   await browser.close();
   srv.close();
-  console.log(`\n${FAELLE.length + 1 - fehler} von ${FAELLE.length + 1} Prüfungen in Ordnung.`);
+  const gesamt = FAELLE.length + 8;
+  console.log(`\n${gesamt - fehler} von ${gesamt} Prüfungen in Ordnung.`);
   process.exit(fehler ? 1 : 0);
 })();
