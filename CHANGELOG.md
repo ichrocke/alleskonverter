@@ -5,6 +5,9 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
 ## 2026-07-26 (Messung statt Umbau, Doku)
 
+### Behoben
+- Acht Textfelder in vier Werkzeugen hatten keine Beschriftung für Vorleseprogramme — mit `aria-label` nachgezogen. Alle Seiten stehen damit wieder bei 100 Punkten für Barrierefreiheit.
+
 ### Geprüft
 - **Web Worker waren nicht nötig.** Vor dem geplanten Umbau wurde gemessen, ob die Oberfläche überhaupt blockiert — sie tut es nicht: 120 Seiten komprimieren ergab als längste Blockade 103 ms, sechs 12-Megapixel-Fotos umwandeln 97 ms (spürbar wird es ab etwa 600 ms). Grund: pdf.js, ffmpeg, Texterkennung und Freistellen bringen jeweils eigene Stränge mit, `canvas.toBlob` kodiert nebenher, und die `await`-Punkte zwischen den Schritten geben die Oberfläche frei. Statt eines Umbaus ohne Nutzen sichert jetzt ein Testfall diesen Zustand dauerhaft ab.
 
