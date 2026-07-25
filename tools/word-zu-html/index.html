@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word → HTML — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/mammoth.browser.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Word <span>→ HTML</span></h1>
+  <p class="sub">DOCX-Dateien in sauberes, schlankes HTML oder reinen Text umwandeln — Überschriften, Listen, Tabellen und Bilder bleiben erhalten.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Vorschau</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Word-Datei auswählen">
+      <strong>Word-Datei (.docx) hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+
+    <div class="preview" id="preview" style="margin-top:18px"><em style="color:var(--ink-soft)">Die Vorschau erscheint hier …</em></div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="wordcount">0<small>Wörter im Dokument</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="mode">Zielformat</label>
+      <select id="mode">
+        <option value="html" selected>HTML — komplette Datei</option>
+        <option value="fragment">HTML — nur Inhalt (Fragment)</option>
+        <option value="text">Reiner Text (.txt)</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Umwandeln</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>Die Umwandlung nutzt die semantische Struktur des Dokuments (Formatvorlagen), nicht das Aussehen — das Ergebnis ist schlankes HTML ohne Word-Ballast. Eingebettete Bilder landen direkt in der Datei. Das alte .doc-Format wird nicht unterstützt, nur .docx.</p>
+</footer>
+</div>
+
+<script>
+let src = null; // { name, buffer }
+
+async function addFiles(files){
+  const file = files.find(f => /\.docx$/i.test(f.name));
+  if(!file){ AK.log('Bitte eine .docx-Datei wählen (das alte .doc geht nicht).', true); return; }
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  src = { name:file.name, buffer:await file.arrayBuffer() };
+  AK.$('#go').disabled = false;
+  AK.log(`${file.name} geladen (${AK.fmtBytes(file.size)}).`);
+  run(); // direkt Vorschau erzeugen
+}
+
+async function run(){
+  if(!src) return;
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.3);
+  const mode = AK.$('#mode').value;
+  const base = src.name.replace(/\.docx$/i, '');
+
+  try{
+    if(mode === 'text'){
+      const result = await mammoth.extractRawText({ arrayBuffer: src.buffer.slice(0) });
+      const text = result.value;
+      AK.$('#preview').innerHTML = '';
+      const pre = document.createElement('pre');
+      pre.style.whiteSpace = 'pre-wrap'; pre.style.fontFamily = 'inherit'; pre.style.margin = '0';
+      pre.textContent = text;
+      AK.$('#preview').appendChild(pre);
+      count(text);
+      AK.offerDownload(new Blob([text], {type:'text/plain;charset=utf-8'}), base + '.txt', '.txt herunterladen');
+    }else{
+      const result = await mammoth.convertToHtml({ arrayBuffer: src.buffer.slice(0) });
+      result.messages.forEach(m => AK.log(m.message, m.type === 'error'));
+      AK.$('#preview').innerHTML = result.value || '<em>Leeres Dokument</em>';
+      count(AK.$('#preview').textContent);
+
+      const payload = mode === 'fragment'
+        ? result.value
+        : `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(base)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}</style>\n</head>\n<body>\n${result.value}\n</body>\n</html>\n`;
+      AK.offerDownload(new Blob([payload], {type:'text/html;charset=utf-8'}), base + '.html', '.html herunterladen');
+    }
+    AK.bar(1);
+    AK.log('Fertig.');
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'Datei kann nicht gelesen werden'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !src; go.textContent = 'Umwandeln';
+  }
+}
+
+function count(text){
+  const words = (text.match(/\S+/g) || []).length;
+  AK.$('#wordcount').innerHTML = words.toLocaleString('de-DE') + '<small>Wörter im Dokument</small>';
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = run;
+AK.$('#mode').onchange = run;
+</script>
+</body>
+</html>
