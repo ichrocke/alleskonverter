@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilder → PDF — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/filelist.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bilder <span>→ PDF</span></h1>
+  <p class="sub">Fotos, Scans und Grafiken in ein PDF packen — JPG, PNG, WebP, HEIC (iPhone), GIF und mehr. Reihenfolge frei sortierbar.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Stapel</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Bilder auswählen">
+      <strong>Bilder hierher ziehen</strong>
+      <small>oder klicken zum Auswählen — mehrere gleichzeitig möglich</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts im Stapel. Die Reihenfolge hier oben ist die Seitenreihenfolge im PDF.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="imgcount">0<small>Bilder im Stapel</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="outname">Dateiname</label>
+      <input type="text" id="outname" value="bilder.pdf">
+    </div>
+
+    <div class="field">
+      <label for="pagesize">Seitengröße</label>
+      <select id="pagesize">
+        <option value="a4p" selected>A4 hochkant — Bild eingepasst</option>
+        <option value="a4l">A4 quer — Bild eingepasst</option>
+        <option value="auto">Wie das Bild (randlos)</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>PDF erstellen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>JPG und PNG landen unverändert im PDF (keine Neukompression). HEIC, WebP, GIF und andere Formate werden vorher lokal umgewandelt — HEIC zu JPEG, alles andere verlustfrei zu PNG.</p>
+</footer>
+</div>
+
+<script>
+const { PDFDocument } = PDFLib;
+const A4 = [595.28, 841.89];
+const entries = [];
+let uid = 0;
+
+async function addFiles(files){
+  for(const file of files){
+    if(!/\.(jpe?g|png|webp|heic|heif|gif|bmp|avif|svg)$/i.test(file.name) && !file.type.startsWith('image/')) continue;
+    const e = { id:++uid, file, name:file.name, size:file.size,
+                kind:null, data:null, w:0, h:0, mode:'pending', note:'wird gelesen …' };
+    entries.push(e);
+    prepare(e);
+  }
+  list.render();
+}
+
+/* Bild dekodieren und als einbettbares JPG/PNG normalisieren */
+async function prepare(e){
+  try{
+    let blob = e.file;
+    const lower = e.name.toLowerCase();
+
+    if(/\.(heic|heif)$/.test(lower) || /hei[cf]/.test(e.file.type)){
+      blob = await heic2any({ blob:e.file, toType:'image/jpeg', quality:0.92 });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+
+    if(blob.type === 'image/jpeg' || blob.type === 'image/png' || /\.(jpe?g|png)$/.test(lower) && !blob.type){
+      const bmp = await loadBitmap(blob);
+      e.kind = (blob.type === 'image/png' || /\.png$/.test(lower)) ? 'png' : 'jpg';
+      e.data = new Uint8Array(await blob.arrayBuffer());
+      e.w = bmp.width; e.h = bmp.height;
+      close(bmp);
+    }else{
+      // WebP, GIF, BMP, AVIF, SVG … → über Canvas verlustfrei zu PNG
+      const bmp = await loadBitmap(blob);
+      const w = bmp.width, h = bmp.height;
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(bmp, 0, 0);
+      close(bmp);
+      const png = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      canvas.width = canvas.height = 0;
+      if(!png) throw new Error('Format nicht dekodierbar');
+      e.kind = 'png';
+      e.data = new Uint8Array(await png.arrayBuffer());
+      e.w = w; e.h = h;
+    }
+    e.mode = 'ok'; e.note = '';
+  }catch(err){
+    console.error(err);
+    e.mode = 'error'; e.note = 'Bild kann nicht gelesen werden';
+  }
+  list.render();
+}
+
+function loadBitmap(blob){
+  if('createImageBitmap' in window) return createImageBitmap(blob);
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+function close(bmp){ if(bmp.close) bmp.close(); }
+
+const list = AK.filelist({
+  container:'#stack', empty:'#empty', entries,
+  rowClass: e => e.mode === 'error' ? 'locked' : '',
+  meta: e => `
+    <div class="fname">${AK.esc(e.name)}</div>
+    <div class="finfo">
+      <span>${AK.fmtBytes(e.size)}</span>
+      ${e.w ? `<span>${e.w} × ${e.h} px</span>` : ''}
+      ${e.mode === 'ok' ? `<span class="badge b-ok">${e.kind === 'jpg' ? 'JPG' : 'PNG'}</span>` : ''}
+      ${e.note ? `<span class="pw-hint">${AK.esc(e.note)}</span>` : ''}
+    </div>`,
+  onChange: updateTotals
+});
+
+function updateTotals(){
+  const ok = entries.filter(e => e.mode === 'ok').length;
+  AK.$('#imgcount').innerHTML = ok + '<small>Bilder im Stapel</small>';
+  AK.$('#go').disabled = ok === 0 || entries.some(e => e.mode === 'pending');
+}
+
+async function build(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const pagesize = AK.$('#pagesize').value;
+
+  try{
+    const out = await PDFDocument.create();
+    const jobs = entries.filter(e => e.mode === 'ok');
+
+    for(let n = 0; n < jobs.length; n++){
+      const e = jobs[n];
+      const img = e.kind === 'jpg' ? await out.embedJpg(e.data) : await out.embedPng(e.data);
+
+      if(pagesize === 'auto'){
+        // 1 px ≙ 0,75 pt (96 dpi) — randlos in Bildgröße
+        const w = img.width * 0.75, h = img.height * 0.75;
+        out.addPage([w, h]).drawImage(img, { x:0, y:0, width:w, height:h });
+      }else{
+        const [pw, ph] = pagesize === 'a4l' ? [A4[1], A4[0]] : A4;
+        const margin = 28.35; // 1 cm
+        const scale = Math.min((pw - 2*margin) / img.width, (ph - 2*margin) / img.height);
+        const w = img.width * scale, h = img.height * scale;
+        out.addPage([pw, ph]).drawImage(img, { x:(pw-w)/2, y:(ph-h)/2, width:w, height:h });
+      }
+      AK.bar((n+1)/jobs.length);
+      AK.log(`${e.name} → Seite ${n+1}`);
+    }
+
+    out.setProducer('Alleskonverter');
+    const name = AK.ensureExt(AK.$('#outname').value || 'bilder', 'pdf');
+    const bytes = await out.save();
+    AK.offerDownload(new Blob([bytes], {type:'application/pdf'}), name);
+    AK.log(`Fertig: ${jobs.length} Seiten, ${AK.fmtBytes(bytes.length)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'PDF erstellen'; updateTotals();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = build;
+</script>
+</body>
+</html>
