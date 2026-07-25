@@ -14,6 +14,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Bilder → PDF](tools/bild-zu-pdf/index.html) | JPG/PNG/WebP/HEIC/GIF → ein PDF, A4 oder randlos |
 | [PDF komprimieren](tools/pdf-komprimieren/index.html) | Neuaufbau mit dpi/Qualität, Vorher-/Nachher-Größe |
 | [PDF stempeln](tools/pdf-stempeln/index.html) | Wasserzeichen und Seitenzahlen einfügen, mit Live-Vorschau |
+| [PDF-Übersichtsblatt](tools/pdf-kontaktabzug/index.html) | Kontaktabzug: alle Seiten als Miniaturen, Raster und Format wählbar |
 | [Text auslesen](tools/pdf-text/index.html) | Textextraktion, Zwischenablage oder .txt |
 
 | [PDF-Passwort](tools/pdf-passwort/index.html) | PDF mit AES-128 verschlüsseln oder bekannten Schutz entfernen, Rechte einstellen |
@@ -24,6 +25,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Bilder zusammenfügen](tools/bilder-zusammenfuegen/index.html) | Collage: nebeneinander, untereinander oder Raster, mit Abstand und Hintergrund |
 | [Hintergrund entfernen](tools/hintergrund-entfernen/index.html) | Motiv freistellen (U²-Net im Browser), transparent oder mit neuer Farbe |
 | [Bild-Metadaten anzeigen](tools/bild-metadaten/index.html) | EXIF lesen: Kamera, Zeit, Einstellungen, GPS-Standort mit Kartenlink |
+| [Bild als Daten-URI](tools/bild-base64/index.html) | Base64-Schnipsel für CSS/HTML/Markdown, mit Größenwarnung |
 | [Bilder konvertieren](tools/bild-konvertieren/index.html) | Batch: JPEG/PNG/WebP/AVIF, HEIC-Eingabe, Größe begrenzen, Qualität, EXIF/GPS wird entfernt |
 
 **Dokumente & Daten**

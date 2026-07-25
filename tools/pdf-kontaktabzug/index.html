@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF-Übersichtsblatt erstellen (Kontaktabzug) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Alle Seiten eines PDFs als Miniaturen auf wenige Übersichtsblätter bringen — ideal zum Nachschlagen und Papiersparen. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/pdf-kontaktabzug/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="PDF-Übersichtsblatt erstellen (Kontaktabzug) — kostenlos | Alleskonverter">
+<meta property="og:description" content="Alle Seiten eines PDFs als Miniaturen auf Übersichtsblätter bringen — ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/pdf-kontaktabzug/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF-Übersichtsblatt erstellen (Kontaktabzug) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF-Übersichtsblatt — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-kontaktabzug/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Alle Seiten eines PDFs als Miniaturen auf Übersichtsblätter bringen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wofür braucht man ein Übersichtsblatt?","acceptedAnswer":{"@type":"Answer","text":"Um ein langes Dokument auf einen Blick zu erfassen, es platzsparend auszudrucken oder schnell die richtige Seite zu finden — etwa bei Präsentationen, Katalogen oder gescannten Ordnern."}},{"@type":"Question","name":"Wird meine Datei hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein, das Dokument wird vollständig in deinem Browser gerendert und zusammengesetzt."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#vorschau{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;text-align:center;display:none}
+#vorschau.on{display:block}
+#blatt{max-width:100%;height:auto;border:1px solid var(--rule);background:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF-<span>Übersichtsblatt</span></h1>
+  <p class="sub">Alle Seiten eines Dokuments als kleine Bilder auf wenige Blätter bringen — praktisch zum Nachschlagen, für den Überblick über lange Präsentationen und um beim Ausdrucken Papier zu sparen.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+
+    <div id="vorschau">
+      <canvas id="blatt"></canvas>
+      <div class="hint" id="vorschauinfo" style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--ink-soft)"></div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Seiten im Dokument</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="raster">Miniaturen je Blatt</label>
+      <select id="raster">
+        <option value="2x2">4 (2 × 2)</option>
+        <option value="3x3" selected>9 (3 × 3)</option>
+        <option value="4x4">16 (4 × 4)</option>
+        <option value="4x5">20 (4 × 5)</option>
+        <option value="5x6">30 (5 × 6)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="ausrichtung">Blattformat</label>
+      <select id="ausrichtung">
+        <option value="hoch" selected>A4 hochkant</option>
+        <option value="quer">A4 quer</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="nummern" checked style="width:auto;margin-right:6px">Seitenzahlen unter die Miniaturen</label>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="rahmen" checked style="width:auto;margin-right:6px">Dünner Rahmen um jede Miniatur</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Übersicht erstellen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Übersichtsblatt — in der Fotografie „Kontaktabzug“ genannt — zeigt viele Seiten stark verkleinert nebeneinander. Bei einer 60-seitigen Präsentation reichen so drei Blätter, um alles auf einen Blick zu haben. Praktisch zum Nachschlagen in Besprechungen, als Deckblatt für einen gescannten Ordner oder einfach, um beim Ausdrucken kein ganzes Paket Papier zu verbrauchen.</p>
+  <h3>Wird meine Datei hochgeladen?</h3>
+  <p>Nein. Das Dokument wird vollständig in deinem Browser gerendert und zusammengesetzt.</p>
+  <h3>Bleibt der Text lesbar?</h3>
+  <p>Nur eingeschränkt — bei neun Miniaturen je Blatt erkennt man Überschriften und die grobe Struktur, aber keinen Fließtext mehr. Das ist der Zweck: Es geht um Wiedererkennung, nicht ums Lesen. Wer weniger Seiten je Blatt wählt, bekommt entsprechend größere Miniaturen.</p>
+  <h3>Warum dauert es bei langen Dokumenten?</h3>
+  <p>Jede Seite muss einzeln gerendert werden. Bei mehreren hundert Seiten braucht das etwas Geduld — der Fortschrittsbalken zeigt, wie weit es ist.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Sollen einzelne Seiten stattdessen als Bilddateien heraus, hilft <a href="../pdf-zu-bild/index.html">PDF → Bild</a>.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/pdf-common.js?v=20260726"></script>
+<script>
+const { PDFDocument, StandardFonts, rgb } = PDFLib;
+const A4 = [595.28, 841.89];
+let src = null, pdfjsDoc = null;
+
+async function addFiles(list){
+  const file = list.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    if(pdfjsDoc) await pdfjsDoc.destroy();
+    pdfjsDoc = await AK.openWithPdfjs(bytes);
+    src = { name:file.name, size:file.size, bytes, seiten:pdfjsDoc.numPages };
+    render();
+    vorschau();
+  }catch(err){
+    console.error(err);
+    src = null; render();
+    AK.log('Datei kann nicht gelesen werden — vermutlich verschlüsselt oder beschädigt.', true);
+  }
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta"><div class="fname">${AK.esc(src.name)}</div>
+        <div class="finfo"><span>${AK.fmtBytes(src.size)}</span><span>${src.seiten} Seiten</span></div></div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = async () => {
+      if(pdfjsDoc){ await pdfjsDoc.destroy(); pdfjsDoc = null; }
+      src = null; AK.$('#vorschau').classList.remove('on'); render();
+    };
+  }
+  AK.$('#anzahl').innerHTML = (src ? src.seiten : 0) + '<small>Seiten im Dokument</small>';
+  AK.$('#go').disabled = !src;
+}
+
+function aufbau(){
+  const [spalten, zeilen] = AK.$('#raster').value.split('x').map(Number);
+  const quer = AK.$('#ausrichtung').value === 'quer';
+  const [breite, hoehe] = quer ? [A4[1], A4[0]] : A4;
+  const rand = 28, luecke = 10;
+  const beschriftung = AK.$('#nummern').checked ? 12 : 0;
+  const zellB = (breite - 2*rand - (spalten-1)*luecke) / spalten;
+  const zellH = (hoehe - 2*rand - (zeilen-1)*luecke) / zeilen;
+  return { spalten, zeilen, breite, hoehe, rand, luecke, zellB, zellH, beschriftung, proBlatt: spalten*zeilen };
+}
+
+/* Vorschau des ersten Blatts als Bild */
+async function vorschau(){
+  if(!src) return;
+  const a = aufbau();
+  const massstab = 1.1;
+  const c = AK.$('#blatt');
+  c.width = Math.round(a.breite * massstab);
+  c.height = Math.round(a.hoehe * massstab);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+
+  const wieviele = Math.min(a.proBlatt, src.seiten);
+  for(let i = 0; i < wieviele; i++){
+    const sp = i % a.spalten, ze = Math.floor(i / a.spalten);
+    const x = (a.rand + sp * (a.zellB + a.luecke)) * massstab;
+    const y = (a.rand + ze * (a.zellH + a.luecke)) * massstab;
+    const bB = a.zellB * massstab, bH = (a.zellH - a.beschriftung) * massstab;
+    const { canvas, width, height } = await AK.renderPage(pdfjsDoc, i, 0.35);
+    const s = Math.min(bB / width, bH / height);
+    const w = width * s, h = height * s;
+    ctx.drawImage(canvas, x + (bB - w)/2, y, w, h);
+    AK.freeCanvas(canvas);
+    if(AK.$('#rahmen').checked){
+      ctx.strokeStyle = '#C9C6BD'; ctx.lineWidth = 1;
+      ctx.strokeRect(x + (bB - w)/2, y, w, h);
+    }
+    if(a.beschriftung){
+      ctx.fillStyle = '#5C6268';
+      ctx.font = `${Math.round(8*massstab)}px Helvetica, Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(String(i+1), x + bB/2, y + bH + 10*massstab);
+    }
+  }
+  AK.$('#vorschau').classList.add('on');
+  const blaetter = Math.ceil(src.seiten / a.proBlatt);
+  AK.$('#vorschauinfo').textContent =
+    `Vorschau des ersten Blatts — insgesamt ${blaetter} ${blaetter === 1 ? 'Blatt' : 'Blätter'} bei ${a.proBlatt} Miniaturen je Blatt`;
+}
+
+async function erstelle(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const a = aufbau();
+
+  try{
+    const out = await PDFDocument.create();
+    const schrift = await out.embedFont(StandardFonts.Helvetica);
+    let seite = null;
+
+    for(let i = 0; i < src.seiten; i++){
+      const platz = i % a.proBlatt;
+      if(platz === 0) seite = out.addPage([a.breite, a.hoehe]);
+
+      const sp = platz % a.spalten, ze = Math.floor(platz / a.spalten);
+      const x = a.rand + sp * (a.zellB + a.luecke);
+      // In PDF zählt y von unten
+      const yOben = a.hoehe - a.rand - ze * (a.zellH + a.luecke);
+      const bH = a.zellH - a.beschriftung;
+
+      const { canvas, width, height } = await AK.renderPage(pdfjsDoc, i, 1.0);
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.7));
+      AK.freeCanvas(canvas);
+      const bild = await out.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+
+      const s = Math.min(a.zellB / width, bH / height);
+      const w = width * s, h = height * s;
+      const bx = x + (a.zellB - w)/2, by = yOben - h;
+      seite.drawImage(bild, { x:bx, y:by, width:w, height:h });
+      if(AK.$('#rahmen').checked){
+        seite.drawRectangle({ x:bx, y:by, width:w, height:h, borderColor: rgb(0.79,0.78,0.74), borderWidth:0.5 });
+      }
+      if(a.beschriftung){
+        const text = String(i+1);
+        const tw = schrift.widthOfTextAtSize(text, 7);
+        seite.drawText(text, { x: x + (a.zellB - tw)/2, y: by - 9, size:7, font:schrift, color: rgb(0.36,0.38,0.41) });
+      }
+      AK.bar((i+1)/src.seiten);
+    }
+
+    out.setProducer('Alleskonverter');
+    const bytes = await out.save();
+    const blaetter = out.getPageCount();
+    AK.offerDownload(new Blob([bytes], {type:'application/pdf'}),
+                     src.name.replace(/\.pdf$/i,'') + '-uebersicht.pdf');
+    AK.log(`Fertig: ${src.seiten} Seiten auf ${blaetter} ${blaetter === 1 ? 'Blatt' : 'Blättern'}, ${AK.fmtBytes(bytes.length)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Übersicht erstellen'; render();
+  }
+}
+
+['#raster','#ausrichtung','#nummern','#rahmen'].forEach(s => AK.$(s).addEventListener('change', vorschau));
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = erstelle;
+render();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

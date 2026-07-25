@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bild in Base64 umwandeln (Daten-URI) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Bild als Base64-Daten-URI für CSS, HTML oder E-Mail-Signaturen erzeugen — mit fertigem Schnipsel und Größenwarnung. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bild-base64/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Bild in Base64 umwandeln (Daten-URI) — kostenlos | Alleskonverter">
+<meta property="og:description" content="Bild als Base64-Daten-URI für CSS, HTML oder E-Mail-Signaturen — ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bild-base64/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bild in Base64 umwandeln (Daten-URI) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild in Base64 — Alleskonverter","url":"https://alleskonverter.de/tools/bild-base64/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Bild als Base64-Daten-URI für CSS, HTML und E-Mail — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wann lohnt sich ein Daten-URI?","acceptedAnswer":{"@type":"Answer","text":"Bei kleinen Bildern bis etwa 10 KB — Symbolen, Mustern, einem Logo in einer E-Mail-Signatur. Dann spart man eine zusätzliche Anfrage. Bei großen Bildern wird der Code unhandlich und die Seite langsamer."}},{"@type":"Question","name":"Wird mein Bild hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein, die Umwandlung passiert vollständig im Browser."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.hinweis{margin-top:14px;padding:11px 13px;border:1.5px solid var(--stamp);background:var(--card);font-size:13px}
+.hinweis.warn{border-color:var(--amber);color:var(--amber)}
+.hinweis.schlecht{border-color:var(--alert);color:var(--alert)}
+.vorschau{max-width:100%;max-height:220px;border:1px solid var(--rule);display:block;margin-top:16px;background:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bild als <span>Daten-URI</span></h1>
+  <p class="sub">Ein Bild in eine Base64-Zeichenkette umwandeln, die sich direkt in CSS, HTML oder eine E-Mail-Signatur einbetten lässt — ganz ohne separate Bilddatei.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bild</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>am besten klein — Symbole, Muster, Logos</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.svg" hidden>
+
+    <img class="vorschau" id="vorschau" alt="Vorschau" hidden>
+    <div class="hinweis" id="hinweis" hidden></div>
+
+    <h2 style="margin-top:24px">Ergebnis</h2>
+    <textarea class="pane" id="ausgabe" spellcheck="false" readonly aria-label="Erzeugter Schnipsel" style="min-height:220px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="ghost" id="kopieren" disabled>In die Zwischenablage</button>
+    </div>
+
+    <div class="empty" id="empty">Noch kein Bild geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="groesse">—<small>Länge der Zeichenkette</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="form">Form</label>
+      <select id="form">
+        <option value="uri" selected>Nur der Daten-URI</option>
+        <option value="css">CSS-Regel (background-image)</option>
+        <option value="html">HTML-Bild (img)</option>
+        <option value="markdown">Markdown-Bild</option>
+        <option value="roh">Nur Base64 ohne Vorspann</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="verkleinern">Vorher verkleinern</label>
+      <select id="verkleinern">
+        <option value="0" selected>Original behalten</option>
+        <option value="512">max. 512 px</option>
+        <option value="256">max. 256 px</option>
+        <option value="128">max. 128 px</option>
+        <option value="64">max. 64 px</option>
+      </select>
+      <div class="hint">macht den Schnipsel deutlich kürzer</div>
+    </div>
+
+    <button class="primary" id="go" disabled>Als Textdatei sichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Daten-URI ist ein Bild, das nicht als eigene Datei liegt, sondern als lange Zeichenkette direkt im Code steht. Das ist praktisch für kleine Symbole in einer CSS-Datei, für ein Logo in einer E-Mail-Signatur oder überall dort, wo man keine zusätzliche Datei hochladen kann oder will.</p>
+  <h3>Wann lohnt sich das — und wann nicht?</h3>
+  <p>Faustregel: bis etwa 10 KB ja, darüber selten. Kleine Bilder sparen eine zusätzliche Serveranfrage. Große Bilder blähen dagegen den Code auf, werden nicht mehr getrennt zwischengespeichert und machen die Seite eher langsamer. Base64 vergrößert die Daten außerdem um rund ein Drittel.</p>
+  <h3>Wird mein Bild hochgeladen?</h3>
+  <p>Nein. Die Umwandlung passiert vollständig in deinem Browser.</p>
+  <h3>Funktioniert das in E-Mails?</h3>
+  <p>Gemischt. Apple Mail und viele Handy-Programme zeigen Daten-URIs an, Outlook und Gmail blockieren sie oft. Für Signaturen ist ein normal verlinktes Bild verlässlicher — probier es im Zweifel mit einer Testmail an dich selbst.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Umgekehrt lässt sich Base64-Text mit den <a href="../text-werkzeuge/index.html">Text-Werkzeugen</a> wieder dekodieren.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+let quelle = null, basisName = 'bild', datenUri = '';
+
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg|avif|bmp|ico)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+  quelle = file;
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  AK.$('#vorschau').src = URL.createObjectURL(file);
+  AK.$('#vorschau').hidden = false;
+  AK.$('#empty').style.display = 'none';
+  await baue();
+}
+
+function lesen(blob){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+async function verkleinert(){
+  const max = +AK.$('#verkleinern').value;
+  if(!max || /svg/i.test(quelle.type)) return quelle;
+  const bmp = 'createImageBitmap' in window ? await createImageBitmap(quelle) : await new Promise((res,rej) => {
+    const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(quelle);
+  });
+  if(Math.max(bmp.width, bmp.height) <= max) return quelle;
+  const s = max / Math.max(bmp.width, bmp.height);
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bmp, 0, 0, c.width, c.height);
+  const typ = /jpe?g/i.test(quelle.type) ? 'image/jpeg' : 'image/png';
+  return await new Promise(r => c.toBlob(r, typ, 0.9));
+}
+
+async function baue(){
+  if(!quelle) return;
+  const blob = await verkleinert();
+  datenUri = await lesen(blob);
+  const form = AK.$('#form').value;
+  const roh = datenUri.split(',')[1] || '';
+
+  const text =
+    form === 'css'      ? `background-image: url("${datenUri}");\nbackground-size: contain;\nbackground-repeat: no-repeat;`
+  : form === 'html'     ? `<img src="${datenUri}" alt="">`
+  : form === 'markdown' ? `![](${datenUri})`
+  : form === 'roh'      ? roh
+  : datenUri;
+
+  AK.$('#ausgabe').value = text;
+  AK.$('#groesse').innerHTML = text.length.toLocaleString('de-DE') + '<small>Zeichen im Schnipsel</small>';
+  AK.$('#kopieren').disabled = AK.$('#go').disabled = false;
+
+  const kb = blob.size / 1024;
+  const el = AK.$('#hinweis');
+  el.hidden = false;
+  el.className = 'hinweis';
+  if(kb <= 10){
+    el.textContent = `Gute Größe: ${AK.fmtBytes(blob.size)} als Datei, ${AK.fmtBytes(text.length)} als Text. Dafür lohnt sich ein Daten-URI.`;
+  }else if(kb <= 100){
+    el.className = 'hinweis warn';
+    el.textContent = `Grenzwertig: ${AK.fmtBytes(blob.size)} werden zu ${AK.fmtBytes(text.length)} Text. Überleg, ob eine normale Bilddatei nicht besser ist — oder verkleinere rechts.`;
+  }else{
+    el.className = 'hinweis schlecht';
+    el.textContent = `Zu groß: ${AK.fmtBytes(blob.size)} ergeben ${AK.fmtBytes(text.length)} Text. Das bläht den Code auf und macht die Seite langsamer. Besser verkleinern oder die Bilddatei normal verlinken.`;
+  }
+}
+
+AK.$('#kopieren').onclick = async () => {
+  await navigator.clipboard.writeText(AK.$('#ausgabe').value);
+  AK.log('Kopiert.');
+};
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  AK.offerDownload(new Blob([AK.$('#ausgabe').value], {type:'text/plain;charset=utf-8'}), basisName + '-base64.txt');
+  AK.stamp(true);
+};
+['#form','#verkleinern'].forEach(s => AK.$(s).addEventListener('change', baue));
+AK.dropzone('#drop', '#picker', addFiles);
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

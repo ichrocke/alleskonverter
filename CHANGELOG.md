@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeuge 30 und 31)
+
+### Hinzugefügt
+- Werkzeug **Bild als Daten-URI** (`tools/bild-base64/`): wandelt ein Bild in Base64 und liefert es fertig als reinen URI, CSS-Regel, HTML- oder Markdown-Schnipsel. Mit ehrlicher Größeneinschätzung — bis 10 KB grün, darüber gelb, ab 100 KB die klare Ansage, dass eine normale Bilddatei besser wäre — und einer Verkleinerung direkt im Werkzeug.
+- Werkzeug **PDF-Übersichtsblatt** (`tools/pdf-kontaktabzug/`): legt alle Seiten als Miniaturen auf wenige A4-Blätter (fünf Raster von 4 bis 30 Stück je Blatt, hoch oder quer, wahlweise mit Seitenzahlen und Rahmen). Mit Vorschau des ersten Blatts, bevor gerechnet wird.
+
 ## 2026-07-26 (Werkzeuge 28 und 29)
 
 ### Hinzugefügt
