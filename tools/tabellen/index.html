@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tabellen-Konverter — Alleskonverter</title>
+<title>CSV in Excel oder JSON umwandeln — kostenlos &amp; lokal | Alleskonverter</title>
+<meta name="description" content="CSV, JSON und Excel (XLSX) online ineinander umwandeln — mit Tabellenvorschau und wählbarem Trennzeichen. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/tabellen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="CSV in Excel oder JSON umwandeln — kostenlos &amp; lokal | Alleskonverter">
+<meta property="og:description" content="CSV, JSON und Excel (XLSX) online ineinander umwandeln — mit Tabellenvorschau und wählbarem Trennzeichen. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/tabellen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CSV in Excel oder JSON umwandeln — kostenlos &amp; lokal | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Tabellen-Konverter — Alleskonverter", "url": "https://alleskonverter.de/tools/tabellen/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "CSV, JSON und Excel (XLSX) online ineinander umwandeln — mit Tabellenvorschau und wählbarem Trennzeichen. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Warum zeigt Excel meine Umlaute kaputt an?", "acceptedAnswer": {"@type": "Answer", "text": "Klassisches CSV-Problem: Excel erwartet eine UTF-8-Kennung (BOM) am Dateianfang. Die hängt dieses Werkzeug automatisch an — und mit Semikolon als Trennzeichen öffnet deutsches Excel die Datei direkt richtig."}}, {"@type": "Question", "name": "Wie muss mein JSON aussehen?", "acceptedAnswer": {"@type": "Answer", "text": "Als Liste von Objekten: jedes Objekt eine Zeile, die Schlüssel werden zu Spaltennamen — das übliche Format von API-Exporten. Auch eine Liste von Listen (Zeilen als Arrays) wird verstanden."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../vendor/fonts/fonts.css">
 <link rel="stylesheet" href="../../css/base.css">
@@ -69,6 +84,19 @@
     <div class="stamp" id="stamp">Fertig</div>
   </aside>
 </div>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Der Export aus dem Onlinebanking kommt als CSV, das Tool will aber JSON — oder umgekehrt? Dieses Werkzeug liest CSV, TSV, JSON, XLSX und das alte XLS, zeigt eine Vorschau und wandelt ins Wunschformat. Für deutsches Excel gibt es das Semikolon-Trennzeichen und eine UTF-8-Kennung, damit Umlaute korrekt ankommen.</p>
+  <h3>Werden meine Dateien hochgeladen?</h3>
+  <p>Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt.</p>
+  <h3>Warum zeigt Excel meine Umlaute kaputt an?</h3>
+  <p>Klassisches CSV-Problem: Excel erwartet eine UTF-8-Kennung (BOM) am Dateianfang. Die hängt dieses Werkzeug automatisch an — und mit Semikolon als Trennzeichen öffnet deutsches Excel die Datei direkt richtig.</p>
+  <h3>Wie muss mein JSON aussehen?</h3>
+  <p>Als Liste von Objekten: jedes Objekt eine Zeile, die Schlüssel werden zu Spaltennamen — das übliche Format von API-Exporten. Auch eine Liste von Listen (Zeilen als Arrays) wird verstanden.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar.</p>
+</section>
 
 <footer>
   <p>JSON wird als Liste von Objekten gelesen und geschrieben (eine Zeile = ein Objekt, Spaltennamen aus der ersten Zeile). CSV-Dateien bekommen eine UTF-8-Kennung (BOM), damit Excel Umlaute korrekt anzeigt.</p>
