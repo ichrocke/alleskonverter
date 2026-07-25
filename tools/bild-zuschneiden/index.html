@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bild zuschneiden &amp; drehen — kostenlos &amp; ohne Upload | Alleskonverter</title>
+<meta name="description" content="Bilder online zuschneiden, drehen und spiegeln — mit festen Seitenverhältnissen für Profilbilder und Social Media. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bild-zuschneiden/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Bild zuschneiden &amp; drehen — kostenlos &amp; ohne Upload | Alleskonverter">
+<meta property="og:description" content="Bilder online zuschneiden, drehen und spiegeln — mit festen Seitenverhältnissen für Profilbilder und Social Media. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bild-zuschneiden/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bild zuschneiden &amp; drehen — kostenlos &amp; ohne Upload | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild zuschneiden & drehen — Alleskonverter","url":"https://alleskonverter.de/tools/bild-zuschneiden/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Bilder online zuschneiden, drehen und spiegeln — mit festen Seitenverhältnissen. Kostenlos, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Bilder hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Zuschnitt passiert vollständig in deinem Browser — es gibt keinen Server, der Bilder annehmen könnte."}},{"@type":"Question","name":"Verliert das Bild an Qualität?","acceptedAnswer":{"@type":"Answer","text":"Der Zuschnitt selbst arbeitet in voller Originalauflösung. Beim Speichern als JPEG wird neu komprimiert, als PNG bleibt das Ergebnis verlustfrei."}},{"@type":"Question","name":"Welches Format brauche ich für ein Profilbild?","acceptedAnswer":{"@type":"Answer","text":"Quadratisch (1:1). Für Beiträge auf Instagram eignet sich 1:1 oder 4:5, für Titelbilder und Präsentationen 16:9."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<style>
+/* Zuschnittfläche */
+#stage{position:relative;margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px;display:none}
+#stage.on{display:block}
+.canvaswrap{position:relative;display:block;margin:0 auto;touch-action:none;line-height:0}
+#view{max-width:100%;height:auto;display:block;cursor:crosshair}
+#shade{position:absolute;inset:0;pointer-events:none}
+#crop{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 1.5px var(--ink),0 0 0 9999px rgba(22,25,27,.55);cursor:move}
+#crop::before,#crop::after{content:"";position:absolute;inset:0;pointer-events:none}
+#crop::before{border-left:1px solid rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.45);left:33.33%;right:33.33%}
+#crop::after{border-top:1px solid rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.45);top:33.33%;bottom:33.33%}
+.hnd{position:absolute;width:16px;height:16px;background:#fff;border:1.5px solid var(--ink);z-index:2}
+.hnd[data-h=nw]{left:-8px;top:-8px;cursor:nwse-resize}
+.hnd[data-h=ne]{right:-8px;top:-8px;cursor:nesw-resize}
+.hnd[data-h=sw]{left:-8px;bottom:-8px;cursor:nesw-resize}
+.hnd[data-h=se]{right:-8px;bottom:-8px;cursor:nwse-resize}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}
+.ratios{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ratios button{padding:6px 10px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.ratios button:hover{border-color:var(--ink)}
+.ratios button.active{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.dims{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-left:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bild <span>zuschneiden</span></h1>
+  <p class="sub">Bildausschnitt frei wählen oder auf ein festes Seitenverhältnis festlegen, drehen und spiegeln — für Profilbilder, Social Media oder einfach den geraden Horizont.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bild</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>oder klicken zum Auswählen — JPG, PNG, WebP, GIF, HEIC</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" hidden>
+
+    <div id="stage">
+      <div class="canvaswrap" id="wrap">
+        <canvas id="view"></canvas>
+        <div id="crop">
+          <span class="hnd" data-h="nw"></span><span class="hnd" data-h="ne"></span>
+          <span class="hnd" data-h="sw"></span><span class="hnd" data-h="se"></span>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="ghost" id="rotl" title="90° nach links">↺ Links</button>
+        <button class="ghost" id="rotr" title="90° nach rechts">↻ Rechts</button>
+        <button class="ghost" id="fliph" title="Waagerecht spiegeln">⇆ Spiegeln</button>
+        <button class="ghost" id="flipv" title="Senkrecht spiegeln">⇅ Kippen</button>
+        <button class="ghost" id="reset">Zurücksetzen</button>
+        <span class="dims" id="dims"></span>
+      </div>
+      <div class="ratios" id="ratios"></div>
+    </div>
+
+    <div class="empty" id="empty">Noch kein Bild geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="outsize">—<small>Ausschnitt in Pixel</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="image/jpeg" selected>JPEG — Fotos</option>
+        <option value="image/png">PNG — verlustfrei</option>
+        <option value="image/webp">WebP — sehr klein</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-quality">
+      <label for="quality">Qualität: <span id="qval">90</span> %</label>
+      <input type="range" id="quality" min="40" max="100" value="90" style="width:100%">
+    </div>
+
+    <button class="primary" id="go" disabled>Zuschneiden</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Foto für den Ausweis, ein Profilbild fürs Netzwerk, ein Screenshot ohne störenden Rand: Hier ziehst du den Ausschnitt direkt im Bild auf, verschiebst ihn mit der Maus oder dem Finger und ziehst die Ecken auf die gewünschte Größe. Feste Seitenverhältnisse (1:1, 4:3, 16:9 …) rasten dabei ein. Drehen und Spiegeln geht mit einem Klick — auch nützlich, um hochkant aufgenommene Fotos geradezurücken.</p>
+  <h3>Werden meine Bilder hochgeladen?</h3>
+  <p>Nein. Der Zuschnitt passiert vollständig in deinem Browser — es gibt keinen Server, der Bilder annehmen könnte. Nebenbei werden beim Speichern alle Metadaten entfernt, auch der GPS-Standort der Aufnahme.</p>
+  <h3>Verliert das Bild an Qualität?</h3>
+  <p>Der Zuschnitt arbeitet in voller Originalauflösung — es wird also nichts hochgerechnet. Beim Speichern als JPEG oder WebP wird neu komprimiert (Qualität regelbar), als PNG bleibt das Ergebnis verlustfrei.</p>
+  <h3>Welches Seitenverhältnis brauche ich wofür?</h3>
+  <p>Profilbilder sind fast immer quadratisch (1:1). Für Instagram-Beiträge eignen sich 1:1 oder 4:5, für Titelbilder, Präsentationen und Videos 16:9. Klassische Fotoabzüge (10 × 15 cm) entsprechen 3:2.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Soll das Bild danach noch kleiner werden oder in ein anderes Format? Dafür gibt es <a href="../bild-konvertieren/index.html">Bilder konvertieren</a>. Mehrere Bilder als PDF bündelt <a href="../bild-zu-pdf/index.html">Bilder → PDF</a>.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script>
+const RATIOS = [
+  ['Frei', null], ['1:1', 1], ['4:3', 4/3], ['3:2', 3/2],
+  ['16:9', 16/9], ['3:4', 3/4], ['2:3', 2/3], ['4:5', 4/5], ['9:16', 9/16]
+];
+
+let src = null;        // ImageBitmap/Image des Originals
+let name = 'bild';
+let rot = 0, flipX = false, flipY = false;
+let ratio = null;
+let crop = { x:0, y:0, w:0, h:0 };   // in Bildpixeln der gedrehten Ansicht
+let scale = 1;                        // Anzeige-Maßstab
+
+const view = AK.$('#view'), box = AK.$('#crop'), wrap = AK.$('#wrap');
+
+/* ---------- Laden ---------- */
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|heic|heif|avif)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  name = file.name.replace(/\.[^.]+$/, '');
+  try{
+    let blob = file;
+    if(/\.(heic|heif)$/i.test(file.name) || /hei[cf]/.test(file.type)){
+      AK.log('iPhone-Format wird umgewandelt …');
+      blob = await heic2any({ blob:file, toType:'image/png' });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+    src = await loadBitmap(blob);
+    rot = 0; flipX = flipY = false;
+    AK.$('#stage').classList.add('on');
+    AK.$('#empty').style.display = 'none';
+    AK.$('#go').disabled = false;
+    AK.logClear();
+    draw(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Bild kann nicht gelesen werden.', true);
+  }
+}
+function loadBitmap(blob){
+  if('createImageBitmap' in window) return createImageBitmap(blob).catch(() => viaImg(blob));
+  return viaImg(blob);
+}
+function viaImg(blob){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img); img.onerror = rej;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+/* ---------- Zeichnen ---------- */
+function rotatedSize(){
+  const swap = rot === 90 || rot === 270;
+  return { w: swap ? src.height : src.width, h: swap ? src.width : src.height };
+}
+
+function drawInto(canvas, w, h){
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.translate(w/2, h/2);
+  ctx.rotate(rot * Math.PI/180);
+  ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
+  ctx.drawImage(src, -src.width/2, -src.height/2);
+  ctx.restore();
+}
+
+function draw(resetCrop){
+  const { w, h } = rotatedSize();
+  const maxW = Math.min(wrap.parentElement.clientWidth - 24, 720);
+  scale = Math.min(1, maxW / w);
+  const dw = Math.round(w * scale), dh = Math.round(h * scale);
+  drawInto(view, w, h);
+  view.style.width = dw + 'px'; view.style.height = dh + 'px';
+  wrap.style.width = dw + 'px'; wrap.style.height = dh + 'px';
+
+  if(resetCrop || crop.w === 0){
+    crop = { x:0, y:0, w, h };
+    if(ratio) fitRatio();
+  }
+  clampCrop();
+  paintBox();
+  AK.$('#dims').textContent = `Original ${w} × ${h} px`;
+}
+
+function paintBox(){
+  box.style.left   = Math.round(crop.x * scale) + 'px';
+  box.style.top    = Math.round(crop.y * scale) + 'px';
+  box.style.width  = Math.round(crop.w * scale) + 'px';
+  box.style.height = Math.round(crop.h * scale) + 'px';
+  AK.$('#outsize').innerHTML = `${Math.round(crop.w)} × ${Math.round(crop.h)}<small>Ausschnitt in Pixel</small>`;
+}
+
+function clampCrop(){
+  const { w, h } = rotatedSize();
+  crop.w = Math.max(16, Math.min(crop.w, w));
+  crop.h = Math.max(16, Math.min(crop.h, h));
+  crop.x = Math.max(0, Math.min(crop.x, w - crop.w));
+  crop.y = Math.max(0, Math.min(crop.y, h - crop.h));
+}
+
+function fitRatio(){
+  const { w, h } = rotatedSize();
+  let cw = crop.w, ch = cw / ratio;
+  if(ch > h){ ch = h; cw = ch * ratio; }
+  if(cw > w){ cw = w; ch = cw / ratio; }
+  crop.x += (crop.w - cw)/2; crop.y += (crop.h - ch)/2;
+  crop.w = cw; crop.h = ch;
+  clampCrop();
+}
+
+/* ---------- Seitenverhältnisse ---------- */
+const ratiosEl = AK.$('#ratios');
+RATIOS.forEach(([label, r], i) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.textContent = label;
+  if(i === 0) b.classList.add('active');
+  b.onclick = () => {
+    ratio = r;
+    ratiosEl.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    if(ratio && src){ fitRatio(); paintBox(); }
+  };
+  ratiosEl.appendChild(b);
+});
+
+/* ---------- Ziehen und Größe ändern ---------- */
+let drag = null;
+function pos(ev){
+  const r = view.getBoundingClientRect();
+  const p = ev.touches ? ev.touches[0] : ev;
+  return { x: (p.clientX - r.left) / scale, y: (p.clientY - r.top) / scale };
+}
+
+box.addEventListener('pointerdown', ev => {
+  if(!src) return;
+  ev.preventDefault();
+  const h = ev.target.dataset.h;
+  drag = { mode: h || 'move', start: pos(ev), orig: { ...crop } };
+  box.setPointerCapture(ev.pointerId);
+});
+
+view.addEventListener('pointerdown', ev => {          // neuen Rahmen aufziehen
+  if(!src) return;
+  ev.preventDefault();
+  const p = pos(ev);
+  crop = { x:p.x, y:p.y, w:16, h:16 };
+  drag = { mode:'se', start:p, orig:{ ...crop } };
+  view.setPointerCapture(ev.pointerId);
+});
+
+function onMove(ev){
+  if(!drag) return;
+  const p = pos(ev);
+  const dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+  const o = drag.orig;
+  const { w:iw, h:ih } = rotatedSize();
+
+  if(drag.mode === 'move'){
+    crop.x = o.x + dx; crop.y = o.y + dy;
+  }else{
+    let x1 = o.x, y1 = o.y, x2 = o.x + o.w, y2 = o.y + o.h;
+    if(drag.mode.includes('w')) x1 = o.x + dx;
+    if(drag.mode.includes('e')) x2 = o.x + o.w + dx;
+    if(drag.mode.includes('n')) y1 = o.y + dy;
+    if(drag.mode.includes('s')) y2 = o.y + o.h + dy;
+    let nx = Math.min(x1, x2), ny = Math.min(y1, y2);
+    let nw = Math.abs(x2 - x1), nh = Math.abs(y2 - y1);
+
+    if(ratio){                                   // Verhältnis halten, Ankerecke fix
+      nh = nw / ratio;
+      if(drag.mode.includes('n')) ny = (o.y + o.h) - nh;
+      if(drag.mode.includes('w')) nx = (o.x + o.w) - nw;
+    }
+    nx = Math.max(0, nx); ny = Math.max(0, ny);
+    nw = Math.min(nw, iw - nx); nh = Math.min(nh, ih - ny);
+    if(ratio) nh = Math.min(nh, nw / ratio), nw = nh * ratio;
+    crop = { x:nx, y:ny, w:Math.max(16, nw), h:Math.max(16, nh) };
+  }
+  clampCrop(); paintBox();
+}
+function onUp(){ drag = null; }
+window.addEventListener('pointermove', onMove);
+window.addEventListener('pointerup', onUp);
+window.addEventListener('pointercancel', onUp);
+
+/* ---------- Drehen und Spiegeln ---------- */
+function turn(deg){
+  if(!src) return;
+  rot = ((rot + deg) % 360 + 360) % 360;
+  draw(true);
+}
+AK.$('#rotl').onclick = () => turn(-90);
+AK.$('#rotr').onclick = () => turn(90);
+AK.$('#fliph').onclick = () => { if(src){ flipX = !flipX; draw(false); } };
+AK.$('#flipv').onclick = () => { if(src){ flipY = !flipY; draw(false); } };
+AK.$('#reset').onclick = () => { if(src){ rot = 0; flipX = flipY = false; draw(true); } };
+
+AK.$('#quality').oninput = e => AK.$('#qval').textContent = e.target.value;
+AK.$('#format').onchange = () => AK.$('#f-quality').style.display = AK.$('#format').value === 'image/png' ? 'none' : '';
+window.addEventListener('resize', () => { if(src) draw(false); });
+
+/* ---------- Speichern ---------- */
+const EXT = { 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp' };
+
+async function cut(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.4);
+  const mime = AK.$('#format').value;
+  const quality = +AK.$('#quality').value / 100;
+  try{
+    const { w, h } = rotatedSize();
+    const full = document.createElement('canvas');
+    drawInto(full, w, h);
+
+    const out = document.createElement('canvas');
+    out.width = Math.round(crop.w); out.height = Math.round(crop.h);
+    const ctx = out.getContext('2d');
+    if(mime === 'image/jpeg'){ ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, out.width, out.height); }
+    ctx.drawImage(full, Math.round(crop.x), Math.round(crop.y), out.width, out.height,
+                        0, 0, out.width, out.height);
+    full.width = full.height = 0;
+
+    const blob = await new Promise(r => out.toBlob(r, mime, quality));
+    out.width = out.height = 0;
+    if(!blob) throw new Error('Format wird nicht unterstützt');
+
+    AK.bar(1);
+    AK.offerDownload(blob, `${name}-zugeschnitten.${EXT[mime]}`);
+    AK.log(`Fertig: ${Math.round(crop.w)} × ${Math.round(crop.h)} px, ${AK.fmtBytes(blob.size)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !src; go.textContent = 'Zuschneiden';
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = cut;
+</script>
+</body>
+</html>
