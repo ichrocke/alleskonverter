@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-25 (dritter Wurf: Feinschliff)
+
+### Behoben
+- „← Alle Werkzeuge“ auf den Unterseiten ist jetzt eine echte Schaltfläche mit großer Trefferfläche (vorher winziger 11-px-Textlink)
+
 ## 2026-07-25 (zweiter Wurf: Auftritt & Recht)
 
 ### Hinzugefügt
