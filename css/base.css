@@ -128,8 +128,63 @@ a.donate:hover{background:#14382e}
 .footlinks{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 10px;padding:0;list-style:none;font-family:var(--mono);font-size:12px}
 .footlinks a{color:var(--stamp)}
 
+/* Hub: Suche und Datei-Erkennung */
+.finder{margin-top:30px}
+.searchrow{display:flex;gap:8px;flex-wrap:wrap}
+.searchrow input[type=search]{
+  flex:1;min-width:220px;font-family:var(--mono);font-size:13px;padding:12px 14px;
+  border:1.5px solid var(--ink);background:var(--field);color:var(--ink);border-radius:0;
+  -webkit-appearance:none;appearance:none;
+}
+.searchrow input[type=search]::placeholder{color:var(--ink-soft)}
+.findhint{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin:8px 0 0}
+.trefferbox{
+  margin-top:14px;border:1.5px solid var(--stamp);background:var(--card);
+  box-shadow:var(--shadow);padding:14px 16px;
+}
+.trefferbox h3{font-family:var(--display);font-weight:400;font-size:19px;text-transform:uppercase;
+  letter-spacing:.02em;margin:0 0 4px;color:var(--stamp)}
+.trefferbox p{margin:0 0 10px;font-size:13px;color:var(--ink-soft)}
+.trefferbox ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
+.trefferbox a{
+  display:inline-block;padding:8px 12px;border:1px solid var(--ink);background:var(--paper);
+  color:var(--ink);text-decoration:none;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:.05em;text-transform:uppercase;
+}
+.trefferbox a:hover{background:var(--ink);color:var(--paper)}
+
+/* Ganze Seite als Ablagefläche */
+body.ablage::after{
+  content:"Datei loslassen — passende Werkzeuge werden angezeigt";
+  position:fixed;inset:14px;z-index:50;pointer-events:none;
+  border:3px dashed var(--stamp);background:rgba(230,228,222,.9);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:clamp(20px,4vw,34px);text-transform:uppercase;
+  letter-spacing:.04em;color:var(--stamp);text-align:center;padding:20px;
+}
+
 /* Hub: Werkzeug-Karten */
 .cat{margin-top:34px}
+details.cat{border-bottom:1px solid var(--rule);padding-bottom:18px}
+details.cat > summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-soft);padding:6px 0;margin-bottom:10px;
+}
+details.cat > summary::-webkit-details-marker{display:none}
+details.cat > summary::before{
+  content:"▸";display:inline-block;transition:transform .15s;color:var(--ink);font-size:13px;
+}
+details.cat[open] > summary::before{transform:rotate(90deg)}
+details.cat > summary:hover{color:var(--ink)}
+details.cat > summary .catname{flex:0 0 auto}
+details.cat > summary::after{content:"";flex:1;height:1px;background:var(--rule)}
+.catcount{
+  font-size:10px;border:1px solid var(--rule);padding:1px 6px;color:var(--ink-soft);
+  order:3;flex:0 0 auto;
+}
+details.cat[hidden]{display:none}
+li[hidden]{display:none}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;list-style:none;margin:0;padding:0}
 .card{
   display:block;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);
@@ -137,8 +192,7 @@ a.donate:hover{background:#14382e}
   transition:transform .12s,border-color .12s;position:relative;
 }
 .card:hover{border-color:var(--ink);transform:translateY(-2px)}
-.card .no{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.12em}
-.card .name{display:block;font-family:var(--display);font-size:21px;text-transform:uppercase;letter-spacing:.02em;margin:6px 0 6px;line-height:1.05}
+.card .name{display:block;font-family:var(--display);font-size:21px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 6px;line-height:1.05;padding-right:22px}
 .card .desc{display:block}
 .card:hover .name{color:var(--stamp)}
 .card .desc{font-size:12.5px;color:var(--ink-soft);line-height:1.45}

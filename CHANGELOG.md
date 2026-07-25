@@ -3,6 +3,18 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Startseite neu geordnet)
+
+### Geändert
+- **Startseite für viele Werkzeuge umgebaut**: Suchfeld ganz oben (filtert live über Name, Beschreibung und hinterlegte Suchwörter wie „heic“ oder „verkleinern“, Umlaute egal; mit `/` direkt anspringbar, `Esc` leert), Kategorien sind jetzt aufklappbar mit Anzahl-Anzeige und lassen sich gesammelt auf- und zuklappen. Auf schmalen Bildschirmen ist zunächst nur die erste Kategorie offen.
+- **Datei auf die Startseite ziehen** schlägt passende Werkzeuge vor: Die ganze Seite ist Ablagefläche, erkannt werden PDF, Bilder, iPhone-Fotos, Tabellen, Word, Markdown, HTML, Untertitel, ZIP, Audio und Video — bei unbekannten Endungen kommt ein verständlicher Hinweis. Die Dateien werden dabei nur dem Namen nach betrachtet und selbstverständlich nirgends hingeschickt.
+- Nummerierung auf den Karten entfernt — sie sagte nach dem Umbau nichts mehr aus
+
+## 2026-07-26 (Werkzeug 18)
+
+### Hinzugefügt
+- Werkzeug **Untertitel SRT ↔ VTT** (`tools/untertitel/`): wandelt in beide Richtungen um, zieht auf Wunsch nur den reinen Text ohne Zeitmarken heraus und verschiebt alle Zeitmarken um einen festen Betrag (Zehntelsekunden möglich) — praktisch bei Untertiteln, die dem Bild hinterherlaufen. Liest auch VTT mit Kopfzeilen und Positionsangaben.
+
 ## 2026-07-26 (Werkzeug 17)
 
 ### Hinzugefügt

@@ -19,6 +19,7 @@ const SHELL = [
   '/js/dropzone.js',
   '/js/filelist.js',
   '/js/pdf-common.js',
+  '/js/hub.js',
   '/manifest.webmanifest',
   '/assets/favicon.png',
   '/assets/apple-touch-icon.png',

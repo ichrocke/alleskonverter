@@ -48,121 +48,117 @@
 </header>
 
 <main>
-<section class="cat">
-  <h2>PDF</h2>
+<div class="finder">
+  <div class="searchrow">
+    <input type="search" id="suche" placeholder="Werkzeug suchen — z. B. „heic“, „pdf verkleinern“, „csv“" aria-label="Werkzeug suchen" autocomplete="off">
+    <button class="ghost" id="alleauf" type="button">Alle aufklappen</button>
+  </div>
+  <p class="findhint" id="findhint">Oder zieh eine Datei irgendwo auf diese Seite — passende Werkzeuge werden dann angezeigt.</p>
+</div>
+
+<div id="treffer" class="trefferbox" hidden></div>
+
+<details class="cat" open>
+  <summary><span class="catname">PDF</span><span class="catcount">8</span></summary>
   <ul class="cards">
-    <li><a class="card" href="tools/pdf-zusammenfuegen/index.html">
-      <span class="no">01</span><span class="arrow">→</span>
+    <li data-tool="pdf-zusammenfuegen" data-tags="pdf merge verbinden kombinieren stapeln zusammenfassen"><a class="card" href="tools/pdf-zusammenfuegen/index.html"><span class="arrow">→</span>
       <span class="name">PDF zusammenfügen</span>
       <span class="desc">Mehrere PDFs in beliebiger Reihenfolge zu einer Datei stapeln — auch geschützte.</span>
     </a></li>
-    <li><a class="card" href="tools/pdf-aufteilen/index.html">
-      <span class="no">02</span><span class="arrow">→</span>
+    <li data-tool="pdf-aufteilen" data-tags="pdf split trennen zerlegen seiten extrahieren teilen"><a class="card" href="tools/pdf-aufteilen/index.html"><span class="arrow">→</span>
       <span class="name">PDF aufteilen</span>
       <span class="desc">Seitenbereiche extrahieren oder jede Seite als eigene Datei speichern.</span>
     </a></li>
-    <li><a class="card" href="tools/pdf-bearbeiten/index.html">
-      <span class="no">03</span><span class="arrow">→</span>
+    <li data-tool="pdf-bearbeiten" data-tags="pdf seiten drehen loeschen sortieren rotieren organisieren"><a class="card" href="tools/pdf-bearbeiten/index.html"><span class="arrow">→</span>
       <span class="name">PDF bearbeiten</span>
       <span class="desc">Seiten als Miniaturen sehen, drehen, löschen, umsortieren, speichern.</span>
     </a></li>
-    <li><a class="card" href="tools/pdf-zu-bild/index.html">
-      <span class="no">04</span><span class="arrow">→</span>
+    <li data-tool="pdf-zu-bild" data-tags="pdf png jpg jpeg bild rendern export screenshot"><a class="card" href="tools/pdf-zu-bild/index.html"><span class="arrow">→</span>
       <span class="name">PDF → Bild</span>
       <span class="desc">Seiten als PNG oder JPEG exportieren, einzeln oder als ZIP.</span>
     </a></li>
-    <li><a class="card" href="tools/bild-zu-pdf/index.html">
-      <span class="no">05</span><span class="arrow">→</span>
+    <li data-tool="bild-zu-pdf" data-tags="jpg png foto scan heic pdf erstellen bilder"><a class="card" href="tools/bild-zu-pdf/index.html"><span class="arrow">→</span>
       <span class="name">Bilder → PDF</span>
       <span class="desc">Fotos und Scans in ein PDF packen — Reihenfolge frei sortierbar.</span>
     </a></li>
-    <li><a class="card" href="tools/pdf-komprimieren/index.html">
-      <span class="no">06</span><span class="arrow">→</span>
+    <li data-tool="pdf-komprimieren" data-tags="pdf verkleinern kleiner komprimieren groesse email anhang"><a class="card" href="tools/pdf-komprimieren/index.html"><span class="arrow">→</span>
       <span class="name">PDF komprimieren</span>
       <span class="desc">Datei verkleinern für E-Mail-Anhänge — Auflösung und Qualität wählbar.</span>
     </a></li>
-    <li><a class="card" href="tools/pdf-text/index.html">
-      <span class="no">07</span><span class="arrow">→</span>
+    <li data-tool="pdf-text" data-tags="pdf text extrahieren kopieren auslesen txt inhalt"><a class="card" href="tools/pdf-text/index.html"><span class="arrow">→</span>
       <span class="name">Text auslesen</span>
       <span class="desc">Den kompletten Text eines PDFs extrahieren, kopieren oder als .txt sichern.</span>
     </a></li>
-    <li><a class="card" href="tools/pdf-stempeln/index.html">
-      <span class="no">16</span><span class="arrow">→</span>
+    <li data-tool="pdf-stempeln" data-tags="pdf wasserzeichen seitenzahlen entwurf vertraulich stempel nummerierung"><a class="card" href="tools/pdf-stempeln/index.html"><span class="arrow">→</span>
       <span class="name">PDF stempeln</span>
       <span class="desc">Wasserzeichen wie „Entwurf“ und Seitenzahlen einfügen — mit Vorschau.</span>
     </a></li>
   </ul>
-</section>
-<section class="cat">
-  <h2>Bilder</h2>
+</details>
+
+<details class="cat" open>
+  <summary><span class="catname">Bilder</span><span class="catcount">2</span></summary>
   <ul class="cards">
-    <li><a class="card" href="tools/bild-konvertieren/index.html">
-      <span class="no">08</span><span class="arrow">→</span>
+    <li data-tool="bild-konvertieren" data-tags="heic jpg png webp avif bild format umwandeln exif metadaten verkleinern"><a class="card" href="tools/bild-konvertieren/index.html"><span class="arrow">→</span>
       <span class="name">Bilder konvertieren</span>
       <span class="desc">JPG, PNG, WebP, HEIC — Format wandeln, verkleinern, komprimieren, Metadaten entfernen. Auch stapelweise.</span>
     </a></li>
-    <li><a class="card" href="tools/bild-zuschneiden/index.html">
-      <span class="no">15</span><span class="arrow">→</span>
+    <li data-tool="bild-zuschneiden" data-tags="bild crop zuschneiden drehen spiegeln profilbild seitenverhaeltnis"><a class="card" href="tools/bild-zuschneiden/index.html"><span class="arrow">→</span>
       <span class="name">Bild zuschneiden</span>
       <span class="desc">Ausschnitt frei oder im festen Seitenverhältnis wählen, drehen und spiegeln.</span>
     </a></li>
   </ul>
-</section>
-<section class="cat">
-  <h2>Dokumente &amp; Daten</h2>
+</details>
+
+<details class="cat" open>
+  <summary><span class="catname">Dokumente &amp; Daten</span><span class="catcount">3</span></summary>
   <ul class="cards">
-    <li><a class="card" href="tools/word-zu-html/index.html">
-      <span class="no">09</span><span class="arrow">→</span>
+    <li data-tool="word-zu-html" data-tags="word docx html text konvertieren dokument office"><a class="card" href="tools/word-zu-html/index.html"><span class="arrow">→</span>
       <span class="name">Word → HTML</span>
       <span class="desc">DOCX-Dateien in sauberes HTML oder reinen Text umwandeln, mit Vorschau.</span>
     </a></li>
-    <li><a class="card" href="tools/markdown-html/index.html">
-      <span class="no">10</span><span class="arrow">→</span>
+    <li data-tool="markdown-html" data-tags="markdown md html readme konvertieren"><a class="card" href="tools/markdown-html/index.html"><span class="arrow">→</span>
       <span class="name">Markdown ↔ HTML</span>
       <span class="desc">In beide Richtungen umwandeln, mit Live-Vorschau.</span>
     </a></li>
-    <li><a class="card" href="tools/tabellen/index.html">
-      <span class="no">11</span><span class="arrow">→</span>
+    <li data-tool="tabellen" data-tags="csv excel xlsx json tabelle umwandeln daten"><a class="card" href="tools/tabellen/index.html"><span class="arrow">→</span>
       <span class="name">Tabellen-Konverter</span>
       <span class="desc">CSV, JSON und Excel (XLSX) ineinander umwandeln, mit Tabellenvorschau.</span>
     </a></li>
   </ul>
-</section>
-<section class="cat">
-  <h2>Medien</h2>
+</details>
+
+<details class="cat" open>
+  <summary><span class="catname">Medien</span><span class="catcount">1</span></summary>
   <ul class="cards">
-    <li><a class="card" href="tools/medien/index.html">
-      <span class="no">12</span><span class="arrow">→</span>
+    <li data-tool="medien" data-tags="video audio mp3 mp4 wav webm gif musik ton konvertieren ffmpeg"><a class="card" href="tools/medien/index.html"><span class="arrow">→</span>
       <span class="name">Audio &amp; Video</span>
       <span class="desc">MP3, WAV, MP4, WebM, GIF — konvertieren oder Ton aus Video ziehen. Lädt einmalig eine größere Bibliothek (von dieser Seite, kein CDN).</span>
     </a></li>
   </ul>
-</section>
-<section class="cat">
-  <h2>Extras</h2>
+</details>
+
+<details class="cat" open>
+  <summary><span class="catname">Extras</span><span class="catcount">4</span></summary>
   <ul class="cards">
-    <li><a class="card" href="tools/untertitel/index.html">
-      <span class="no">18</span><span class="arrow">→</span>
+    <li data-tool="untertitel" data-tags="srt vtt untertitel subtitle video zeiten"><a class="card" href="tools/untertitel/index.html"><span class="arrow">→</span>
       <span class="name">Untertitel SRT ↔ VTT</span>
       <span class="desc">Untertitel umwandeln, Text ohne Zeiten herausziehen, Zeitversatz korrigieren.</span>
     </a></li>
-    <li><a class="card" href="tools/text-werkzeuge/index.html">
-      <span class="no">17</span><span class="arrow">→</span>
+    <li data-tool="text-werkzeuge" data-tags="base64 url encode hash sha256 pruefsumme zeichen zaehlen text"><a class="card" href="tools/text-werkzeuge/index.html"><span class="arrow">→</span>
       <span class="name">Text-Werkzeuge</span>
       <span class="desc">Base64, URL-Kodierung, Prüfsummen, Groß-/Kleinschreibung, Zeichen- und Wortzähler.</span>
     </a></li>
-    <li><a class="card" href="tools/qr-code/index.html">
-      <span class="no">13</span><span class="arrow">→</span>
+    <li data-tool="qr-code" data-tags="qr code wlan vcard visitenkarte girocode link erstellen scannen"><a class="card" href="tools/qr-code/index.html"><span class="arrow">→</span>
       <span class="name">QR-Code erstellen</span>
       <span class="desc">Link, WLAN, vCard, GiroCode u. v. m. — mit Farben, Logos, Rahmen und Bild-im-Code.</span>
     </a></li>
-    <li><a class="card" href="tools/zip/index.html">
-      <span class="no">14</span><span class="arrow">→</span>
+    <li data-tool="zip" data-tags="zip archiv entpacken packen komprimieren ordner"><a class="card" href="tools/zip/index.html"><span class="arrow">→</span>
       <span class="name">ZIP entpacken &amp; packen</span>
       <span class="desc">Archive öffnen und Dateien herausholen — oder mehrere Dateien zu einem ZIP schnüren.</span>
     </a></li>
   </ul>
-</section>
+</details>
 </main>
 
 <footer>
@@ -174,6 +170,7 @@
   <p>© 2026 alleskonverter.de — alle Werkzeuge laufen vollständig lokal in deinem Browser.</p>
 </footer>
 </div>
+<script src="js/hub.js?v=20260726"></script>
 <script>
 /* Website als App installierbar machen und offline verfügbar halten.
    Über file:// gibt es keine Service Worker — dort still überspringen. */
