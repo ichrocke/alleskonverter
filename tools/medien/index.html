@@ -17,7 +17,7 @@
 <header>
   <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
   <h1>Audio &amp; <span>Video</span></h1>
-  <p class="sub">MP3, WAV, OGG, M4A, FLAC, MP4, WebM, GIF — konvertieren oder die Tonspur aus einem Video ziehen. Die Umwandlung läuft komplett lokal; nur die Konverter-Bibliothek kommt einmalig aus dem Netz.</p>
+  <p class="sub">MP3, WAV, OGG, M4A, FLAC, MP4, WebM, GIF — konvertieren oder die Tonspur aus einem Video ziehen. Die Umwandlung läuft komplett lokal; die Konverter-Bibliothek (~31 MB) wird einmalig von dieser Website geladen — kein Dritt-CDN.</p>
 </header>
 
 <div class="grid">
@@ -40,7 +40,7 @@
     <div class="field" id="f-lib">
       <label>Konverter-Bibliothek (ffmpeg)</label>
       <button class="ghost" id="loadlib" style="width:100%">Bibliothek laden — einmalig ~31 MB</button>
-      <div class="hint" id="libhint">Wird vom CDN geladen und vom Browser zwischengespeichert.</div>
+      <div class="hint" id="libhint">Kommt von diesem Server (kein Dritt-CDN) und wird vom Browser zwischengespeichert.</div>
     </div>
 
     <div class="field">
@@ -88,16 +88,15 @@
 </div>
 
 <footer>
-  <p><strong>So funktioniert es:</strong> Das Werkzeug nutzt ffmpeg als WebAssembly — dieselbe Software, die auch Profi-Tools verwenden, nur im Browser. Deine Datei bleibt trotzdem lokal: Heruntergeladen wird nur das Programm, nie deine Daten hochgeladen. Videokonvertierung ist spürbar langsamer als am Rechner installierte Programme — für Alltagsdateien reicht es gut. Wird ein Video als Audioformat (z.&nbsp;B. MP3) ausgegeben, wird automatisch nur die Tonspur übernommen.</p>
+  <p><strong>So funktioniert es:</strong> Das Werkzeug nutzt ffmpeg als WebAssembly — dieselbe Software, die auch Profi-Tools verwenden, nur im Browser. Die Bibliothek liegt auf diesem Server — es wird kein fremdes CDN kontaktiert. Deine Dateien bleiben lokal und werden nie hochgeladen. Videokonvertierung ist spürbar langsamer als am Rechner installierte Programme — für Alltagsdateien reicht es gut. Wird ein Video als Audioformat (z.&nbsp;B. MP3) ausgegeben, wird automatisch nur die Tonspur übernommen.</p>
   <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
 </footer>
 </div>
 
 <script>
-const CDN_FFMPEG = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd';
-const CDN_UTIL   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd';
-/* Wichtig: ESM-Core, weil der Worker (Module-Worker) den Core per import() lädt */
-const CDN_CORE   = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+/* ffmpeg liegt komplett auf dem eigenen Server (vendor/ffmpeg/) — kein CDN.
+   Der Core ist die ESM-Variante, weil der Module-Worker ihn per import() lädt. */
+const FF = '../../vendor/ffmpeg';
 
 let ffmpeg = null, src = null;
 
@@ -113,10 +112,14 @@ function script(url){
 
 async function loadLib(){
   const btn = AK.$('#loadlib');
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver (die Bibliothek lässt sich nicht per Doppelklick-Datei laden). Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Lädt …';
   try{
-    await script(CDN_FFMPEG + '/ffmpeg.js');
-    await script(CDN_UTIL + '/index.js');
+    await script(FF + '/ffmpeg.js');
+    await script(FF + '/util.js');
     const { toBlobURL } = FFmpegUtil;
 
     ffmpeg = new FFmpegWASM.FFmpeg();
@@ -125,9 +128,9 @@ async function loadLib(){
 
     AK.$('#libhint').textContent = 'ffmpeg-Kern wird geladen (~31 MB) …';
     await ffmpeg.load({
-      coreURL: await toBlobURL(CDN_CORE + '/ffmpeg-core.js', 'text/javascript'),
-      wasmURL: await toBlobURL(CDN_CORE + '/ffmpeg-core.wasm', 'application/wasm'),
-      classWorkerURL: await toBlobURL(CDN_FFMPEG + '/814.ffmpeg.js', 'text/javascript'),
+      coreURL: await toBlobURL(FF + '/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL(FF + '/ffmpeg-core.wasm', 'application/wasm'),
+      classWorkerURL: await toBlobURL(FF + '/814.ffmpeg.js', 'text/javascript'),
     });
 
     AK.$('#f-lib').innerHTML = '<label>Konverter-Bibliothek (ffmpeg)</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
@@ -136,7 +139,7 @@ async function loadLib(){
   }catch(err){
     console.error(err);
     btn.disabled = false; btn.textContent = 'Bibliothek laden — einmalig ~31 MB';
-    AK.log('Bibliothek konnte nicht geladen werden — besteht eine Internetverbindung? ' + (err.message || ''), true);
+    AK.log('Bibliothek konnte nicht geladen werden: ' + (err.message || 'unbekannter Fehler'), true);
   }
 }
 

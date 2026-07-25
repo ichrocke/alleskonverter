@@ -47,7 +47,7 @@ python3 -m http.server 8000
 
 - Alle Konvertierungen laufen per JavaScript/WebAssembly **im Browser-Tab**; es existiert kein Backend.
 - Bibliotheken (pdf-lib, pdf.js, mammoth, SheetJS, marked, turndown, heic2any, JSZip) und Schriften liegen lokal unter `vendor/` — beim Öffnen werden keine Drittserver kontaktiert.
-- Einzige Ausnahme: das Werkzeug **Audio & Video** lädt die ffmpeg-Bibliothek (~31 MB) auf Klick vom CDN (jsdelivr) und der Browser cached sie. Auch dabei werden nur Programmdateien geladen — nie eigene Dateien hochgeladen.
+- Auch die ffmpeg-Bibliothek des Werkzeugs **Audio & Video** (~31 MB, wird erst auf Klick geladen) liegt lokal unter `vendor/ffmpeg/` — es gibt keinerlei CDN- oder Drittserver-Kontakte. Hinweis: Dieses eine Werkzeug braucht einen Webserver (`file://` reicht dafür nicht).
 - Beim Neukodieren von Bildern gehen EXIF-Metadaten (Kameramodell, Aufnahmezeit, GPS) verloren — gewollt.
 
 ## Technik
