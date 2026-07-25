@@ -17,7 +17,8 @@
 <meta name="twitter:title" content="CSV in Excel oder JSON umwandeln — kostenlos &amp; lokal | Alleskonverter">
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
-<meta name="theme-color" content="#E6E4DE">
+<meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Tabellen-Konverter — Alleskonverter", "url": "https://alleskonverter.de/tools/tabellen/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "CSV, JSON und Excel (XLSX) online ineinander umwandeln — mit Tabellenvorschau und wählbarem Trennzeichen. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Warum zeigt Excel meine Umlaute kaputt an?", "acceptedAnswer": {"@type": "Answer", "text": "Klassisches CSV-Problem: Excel erwartet eine UTF-8-Kennung (BOM) am Dateianfang. Die hängt dieses Werkzeug automatisch an — und mit Semikolon als Trennzeichen öffnet deutsches Excel die Datei direkt richtig."}}, {"@type": "Question", "name": "Wie muss mein JSON aussehen?", "acceptedAnswer": {"@type": "Answer", "text": "Als Liste von Objekten: jedes Objekt eine Zeile, die Schlüssel werden zu Spaltennamen — das übliche Format von API-Exporten. Auch eine Liste von Listen (Zeilen als Arrays) wird verstanden."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css">
@@ -107,6 +108,17 @@
 <script src="../../js/ui.js"></script>
 <script src="../../js/dropzone.js"></script>
 <script>
+/* Text mit der richtigen Zeichenkodierung lesen: erst UTF-8, sonst Windows-1252 */
+async function readText(file){
+  const buf = await file.arrayBuffer();
+  try{
+    return new TextDecoder('utf-8', { fatal:true }).decode(buf).replace(/^\uFEFF/, '');
+  }catch(_){
+    AK.log('Datei ist nicht UTF-8 — wird als Windows-1252 gelesen.');
+    return new TextDecoder('windows-1252').decode(buf);
+  }
+}
+
 let wb = null, fileBase = 'tabelle';
 
 async function addFiles(files){
@@ -124,6 +136,10 @@ async function addFiles(files){
         : XLSX.utils.json_to_sheet(rows);
       wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, sheet, 'Daten');
+    }else if(/\.(csv|tsv|txt)$/i.test(file.name)){
+      // Textformate selbst dekodieren — sonst liest SheetJS UTF-8 als Latin-1
+      // und aus „Müller“ wird „MÃ¼ller“.
+      wb = XLSX.read(await readText(file), { type:'string', raw:false });
     }else{
       wb = XLSX.read(await file.arrayBuffer(), { type:'array' });
     }

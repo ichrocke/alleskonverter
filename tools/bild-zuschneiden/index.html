@@ -19,7 +19,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild zuschneiden & drehen — Alleskonverter","url":"https://alleskonverter.de/tools/bild-zuschneiden/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Bilder online zuschneiden, drehen und spiegeln — mit festen Seitenverhältnissen. Kostenlos, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Bilder hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Zuschnitt passiert vollständig in deinem Browser — es gibt keinen Server, der Bilder annehmen könnte."}},{"@type":"Question","name":"Verliert das Bild an Qualität?","acceptedAnswer":{"@type":"Answer","text":"Der Zuschnitt selbst arbeitet in voller Originalauflösung. Beim Speichern als JPEG wird neu komprimiert, als PNG bleibt das Ergebnis verlustfrei."}},{"@type":"Question","name":"Welches Format brauche ich für ein Profilbild?","acceptedAnswer":{"@type":"Answer","text":"Quadratisch (1:1). Für Beiträge auf Instagram eignet sich 1:1 oder 4:5, für Titelbilder und Präsentationen 16:9."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
-<meta name="theme-color" content="#E6E4DE">
+<meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
 <style>
@@ -27,13 +28,13 @@
 #stage{position:relative;margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px;display:none}
 #stage.on{display:block}
 .canvaswrap{position:relative;display:block;margin:0 auto;touch-action:none;line-height:0}
-#view{max-width:100%;height:auto;display:block;cursor:crosshair}
+#view{max-width:100%;height:auto;display:block;cursor:crosshair;background:#fff}
 #shade{position:absolute;inset:0;pointer-events:none}
-#crop{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 1.5px var(--ink),0 0 0 9999px rgba(22,25,27,.55);cursor:move}
+#crop{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.75),0 0 0 9999px rgba(10,12,10,.6);cursor:move}
 #crop::before,#crop::after{content:"";position:absolute;inset:0;pointer-events:none}
 #crop::before{border-left:1px solid rgba(255,255,255,.45);border-right:1px solid rgba(255,255,255,.45);left:33.33%;right:33.33%}
 #crop::after{border-top:1px solid rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.45);top:33.33%;bottom:33.33%}
-.hnd{position:absolute;width:16px;height:16px;background:#fff;border:1.5px solid var(--ink);z-index:2}
+.hnd{position:absolute;width:16px;height:16px;background:#fff;border:1.5px solid #16191B;z-index:2}
 .hnd[data-h=nw]{left:-8px;top:-8px;cursor:nwse-resize}
 .hnd[data-h=ne]{right:-8px;top:-8px;cursor:nesw-resize}
 .hnd[data-h=sw]{left:-8px;bottom:-8px;cursor:nesw-resize}
@@ -42,7 +43,7 @@
 .ratios{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .ratios button{padding:6px 10px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .ratios button:hover{border-color:var(--ink)}
-.ratios button.active{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.ratios button.active{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
 .dims{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-left:auto}
 </style>
 </head>

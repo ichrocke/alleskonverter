@@ -19,7 +19,8 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF stempeln — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-stempeln/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Wasserzeichen und Seitenzahlen in ein PDF einfügen — kostenlos, ohne Upload, mit Live-Vorschau."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das PDF wird vollständig in deinem Browser bearbeitet — es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Lässt sich das Wasserzeichen wieder entfernen?","acceptedAnswer":{"@type":"Answer","text":"Nicht ohne Weiteres. Der Text wird fest in den Seiteninhalt geschrieben. Es ist ein sichtbarer Hinweis, kein Kopierschutz — wer das PDF als Bild abfotografiert, umgeht jedes Wasserzeichen."}},{"@type":"Question","name":"Bleibt der Text im PDF durchsuchbar?","acceptedAnswer":{"@type":"Answer","text":"Ja. Die Seiten werden nicht gerastert, sondern nur ergänzt — der vorhandene Text bleibt markierbar und durchsuchbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
-<meta name="theme-color" content="#E6E4DE">
+<meta name="theme-color" content="#E6E4DE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151815" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
 <style>
@@ -32,7 +33,7 @@
 .posgrid button::after{content:"";display:block;width:7px;height:7px;background:var(--ink-soft);margin:auto}
 .posgrid button:hover{border-color:var(--ink)}
 .posgrid button.active{background:var(--stamp);border-color:var(--stamp)}
-.posgrid button.active::after{background:#fff}
+.posgrid button.active::after{background:var(--stamp-text)}
 fieldset{border:1px solid var(--rule);padding:12px;margin:0 0 14px}
 legend{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:0 6px}
 .check{display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:10px}

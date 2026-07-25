@@ -24,8 +24,8 @@
 
 /* base.css bestimmt Seite/Typo — style.css-Reste neutralisieren */
 body {
-  background: var(--paper);
-  background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.018) 0 1px, transparent 1px 4px);
+  background: var(--bg);
+  background-image: repeating-linear-gradient(90deg, var(--grain) 0 1px, transparent 1px 4px);
   font-size: 15px;
 }
 .layout { max-width: none; padding: 0; }
@@ -60,3 +60,9 @@ body {
 #typeForm { min-height: 76px; }
 #presetGrid { min-height: 188px; }
 .preview-stage { min-height: 296px; display: grid; place-items: center; }
+
+/* Auf hellem Grün im Dunkelmodus muss die Schrift dunkel sein (Kontrast) */
+:root[data-theme="dark"] .chip.active,
+:root[data-theme="dark"] .seg-btn.active,
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .fab { color: #101410; }
