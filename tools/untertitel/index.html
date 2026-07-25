@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SRT in VTT umwandeln — Untertitel-Konverter kostenlos | Alleskonverter</title>
+<meta name="description" content="Untertitel online umwandeln: SRT ↔ VTT, auch als reiner Text. Zeiten verschieben und Untertitel prüfen. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/untertitel/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="SRT in VTT umwandeln — Untertitel-Konverter kostenlos | Alleskonverter">
+<meta property="og:description" content="Untertitel online umwandeln: SRT ↔ VTT, auch als reiner Text. Zeiten verschieben. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/untertitel/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SRT in VTT umwandeln — Untertitel-Konverter kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Untertitel-Konverter — Alleskonverter","url":"https://alleskonverter.de/tools/untertitel/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Untertitel zwischen SRT und VTT umwandeln, Zeiten verschieben — kostenlos, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist der Unterschied zwischen SRT und VTT?","acceptedAnswer":{"@type":"Answer","text":"SRT ist das klassische Format für Videoplayer wie VLC. VTT (WebVTT) ist der Standard für Untertitel in HTML5-Videos im Browser. Inhaltlich sind sie fast identisch; VTT beginnt mit einer WEBVTT-Kennzeile und trennt Millisekunden mit einem Punkt statt einem Komma."}},{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Umwandlung läuft vollständig in deinem Browser."}},{"@type":"Question","name":"Meine Untertitel sind zeitversetzt — was tun?","acceptedAnswer":{"@type":"Answer","text":"Mit der Zeitverschiebung lassen sich alle Zeitmarken um einen festen Betrag nach vorne oder hinten schieben, in Sekunden mit einer Nachkommastelle."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Unter<span>titel</span></h1>
+  <p class="sub">SRT und VTT ineinander umwandeln, den Text ohne Zeitmarken herausziehen und zeitversetzte Untertitel geradeziehen — direkt auf deinem Gerät.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Datei</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Untertiteldatei hierher ziehen</strong>
+      <small>.srt · .vtt — oder unten direkt einfügen</small>
+    </div>
+    <input type="file" id="picker" accept=".srt,.vtt,.txt" hidden>
+
+    <div class="twocol" style="margin-top:18px">
+      <div>
+        <h2>Eingabe</h2>
+        <textarea class="pane" id="input" spellcheck="false" placeholder="1&#10;00:00:01,000 --> 00:00:03,500&#10;Erster Untertitel"></textarea>
+      </div>
+      <div>
+        <h2>Ergebnis</h2>
+        <textarea class="pane" id="output" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="count">0<small>Untertitel erkannt</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="ziel">Zielformat</label>
+      <select id="ziel">
+        <option value="vtt" selected>VTT — für HTML5-Video</option>
+        <option value="srt">SRT — für Videoplayer</option>
+        <option value="txt">Nur Text — ohne Zeiten</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="shift">Zeiten verschieben (Sekunden)</label>
+      <input type="number" id="shift" value="0" step="0.1" style="width:100%">
+      <div class="hint">negativ = früher, positiv = später</div>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="renumber" checked style="width:auto;margin-right:6px">Neu durchnummerieren</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Herunterladen</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Untertitel liegen meist in einem von zwei Formaten vor: <strong>SRT</strong> ist der Klassiker, den Programme wie VLC und die meisten Fernseher verstehen. <strong>VTT</strong> (WebVTT) braucht man, sobald ein Video direkt auf einer Webseite im Browser laufen soll. Dieses Werkzeug wandelt in beide Richtungen um, zieht auf Wunsch nur den reinen Text heraus und kann alle Zeitmarken um einen festen Betrag verschieben.</p>
+  <h3>Werden meine Dateien hochgeladen?</h3>
+  <p>Nein. Die Umwandlung läuft vollständig in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte.</p>
+  <h3>Was unterscheidet SRT und VTT genau?</h3>
+  <p>Inhaltlich fast nichts. VTT beginnt mit einer <code>WEBVTT</code>-Kennzeile, trennt Millisekunden mit einem Punkt statt einem Komma und erlaubt zusätzliche Gestaltungsangaben. Beim Umwandeln wird beides automatisch angepasst.</p>
+  <h3>Meine Untertitel laufen dem Bild hinterher — was tun?</h3>
+  <p>Trage bei „Zeiten verschieben“ ein, um wie viele Sekunden alles verschoben werden soll: negativ, wenn die Untertitel zu spät kommen, positiv, wenn sie zu früh erscheinen. Zehntelsekunden sind möglich.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Formatierungen innerhalb der Untertitel (etwa <code>&lt;i&gt;kursiv&lt;/i&gt;</code>) bleiben erhalten. Beim Export als reiner Text werden sie zusammen mit den Zeitmarken entfernt.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+let basisName = 'untertitel';
+
+/* "00:01:02,500" oder "01:02.500" → Sekunden */
+function zeitZuSekunden(t){
+  const m = t.trim().match(/^(?:(\d+):)?(\d{1,2}):(\d{1,2})[,.](\d{1,3})$/);
+  if(!m) return null;
+  const [, h, min, s, ms] = m;
+  return (+(h||0))*3600 + (+min)*60 + (+s) + (+ms.padEnd(3,'0'))/1000;
+}
+
+function sekundenZuZeit(sek, komma){
+  sek = Math.max(0, sek);
+  const h = Math.floor(sek/3600), m = Math.floor(sek%3600/60), s = Math.floor(sek%60);
+  const ms = Math.round((sek - Math.floor(sek)) * 1000);
+  const p = (n,l=2) => String(n).padStart(l,'0');
+  return `${p(h)}:${p(m)}:${p(s)}${komma ? ',' : '.'}${p(ms,3)}`;
+}
+
+/* SRT und VTT haben denselben Aufbau — ein Leser genügt für beide. */
+function lies(text){
+  const roh = text.replace(/^﻿/, '').replace(/\r\n?/g, '\n');
+  const ohneKopf = roh.replace(/^WEBVTT[^\n]*\n(?:[^\n]*\n)*?\n/, '');
+  const eintraege = [];
+  for(const block of ohneKopf.split(/\n{2,}/)){
+    const zeilen = block.split('\n').filter(z => z.trim() !== '');
+    if(!zeilen.length) continue;
+    let i = 0;
+    if(/^\d+$/.test(zeilen[0].trim()) && zeilen.length > 1) i = 1;   // Nummer überspringen
+    const zeit = (zeilen[i] || '').split('-->');
+    if(zeit.length !== 2) continue;
+    const von = zeitZuSekunden(zeit[0]);
+    // Nach der Endzeit können in VTT noch Positionsangaben stehen — nur das erste Wort zählt.
+    const bis = zeitZuSekunden(zeit[1].trim().split(/\s+/)[0] || '');
+    if(von === null || bis === null) continue;
+    const inhalt = zeilen.slice(i+1).join('\n');
+    if(!inhalt) continue;
+    eintraege.push({ von, bis, text:inhalt });
+  }
+  return eintraege;
+}
+
+function schreibe(eintraege, format, nummerieren){
+  if(format === 'txt'){
+    return eintraege.map(e => e.text.replace(/<[^>]+>/g, '')).join('\n');
+  }
+  const komma = format === 'srt';
+  const teile = eintraege.map((e, i) => {
+    const kopf = (format === 'srt' || nummerieren) ? `${i+1}\n` : '';
+    return `${kopf}${sekundenZuZeit(e.von, komma)} --> ${sekundenZuZeit(e.bis, komma)}\n${e.text}`;
+  });
+  return (format === 'vtt' ? 'WEBVTT\n\n' : '') + teile.join('\n\n') + '\n';
+}
+
+function lauf(){
+  const eintraege = lies(AK.$('#input').value);
+  const shift = +AK.$('#shift').value || 0;
+  const verschoben = eintraege.map(e => ({ ...e, von:e.von + shift, bis:e.bis + shift }));
+  const format = AK.$('#ziel').value;
+  const out = verschoben.length ? schreibe(verschoben, format, AK.$('#renumber').checked) : '';
+  AK.$('#output').value = out;
+  AK.$('#count').innerHTML = eintraege.length + '<small>Untertitel erkannt</small>';
+  AK.$('#go').disabled = !eintraege.length;
+  AK.logClear();
+  if(AK.$('#input').value.trim() && !eintraege.length)
+    AK.log('Keine Untertitel erkannt — erwartet wird SRT oder VTT mit Zeitmarken der Form 00:00:01,000 --> 00:00:03,500.', true);
+  else if(eintraege.length)
+    AK.log(`Länge: ${sekundenZuZeit(Math.max(...verschoben.map(e => e.bis)), false).slice(0,8)} Stunden:Minuten:Sekunden`);
+}
+
+async function addFiles(list){
+  const file = list.find(f => /\.(srt|vtt|txt)$/i.test(f.name));
+  if(!file) return;
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  AK.$('#input').value = await file.text();
+  AK.$('#ziel').value = /\.vtt$/i.test(file.name) ? 'srt' : 'vtt';   // sinnvolle Gegenrichtung
+  lauf();
+}
+
+const TYP = { vtt:'text/vtt', srt:'application/x-subrip', txt:'text/plain' };
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const format = AK.$('#ziel').value;
+  const blob = new Blob([AK.$('#output').value], { type: TYP[format] + ';charset=utf-8' });
+  AK.offerDownload(blob, `${basisName}.${format}`);
+  AK.stamp(true);
+};
+
+AK.dropzone('#drop', '#picker', addFiles);
+['#input','#shift'].forEach(s => AK.$(s).addEventListener('input', lauf));
+['#ziel','#renumber'].forEach(s => AK.$(s).addEventListener('change', lauf));
+lauf();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

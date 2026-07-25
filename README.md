@@ -36,6 +36,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [ZIP entpacken & packen](tools/zip/index.html) | Archive öffnen, Dateien einzeln oder gebündelt herausholen; Dateien zu ZIP packen |
 
 | [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
+| [Untertitel SRT ↔ VTT](tools/untertitel/index.html) | Untertitel umwandeln, reinen Text extrahieren, Zeiten verschieben |
 **Medien**
 | Werkzeug | Kann |
 |---|---|
