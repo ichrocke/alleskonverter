@@ -19,6 +19,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 
 | [PDF-Passwort](tools/pdf-passwort/index.html) | PDF mit AES-128 verschlüsseln oder bekannten Schutz entfernen, Rechte einstellen |
 | [PDF-Formular ausfüllen](tools/pdf-formular/index.html) | Formularfelder auslesen, ausfüllen und speichern, optional festschreiben |
+| [PDF durchsuchbar machen](tools/pdf-durchsuchbar/index.html) | OCR legt eine unsichtbare Textebene über den Scan |
 **Bilder**
 | Werkzeug | Kann |
 |---|---|

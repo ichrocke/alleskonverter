@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 36)
+
+### Hinzugefügt
+- Werkzeug **PDF durchsuchbar machen** (`tools/pdf-durchsuchbar/`) — die große Ergänzung zur Texterkennung: Aus einem gescannten PDF (oder mehreren Fotos) entsteht ein PDF, das aussieht wie vorher, in dem sich aber suchen, markieren und kopieren lässt. Dafür wird jedes erkannte Wort mit passender Größe an seiner tatsächlichen Position vollständig durchsichtig über den Scan gelegt. Geprüft wurde nicht nur, dass eine Datei entsteht, sondern dass sich der Text aus dem Ergebnis auch wirklich wieder auslesen lässt.
+
+### Behoben
+- Bei der Entwicklung: Tesseract liefert Wortpositionen in dieser Fassung nur, wenn man die Blockstruktur ausdrücklich anfordert — anfangs kamen deshalb null Wörter. Der Auslesecode kommt jetzt mit beiden Rückgabeformen zurecht.
+
 ## 2026-07-26 (Werkzeuge 34 und 35)
 
 ### Hinzugefügt
