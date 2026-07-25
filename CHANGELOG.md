@@ -3,6 +3,14 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 23 & offener Quellcode)
+
+### Geändert
+- **Das Repository ist jetzt öffentlich**: <https://github.com/ichrocke/alleskonverter>. Bei Werkzeugen, die mit vertraulichen Dateien umgehen, sollte niemand einem Versprechen glauben müssen — jetzt lässt sich Zeile für Zeile nachlesen, dass nichts hochgeladen wird. Hinweis darauf in der Datenschutzerklärung (eigener Abschnitt), in der USP-Leiste der Startseite, in der Fußzeile und im README. Vorher wurde die gesamte Git-Historie auf Zugangsdaten geprüft: `.env` war von Beginn an ausgeschlossen, in keinem Commit stehen Passwörter oder Serverdaten.
+
+### Hinzugefügt
+- Werkzeug **Texterkennung (OCR)** (`tools/texterkennung/`): liest Text aus Fotos, Screenshots und gescannten PDFs — auf Deutsch, Englisch oder gemischt. Läuft mit Tesseract (Apache-2.0) vollständig im Browser; Programm und Sprachdaten (~19 MB) liegen auf diesem Server und werden erst auf Klick geladen. Mehrseitige PDFs werden Seite für Seite gerendert und einzeln erkannt, kleine Vorlagen automatisch hochskaliert, und eine optionale Aufbereitung (Graustufen, mehr Kontrast) verbessert Fotos. Ergebnis kopieren oder als .txt speichern.
+
 ## 2026-07-26 (Werkzeug 22)
 
 ### Hinzugefügt

@@ -31,6 +31,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Markdown ↔ HTML](tools/markdown-html/index.html) | Beide Richtungen, Live-Vorschau |
 | [Tabellen-Konverter](tools/tabellen/index.html) | CSV/TSV/JSON/XLSX/XLS ↔ CSV/JSON/XLSX, Vorschau |
 
+| [Texterkennung (OCR)](tools/texterkennung/index.html) | Text aus Bildern und gescannten PDFs erkennen (Tesseract, deutsch/englisch) |
 **Extras**
 | Werkzeug | Kann |
 |---|---|

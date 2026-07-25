@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Text aus Bild oder Scan erkennen (OCR) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Texterkennung im Browser: Text aus Fotos, Screenshots und gescannten PDFs auslesen — deutsch und englisch. Kostenlos, ohne Upload, ohne Anmeldung.">
+<link rel="canonical" href="https://alleskonverter.de/tools/texterkennung/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Text aus Bild oder Scan erkennen (OCR) — kostenlos | Alleskonverter">
+<meta property="og:description" content="Texterkennung im Browser: Text aus Fotos, Screenshots und gescannten PDFs auslesen — deutsch und englisch. Ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/texterkennung/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Text aus Bild oder Scan erkennen (OCR) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Texterkennung (OCR) — Alleskonverter","url":"https://alleskonverter.de/tools/texterkennung/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Text aus Bildern und gescannten PDFs auslesen — deutsch und englisch, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wird mein Dokument hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Texterkennung läuft vollständig in deinem Browser. Nur das Erkennungsprogramm und die Sprachdaten werden einmalig von dieser Website geladen."}},{"@type":"Question","name":"Wie gut ist die Erkennung?","acceptedAnswer":{"@type":"Answer","text":"Bei sauberen Scans und geraden Aufnahmen sehr gut. Schlechte Beleuchtung, Schräglage, Handschrift oder ungewöhnliche Schriften machen ihr zu schaffen. Ein gerade fotografiertes, gut ausgeleuchtetes Blatt liefert die besten Ergebnisse."}},{"@type":"Question","name":"Funktioniert das auch mit PDFs?","acceptedAnswer":{"@type":"Answer","text":"Ja. Gescannte PDFs werden Seite für Seite gerendert und erkannt. Bei PDFs mit echter Textebene ist das Werkzeug „Text auslesen“ schneller und genauer."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Text<span>erkennung</span></h1>
+  <p class="sub">Text aus Fotos, Screenshots und gescannten PDFs auslesen — auf Deutsch und Englisch. Die Erkennung läuft komplett auf deinem Gerät, das Dokument verlässt es nicht.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Vorlage</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild oder PDF hierher ziehen</strong>
+      <small>JPG, PNG, HEIC, WebP oder ein gescanntes PDF</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif,application/pdf,.pdf" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts geladen.</div>
+
+    <h2 style="margin-top:26px">Erkannter Text</h2>
+    <textarea class="pane" id="out" spellcheck="false" placeholder="Hier erscheint der erkannte Text …"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="ghost" id="copy" disabled>In die Zwischenablage</button>
+      <button class="ghost" id="clear" disabled>Leeren</button>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="zeichen">0<small>Zeichen erkannt</small></div>
+
+    <div class="field" id="f-lib" style="margin-top:16px">
+      <label>Erkennungsprogramm</label>
+      <button class="ghost" id="loadlib" style="width:100%">Laden — einmalig ~6 MB</button>
+      <div class="hint" id="libhint">Programm und Sprachdaten kommen von diesem Server.</div>
+    </div>
+
+    <div class="field">
+      <label for="sprache">Sprache</label>
+      <select id="sprache">
+        <option value="deu" selected>Deutsch</option>
+        <option value="eng">Englisch</option>
+        <option value="deu+eng">Deutsch und Englisch gemischt</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="dpi">Auflösung bei PDFs</label>
+      <select id="dpi">
+        <option value="150">150 dpi — schnell</option>
+        <option value="200" selected>200 dpi — empfohlen</option>
+        <option value="300">300 dpi — beste Erkennung, langsam</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="aufbereiten" checked style="width:auto;margin-right:6px">Vorlage automatisch aufbereiten</label>
+      <div class="hint">Graustufen und mehr Kontrast — hilft bei Fotos</div>
+    </div>
+
+    <button class="primary" id="go" disabled>Text erkennen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein abfotografierter Brief, ein Screenshot mit Text, ein eingescannter Vertrag ohne Textebene: Texterkennung — im Fachjargon OCR — macht daraus wieder bearbeitbaren Text. Das Besondere hier: Die Erkennung läuft vollständig in deinem Browser. Bei den üblichen Online-Diensten müsste man genau die Dokumente hochladen, die man am wenigsten aus der Hand geben möchte.</p>
+  <h3>Wird mein Dokument hochgeladen?</h3>
+  <p>Nein. Einmalig werden das Erkennungsprogramm und die Sprachdaten von dieser Website geladen (rund 6&nbsp;MB, danach zwischengespeichert). Dein Dokument selbst wird nie übertragen.</p>
+  <h3>Wie gut ist die Erkennung?</h3>
+  <p>Bei sauberen Scans und gerade aufgenommenen Fotos sehr ordentlich. Schwierig wird es bei schlechter Beleuchtung, starker Schräglage, Handschrift oder sehr verschnörkelten Schriften. Für ein gutes Ergebnis hilft: gerade von oben fotografieren, gleichmäßig ausleuchten, und bei PDFs lieber 300&nbsp;dpi wählen.</p>
+  <h3>Funktioniert das auch mit PDFs?</h3>
+  <p>Ja, gescannte PDFs werden Seite für Seite gerendert und erkannt. Wenn dein PDF bereits eine echte Textebene hat — also aus Word oder einem anderen Programm exportiert wurde —, ist <a href="../pdf-text/index.html">Text auslesen</a> schneller und liefert das exakte Original.</p>
+  <h3>Warum dauert das so lange?</h3>
+  <p>Weil die gesamte Rechenarbeit auf deinem Gerät passiert statt in einem Rechenzentrum. Eine Seite braucht je nach Gerät einige Sekunden. Das ist der Preis dafür, dass das Dokument privat bleibt.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Dieses Werkzeug braucht einen Webserver — als heruntergeladene Datei per Doppelklick funktioniert es nicht. Die Texterkennung nutzt Tesseract (Apache-2.0) mit den schnellen Sprachmodellen.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/pdf-common.js?v=20260726"></script>
+<script>
+const TESS = '../../vendor/tesseract';
+let bereit = false, arbeiter = null, geladeneSprache = null;
+const vorlagen = [];        // { id, name, size, typ, quelle }
+let uid = 0;
+
+/* ---------- Programm laden ---------- */
+function skript(url){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = res;
+    s.onerror = () => rej(new Error('Download fehlgeschlagen'));
+    document.head.appendChild(s);
+  });
+}
+
+async function ladeProgramm(){
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  const btn = AK.$('#loadlib');
+  btn.disabled = true; btn.textContent = 'Lädt …';
+  try{
+    await skript(TESS + '/tesseract.min.js');
+    bereit = true;
+    AK.$('#f-lib').innerHTML = '<label>Erkennungsprogramm</label><div class="hint"><span class="badge b-ok">geladen &amp; bereit</span></div>';
+    AK.log('Erkennungsprogramm bereit.');
+    pruefe();
+  }catch(err){
+    console.error(err);
+    btn.disabled = false; btn.textContent = 'Laden — einmalig ~6 MB';
+    AK.log('Programm konnte nicht geladen werden.', true);
+  }
+}
+
+/* Arbeiter mit der gewünschten Sprache vorbereiten (Sprachdaten liegen lokal) */
+async function holeArbeiter(sprache){
+  if(arbeiter && geladeneSprache === sprache) return arbeiter;
+  if(arbeiter){ await arbeiter.terminate(); arbeiter = null; }
+  AK.log(`Sprachdaten „${sprache}“ werden vorbereitet …`);
+  arbeiter = await Tesseract.createWorker(sprache, 1, {
+    workerPath: TESS + '/worker.min.js',
+    corePath: TESS + '/',
+    langPath: TESS,
+    logger: m => {
+      if(m.status === 'recognizing text') AK.bar(fortschrittBasis + m.progress * fortschrittAnteil);
+    },
+  });
+  geladeneSprache = sprache;
+  return arbeiter;
+}
+
+/* ---------- Vorlagen aufnehmen ---------- */
+async function addFiles(list){
+  for(const file of list){
+    const istPdf = /\.pdf$/i.test(file.name) || file.type === 'application/pdf';
+    const istBild = file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|avif|hei[cf])$/i.test(file.name);
+    if(!istPdf && !istBild) continue;
+    vorlagen.push({ id:++uid, name:file.name, size:file.size, typ: istPdf ? 'pdf' : 'bild', quelle:file });
+  }
+  render();
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = vorlagen.length ? 'none' : '';
+  stack.innerHTML = '';
+  vorlagen.forEach((v, i) => {
+    const li = document.createElement('li');
+    li.className = 'row';
+    li.innerHTML = `
+      <div class="tab" style="cursor:default">${String(i+1).padStart(2,'0')}</div>
+      <div class="meta">
+        <div class="fname">${AK.esc(v.name)}</div>
+        <div class="finfo"><span>${AK.fmtBytes(v.size)}</span><span>${v.typ === 'pdf' ? 'PDF' : 'Bild'}</span></div>
+      </div>
+      <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>`;
+    li.querySelector('.del').onclick = () => { vorlagen.splice(i,1); render(); };
+    stack.appendChild(li);
+  });
+  pruefe();
+}
+
+function pruefe(){
+  AK.$('#go').disabled = !(bereit && vorlagen.length);
+}
+
+/* ---------- Vorlage in Bilddaten wandeln ---------- */
+function aufbereiten(canvas){
+  if(!AK.$('#aufbereiten').checked) return canvas;
+  const ctx = canvas.getContext('2d');
+  const bild = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = bild.data;
+  // Graustufen mit leicht angehobenem Kontrast — Text hebt sich besser ab
+  for(let i = 0; i < d.length; i += 4){
+    const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+    const k = Math.max(0, Math.min(255, (g - 128) * 1.35 + 128));
+    d[i] = d[i+1] = d[i+2] = k;
+  }
+  ctx.putImageData(bild, 0, 0);
+  return canvas;
+}
+
+async function bildAufLeinwand(blob){
+  let quelle = blob;
+  if(/hei[cf]/.test(blob.type) || /\.(hei[cf])$/i.test(blob.name || '')){
+    quelle = await heic2any({ blob, toType:'image/png' });
+    if(Array.isArray(quelle)) quelle = quelle[0];
+  }
+  const bmp = 'createImageBitmap' in window ? await createImageBitmap(quelle) : await new Promise((res, rej) => {
+    const img = new Image(); img.onload = () => res(img); img.onerror = rej;
+    img.src = URL.createObjectURL(quelle);
+  });
+  const c = document.createElement('canvas');
+  // Sehr kleine Vorlagen hochskalieren, das verbessert die Erkennung deutlich
+  const faktor = Math.min(3, Math.max(1, 1200 / Math.max(bmp.width, bmp.height)));
+  c.width = Math.round(bmp.width * faktor);
+  c.height = Math.round(bmp.height * faktor);
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bmp, 0, 0, c.width, c.height);
+  if(bmp.close) bmp.close();
+  return aufbereiten(c);
+}
+
+/* ---------- Erkennen ---------- */
+let fortschrittBasis = 0, fortschrittAnteil = 1;
+
+async function erkennen(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const dpi = +AK.$('#dpi').value;
+
+  try{
+    const w = await holeArbeiter(AK.$('#sprache').value);
+
+    // Alle Seiten einsammeln, damit der Fortschritt stimmt
+    const seiten = [];
+    for(const v of vorlagen){
+      if(v.typ === 'bild'){
+        seiten.push({ beschriftung: v.name, machen: () => bildAufLeinwand(v.quelle) });
+      }else{
+        const bytes = new Uint8Array(await v.quelle.arrayBuffer());
+        const doc = await AK.openWithPdfjs(bytes);
+        for(let i = 0; i < doc.numPages; i++){
+          seiten.push({
+            beschriftung: `${v.name}, Seite ${i+1}`,
+            machen: async () => aufbereiten((await AK.renderPage(doc, i, dpi/72)).canvas),
+          });
+        }
+      }
+    }
+
+    AK.log(`${seiten.length} ${seiten.length === 1 ? 'Seite wird' : 'Seiten werden'} erkannt …`);
+    const teile = [];
+    for(let i = 0; i < seiten.length; i++){
+      fortschrittBasis = i / seiten.length;
+      fortschrittAnteil = 1 / seiten.length;
+      const leinwand = await seiten[i].machen();
+      const { data } = await w.recognize(leinwand);
+      leinwand.width = leinwand.height = 0;
+      const text = (data.text || '').trim();
+      teile.push(seiten.length > 1 ? `───── ${seiten[i].beschriftung} ─────\n\n${text}` : text);
+      AK.log(`${seiten[i].beschriftung}: ${text.length} Zeichen (Sicherheit ${Math.round(data.confidence)} %)`);
+    }
+
+    const gesamt = teile.join('\n\n');
+    AK.$('#out').value = gesamt;
+    AK.$('#zeichen').innerHTML = gesamt.length.toLocaleString('de-DE') + '<small>Zeichen erkannt</small>';
+    AK.$('#copy').disabled = AK.$('#clear').disabled = !gesamt;
+    AK.bar(1);
+
+    if(gesamt.trim()){
+      AK.offerDownload(new Blob([gesamt], {type:'text/plain;charset=utf-8'}), 'erkannter-text.txt', '.txt herunterladen');
+      AK.stamp(true);
+    }else{
+      AK.log('Kein Text gefunden — probier eine höhere Auflösung oder eine schärfere Vorlage.', true);
+    }
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Text erkennen'; pruefe();
+  }
+}
+
+AK.$('#copy').onclick = async () => {
+  await navigator.clipboard.writeText(AK.$('#out').value);
+  AK.log('In die Zwischenablage kopiert.');
+};
+AK.$('#clear').onclick = () => {
+  AK.$('#out').value = '';
+  AK.$('#zeichen').innerHTML = '0<small>Zeichen erkannt</small>';
+  AK.$('#copy').disabled = AK.$('#clear').disabled = true;
+  AK.clearDownloads();
+};
+AK.$('#loadlib').onclick = ladeProgramm;
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = erkennen;
+render();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

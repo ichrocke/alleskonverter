@@ -4,7 +4,8 @@
    Strategien:
    • HTML, eigenes CSS/JS  → Netz zuerst (Änderungen kommen sofort an, Cache als Rückfall)
    • Bibliotheken, Schriften, Bilder → Cache zuerst (unveränderlich, spart Ladezeit)
-   • ffmpeg (~32 MB)       → nur bei Bedarf, wird nach dem ersten Einsatz behalten
+   • ffmpeg (~32 MB), Texterkennung (~19 MB)
+                           → nur bei Bedarf, werden nach dem ersten Einsatz behalten
 */
 const VERSION = '2026-07-26b';
 const CACHE = 'alleskonverter-' + VERSION;
