@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EXIF-Daten anzeigen — was verrät mein Foto? | Alleskonverter</title>
+<meta name="description" content="EXIF-Daten eines Fotos anzeigen: Kamera, Aufnahmezeit, Einstellungen und GPS-Standort. Sehen, was ein Bild über dich verrät — kostenlos, ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bild-metadaten/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="EXIF-Daten anzeigen — was verrät mein Foto? | Alleskonverter">
+<meta property="og:description" content="Kamera, Aufnahmezeit und GPS-Standort eines Fotos anzeigen — kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bild-metadaten/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EXIF-Daten anzeigen — was verrät mein Foto? | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild-Metadaten anzeigen — Alleskonverter","url":"https://alleskonverter.de/tools/bild-metadaten/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"EXIF-Daten eines Fotos anzeigen: Kamera, Zeit, Einstellungen, GPS — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was sind EXIF-Daten?","acceptedAnswer":{"@type":"Answer","text":"Zusatzangaben, die die Kamera unsichtbar in die Bilddatei schreibt: Kameramodell, Objektiv, Belichtung, Aufnahmezeitpunkt und bei Handys oft auch der GPS-Standort."}},{"@type":"Question","name":"Wird mein Foto hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Datei wird nur in deinem Browser gelesen — gerade bei Fotos mit Standortangabe wäre ein Upload das Gegenteil von dem, was man will."}},{"@type":"Question","name":"Wie entferne ich die Daten?","acceptedAnswer":{"@type":"Answer","text":"Mit dem Werkzeug „Bilder konvertieren“: Beim Neukodieren gehen sämtliche Metadaten verloren."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.warnung{border:1.5px solid var(--alert);background:var(--card);padding:14px 16px;margin-top:18px}
+.warnung h3{font-family:var(--display);font-weight:400;font-size:19px;text-transform:uppercase;margin:0 0 6px;color:var(--alert)}
+.warnung p{margin:0 0 8px;font-size:13.5px}
+.warnung a{color:var(--stamp)}
+.gruppe{margin-top:22px}
+.gruppe h3{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px}
+table.daten{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow)}
+table.daten td{padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+table.daten tr:last-child td{border-bottom:0}
+table.daten td:first-child{width:38%;color:var(--ink-soft);font-family:var(--mono);font-size:11.5px}
+.vorschau{max-width:100%;max-height:300px;border:1px solid var(--rule);display:block;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bild-<span>Metadaten</span></h1>
+  <p class="sub">Sehen, was ein Foto über dich verrät: Kameramodell, Aufnahmezeitpunkt, Belichtungseinstellungen — und bei Handyfotos oft der genaue Ort der Aufnahme.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Foto</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Foto hierher ziehen</strong>
+      <small>JPG, HEIC, PNG, TIFF, WebP — die Datei wird nur gelesen</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif,.tif,.tiff" hidden>
+
+    <div id="ausgabe"></div>
+    <div class="empty" id="empty">Noch kein Foto geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Übersicht</h2>
+    <div class="count" id="anzahl">0<small>Angaben gefunden</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label><input type="checkbox" id="alles" style="width:auto;margin-right:6px">Auch technische Rohwerte zeigen</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Als Textdatei sichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Jede Kamera und jedes Handy schreibt unsichtbare Zusatzangaben in die Bilddatei — sogenannte EXIF-Daten. Darin stehen Modell und Hersteller, Blende, Belichtungszeit und ISO-Wert, der Aufnahmezeitpunkt auf die Sekunde genau und, bei eingeschalteter Ortung, die geografischen Koordinaten. Wer ein Foto verschickt oder hochlädt, gibt all das mit weiter, ohne es zu merken. Dieses Werkzeug macht sichtbar, was drinsteht.</p>
+  <h3>Wird mein Foto hochgeladen?</h3>
+  <p>Nein — und das ist hier besonders wichtig. Ausgerechnet ein Werkzeug, das Standortdaten sichtbar macht, dürfte sie am wenigsten irgendwohin schicken. Die Datei wird ausschließlich in deinem Browser gelesen.</p>
+  <h3>Wie werde ich die Daten wieder los?</h3>
+  <p>Mit <a href="../bild-konvertieren/index.html">Bilder konvertieren</a>: Beim Neukodieren gehen sämtliche Metadaten verloren, auch der Standort. Das funktioniert stapelweise für ganze Ordner.</p>
+  <h3>Warum finde ich bei manchen Bildern nichts?</h3>
+  <p>Weil viele Plattformen die Daten beim Hochladen entfernen — ein Foto, das du von WhatsApp oder Instagram gespeichert hast, ist meist schon bereinigt. Auch Screenshots und PNG-Dateien enthalten selten EXIF-Angaben.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Der Kartenlink zu gefundenen Koordinaten führt zu OpenStreetMap und öffnet sich in einem neuen Tab — erst dann erfährt jener Dienst überhaupt etwas von der Position.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/exifr.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+let daten = null, basisName = 'metadaten', textFassung = '', letzteDatei = null;
+
+/* Rohbezeichnungen in verständliche deutsche Begriffe übersetzen */
+const NAMEN = {
+  Make:'Hersteller', Model:'Kameramodell', LensModel:'Objektiv', Software:'Software',
+  DateTimeOriginal:'Aufgenommen am', CreateDate:'Erstellt am', ModifyDate:'Geändert am',
+  ExposureTime:'Belichtungszeit', FNumber:'Blende', ISO:'ISO-Wert',
+  FocalLength:'Brennweite', FocalLengthIn35mmFormat:'Brennweite (Kleinbild)',
+  Flash:'Blitz', WhiteBalance:'Weißabgleich', MeteringMode:'Messmethode',
+  ExposureProgram:'Belichtungsprogramm', Orientation:'Ausrichtung',
+  ExifImageWidth:'Breite', ExifImageHeight:'Höhe',
+  Artist:'Urheber', Copyright:'Urheberrecht', ImageDescription:'Beschreibung',
+  latitude:'Breitengrad', longitude:'Längengrad', GPSAltitude:'Höhe über Meer',
+};
+
+const GRUPPEN = [
+  ['Aufnahme',   ['DateTimeOriginal','CreateDate','ModifyDate']],
+  ['Gerät',      ['Make','Model','LensModel','Software']],
+  ['Einstellungen', ['ExposureTime','FNumber','ISO','FocalLength','FocalLengthIn35mmFormat','Flash','WhiteBalance','MeteringMode','ExposureProgram']],
+  ['Bild',       ['ExifImageWidth','ExifImageHeight','Orientation']],
+  ['Urheber',    ['Artist','Copyright','ImageDescription']],
+];
+
+function formatiere(schluessel, wert){
+  if(wert instanceof Date) return wert.toLocaleString('de-DE');
+  if(schluessel === 'ExposureTime' && typeof wert === 'number')
+    return wert < 1 ? `1/${Math.round(1/wert)} Sekunde` : `${wert} Sekunden`;
+  if(schluessel === 'FNumber') return 'f/' + wert;
+  if(schluessel === 'FocalLength' || schluessel === 'FocalLengthIn35mmFormat') return Math.round(wert) + ' mm';
+  if(schluessel === 'GPSAltitude') return Math.round(wert) + ' m';
+  if(typeof wert === 'number') return Number.isInteger(wert) ? String(wert) : wert.toFixed(2);
+  if(Array.isArray(wert)) return wert.join(', ');
+  if(typeof wert === 'object' && wert !== null) return JSON.stringify(wert);
+  return String(wert);
+}
+
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|tiff?|hei[cf]|avif)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  try{
+    daten = await exifr.parse(file, { tiff:true, exif:true, gps:true, ifd0:true, xmp:true, iptc:true, translateValues:true, reviveValues:true }) || {};
+    daten.__datei = { Dateiname: file.name, Dateigröße: AK.fmtBytes(file.size), Typ: file.type || '—' };
+    letzteDatei = file;
+    zeige(file);
+  }catch(err){
+    console.error(err);
+    daten = null;
+    AK.log('Datei kann nicht gelesen werden.', true);
+  }
+}
+
+function zeige(file){
+  const wrap = AK.$('#ausgabe');
+  wrap.innerHTML = '';
+  AK.$('#empty').style.display = 'none';
+  const zeilen = [];
+
+  // Vorschau
+  const img = document.createElement('img');
+  img.className = 'vorschau';
+  img.alt = 'Vorschau des geladenen Fotos';
+  img.src = URL.createObjectURL(file);
+  wrap.appendChild(img);
+
+  // Standort zuerst und deutlich, das ist der heikle Teil
+  if(typeof daten.latitude === 'number' && typeof daten.longitude === 'number'){
+    const la = daten.latitude.toFixed(6), lo = daten.longitude.toFixed(6);
+    const box = document.createElement('div');
+    box.className = 'warnung';
+    box.innerHTML = `<h3>Standort im Foto enthalten</h3>
+      <p>Dieses Bild verrät, wo es aufgenommen wurde: <strong>${la}, ${lo}</strong>${
+        typeof daten.GPSAltitude === 'number' ? ` (Höhe ${Math.round(daten.GPSAltitude)} m)` : ''}.
+      Wer die Datei bekommt, kann den Ort auf wenige Meter genau bestimmen.</p>
+      <p><a href="https://www.openstreetmap.org/?mlat=${la}&mlon=${lo}#map=16/${la}/${lo}" target="_blank" rel="noopener">Auf der Karte ansehen (OpenStreetMap)</a>
+      &nbsp;·&nbsp; <a href="../bild-konvertieren/index.html">Metadaten entfernen</a></p>`;
+    wrap.appendChild(box);
+    zeilen.push(['Standort', `${la}, ${lo}`]);
+  }
+
+  // Datei-Angaben
+  const machGruppe = (titel, paare) => {
+    if(!paare.length) return;
+    const g = document.createElement('div');
+    g.className = 'gruppe';
+    g.innerHTML = `<h3>${titel}</h3><table class="daten"><tbody>${
+      paare.map(([k,v]) => `<tr><td>${AK.esc(k)}</td><td>${AK.esc(v)}</td></tr>`).join('')
+    }</tbody></table>`;
+    wrap.appendChild(g);
+    paare.forEach(p => zeilen.push(p));
+  };
+
+  machGruppe('Datei', Object.entries(daten.__datei));
+
+  const benutzt = new Set(['__datei','latitude','longitude']);
+  for(const [titel, felder] of GRUPPEN){
+    const paare = [];
+    for(const f of felder){
+      if(daten[f] === undefined || daten[f] === null || daten[f] === '') continue;
+      paare.push([NAMEN[f] || f, formatiere(f, daten[f])]);
+      benutzt.add(f);
+    }
+    machGruppe(titel, paare);
+  }
+
+  if(AK.$('#alles').checked){
+    const rest = Object.entries(daten)
+      .filter(([k,v]) => !benutzt.has(k) && !k.startsWith('__') && v !== undefined && v !== null && v !== '')
+      .map(([k,v]) => [k, formatiere(k, v)]);
+    machGruppe('Weitere Angaben', rest);
+  }
+
+  const anzahl = zeilen.length - Object.keys(daten.__datei).length;
+  AK.$('#anzahl').innerHTML = Math.max(0, anzahl) + '<small>Angaben gefunden</small>';
+  AK.$('#go').disabled = !zeilen.length;
+  textFassung = zeilen.map(([k,v]) => `${k}: ${v}`).join('\n');
+
+  if(anzahl <= 0){
+    AK.log('Keine Metadaten gefunden — die Datei enthält keine oder sie wurden bereits entfernt.');
+  }else if(typeof daten.latitude !== 'number'){
+    AK.log('Kein Standort enthalten.');
+  }
+}
+
+AK.$('#alles').onchange = () => { if(daten && letzteDatei) zeige(letzteDatei); };
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  AK.offerDownload(new Blob([textFassung], {type:'text/plain;charset=utf-8'}), basisName + '-metadaten.txt');
+  AK.stamp(true);
+};
+AK.dropzone('#drop', '#picker', addFiles);
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

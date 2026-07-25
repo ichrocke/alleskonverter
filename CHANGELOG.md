@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 25)
+
+### Hinzugefügt
+- Werkzeug **Bild-Metadaten anzeigen** (`tools/bild-metadaten/`): liest die EXIF-Angaben eines Fotos aus und übersetzt sie in verständliche Begriffe — Kamera und Objektiv, Aufnahmezeitpunkt, Blende, Belichtungszeit, ISO. Ist ein GPS-Standort enthalten, steht er als deutlich abgesetzte Warnung ganz oben, mit Kartenlink und direktem Verweis aufs Entfernen. Rohwerte auf Wunsch einblendbar, Ergebnis als Textdatei speicherbar.
+
 ## 2026-07-26 (Messung statt Umbau, Doku)
 
 ### Behoben
