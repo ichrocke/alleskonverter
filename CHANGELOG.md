@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 19)
+
+### Hinzugefügt
+- Werkzeug **Favicon-Generator** (`tools/favicon/`): erzeugt aus einem Bild alle gängigen Symbolgrößen, eine echte `favicon.ico` mit 16/32/48 px (im Browser zusammengesetzt), Apple-Touch-Icon, App-Icons, eine `site.webmanifest` und den passenden HTML-Schnipsel — alles als ZIP. Mit Live-Vorschau inklusive Browser-Tab-Simulation, wählbarem Hintergrund und Rand für runde App-Symbole.
+
 ## 2026-07-26 (Startseite neu geordnet)
 
 ### Geändert

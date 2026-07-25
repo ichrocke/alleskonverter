@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Favicon-Generator — alle Größen inkl. ICO, kostenlos | Alleskonverter</title>
+<meta name="description" content="Favicon aus einem Bild erzeugen: alle gängigen Größen, favicon.ico, Apple-Touch-Icon und App-Icons als ZIP — mit fertigem HTML-Schnipsel. Ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/favicon/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Favicon-Generator — alle Größen inkl. ICO, kostenlos | Alleskonverter">
+<meta property="og:description" content="Favicon aus einem Bild erzeugen: alle Größen, favicon.ico, Apple-Touch-Icon und App-Icons als ZIP. Ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/favicon/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Favicon-Generator — alle Größen inkl. ICO, kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Favicon-Generator — Alleskonverter","url":"https://alleskonverter.de/tools/favicon/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Favicon in allen Größen inklusive ICO und App-Icons aus einem Bild erzeugen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Welches Ausgangsbild brauche ich?","acceptedAnswer":{"@type":"Answer","text":"Am besten ein quadratisches Bild mit mindestens 512 × 512 Pixeln. PNG mit Transparenz funktioniert, ebenso SVG, JPG oder WebP."}},{"@type":"Question","name":"Wird meine Datei hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Alle Größen werden im Browser berechnet, auch die ICO-Datei wird lokal zusammengesetzt."}},{"@type":"Question","name":"Brauche ich heute noch eine favicon.ico?","acceptedAnswer":{"@type":"Answer","text":"Ja, es schadet nicht: Manche Programme und ältere Browser suchen weiterhin nach /favicon.ico. Moderne Browser bevorzugen die PNG-Varianten."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.vorschau{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:16px}
+.vorschau figure{margin:0;text-align:center}
+.vorschau canvas{display:block;border:1px solid var(--rule);background:#fff;image-rendering:auto}
+.vorschau figcaption{font-family:var(--mono);font-size:10px;color:var(--ink-soft);margin-top:5px;letter-spacing:.08em}
+.tabbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);padding:6px 10px;margin-top:18px;max-width:340px}
+.tabbar canvas{border:0;background:transparent}
+.tabbar span{font-size:12.5px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+pre.snippet{background:var(--card);border:1px solid var(--rule);padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:11.5px;line-height:1.6;margin:10px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Favicon-<span>Generator</span></h1>
+  <p class="sub">Ein Bild hineinziehen und alle Symbolgrößen für Website und Startbildschirm herausbekommen — inklusive <code>favicon.ico</code>, Apple-Touch-Icon, App-Icons, Manifest und fertigem HTML-Schnipsel.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bild</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>am besten quadratisch, mindestens 512 px — PNG, SVG, JPG, WebP</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.svg" hidden>
+
+    <div id="ausgabe" hidden>
+      <h2 style="margin-top:24px">Vorschau</h2>
+      <div class="vorschau" id="vorschau"></div>
+
+      <div class="tabbar">
+        <canvas id="tab16" width="16" height="16"></canvas>
+        <span>Meine Website — so sieht es im Browser-Tab aus</span>
+      </div>
+
+      <h2 style="margin-top:24px">Einbau in die Seite</h2>
+      <pre class="snippet" id="snippet"></pre>
+      <button class="ghost" id="copy" style="margin-top:10px">Schnipsel kopieren</button>
+    </div>
+
+    <div class="empty" id="empty">Noch kein Bild geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Dateien im Paket</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="hintergrund">Hintergrund</label>
+      <select id="hintergrund">
+        <option value="transparent" selected>Transparent lassen</option>
+        <option value="#ffffff">Weiß</option>
+        <option value="#E6E4DE">Papier (wie diese Seite)</option>
+        <option value="eigene">Eigene Farbe …</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-farbe" hidden>
+      <label for="farbe">Farbe wählen</label>
+      <input type="color" id="farbe" value="#1B4D3E" style="width:100%;height:38px;padding:2px;border:1px solid var(--rule);background:var(--field)">
+    </div>
+
+    <div class="field">
+      <label for="rand">Rand: <span id="randVal">0</span> %</label>
+      <input type="range" id="rand" min="0" max="30" step="2" value="0" style="width:100%">
+      <div class="hint">etwas Rand hilft bei runden App-Symbolen</div>
+    </div>
+
+    <button class="primary" id="go" disabled>Paket erstellen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Symbol für die eigene Website zu erzeugen ist erstaunlich fummelig: Browser wollen PNGs in mehreren Größen, Apple ein Touch-Icon, Android App-Icons über ein Manifest, und ältere Software sucht weiterhin nach einer <code>favicon.ico</code>. Dieses Werkzeug erzeugt alles auf einmal aus einem Bild, packt es in ein ZIP und liefert den passenden HTML-Schnipsel gleich mit.</p>
+  <h3>Welches Ausgangsbild sollte ich nehmen?</h3>
+  <p>Am besten ein quadratisches Bild mit mindestens 512 × 512 Pixeln. Nicht-quadratische Bilder werden mittig eingepasst. Da Symbole am Ende sehr klein dargestellt werden, funktionieren einfache, kräftige Motive deutlich besser als feine Details oder Text.</p>
+  <h3>Wird meine Datei hochgeladen?</h3>
+  <p>Nein. Alle Größen werden im Browser berechnet, auch die <code>.ico</code>-Datei wird lokal zusammengesetzt. Es gibt keinen Server, der Bilder annehmen könnte.</p>
+  <h3>Brauche ich heute noch eine favicon.ico?</h3>
+  <p>Sie schadet nicht. Moderne Browser bevorzugen die PNG-Varianten, aber manche Programme und Feed-Leser fragen weiterhin stur <code>/favicon.ico</code> im Wurzelverzeichnis ab — deshalb liegt sie im Paket.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Die Dateien aus dem ZIP gehören ins Wurzelverzeichnis der Website; der HTML-Schnipsel kommt in den <code>&lt;head&gt;</code>. Die mitgelieferte <code>site.webmanifest</code> kannst du an Name und Farben deiner Seite anpassen.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+/* Größen, die tatsächlich gebraucht werden */
+const GROESSEN = [
+  { px:16,  datei:'favicon-16x16.png',        zeig:true  },
+  { px:32,  datei:'favicon-32x32.png',        zeig:true  },
+  { px:48,  datei:'favicon-48x48.png',        zeig:false },
+  { px:96,  datei:'favicon-96x96.png',        zeig:false },
+  { px:180, datei:'apple-touch-icon.png',     zeig:true  },
+  { px:192, datei:'icon-192.png',             zeig:true  },
+  { px:512, datei:'icon-512.png',             zeig:false },
+];
+const ICO = [16, 32, 48];
+
+let bild = null, basisName = 'favicon';
+
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(svg|png|jpe?g|webp|gif|bmp|avif)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  try{
+    bild = await ladeBild(file);
+    AK.$('#ausgabe').hidden = false;
+    AK.$('#empty').style.display = 'none';
+    AK.$('#go').disabled = false;
+    zeichneVorschau();
+    schnipsel();
+    AK.$('#anzahl').innerHTML = (GROESSEN.length + 3) + '<small>Dateien im Paket</small>';
+  }catch(err){
+    console.error(err);
+    AK.log('Bild kann nicht gelesen werden.', true);
+  }
+}
+
+/* SVG braucht den Umweg über ein <img>, damit es sauber skaliert */
+function ladeBild(file){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error('nicht lesbar'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function einstellungen(){
+  const wahl = AK.$('#hintergrund').value;
+  return {
+    grund: wahl === 'transparent' ? null : (wahl === 'eigene' ? AK.$('#farbe').value : wahl),
+    rand: +AK.$('#rand').value / 100,
+  };
+}
+
+function male(px, ziel){
+  const { grund, rand } = einstellungen();
+  const c = ziel || document.createElement('canvas');
+  c.width = c.height = px;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, px, px);
+  if(grund){ ctx.fillStyle = grund; ctx.fillRect(0, 0, px, px); }
+  const innen = px * (1 - 2*rand);
+  const s = Math.min(innen / bild.width, innen / bild.height);
+  const w = bild.width * s, h = bild.height * s;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bild, (px-w)/2, (px-h)/2, w, h);
+  return c;
+}
+
+function zeichneVorschau(){
+  const wrap = AK.$('#vorschau');
+  wrap.innerHTML = '';
+  GROESSEN.filter(g => g.zeig).forEach(g => {
+    const fig = document.createElement('figure');
+    const c = male(g.px);
+    c.style.width = Math.min(g.px, 96) + 'px';
+    c.style.height = Math.min(g.px, 96) + 'px';
+    fig.appendChild(c);
+    const cap = document.createElement('figcaption');
+    cap.textContent = g.px + ' px';
+    fig.appendChild(cap);
+    wrap.appendChild(fig);
+  });
+  male(16, AK.$('#tab16'));
+}
+
+function schnipsel(){
+  AK.$('#snippet').textContent =
+`<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">`;
+}
+
+/* ---------- ICO selbst zusammensetzen (mehrere PNGs in einem Container) ---------- */
+async function baueIco(groessen){
+  const bilder = [];
+  for(const px of groessen){
+    const blob = await new Promise(r => male(px).toBlob(r, 'image/png'));
+    bilder.push({ px, daten: new Uint8Array(await blob.arrayBuffer()) });
+  }
+  const kopf = 6, eintrag = 16;
+  const gesamt = kopf + eintrag*bilder.length + bilder.reduce((s,b) => s + b.daten.length, 0);
+  const buf = new ArrayBuffer(gesamt);
+  const dv = new DataView(buf);
+  const bytes = new Uint8Array(buf);
+
+  dv.setUint16(0, 0, true);                    // reserviert
+  dv.setUint16(2, 1, true);                    // Typ 1 = Symbol
+  dv.setUint16(4, bilder.length, true);
+
+  let offset = kopf + eintrag*bilder.length;
+  bilder.forEach((b, i) => {
+    const p = kopf + i*eintrag;
+    dv.setUint8(p,   b.px >= 256 ? 0 : b.px);  // Breite (0 bedeutet 256)
+    dv.setUint8(p+1, b.px >= 256 ? 0 : b.px);  // Höhe
+    dv.setUint8(p+2, 0);                       // Farbpalette
+    dv.setUint8(p+3, 0);                       // reserviert
+    dv.setUint16(p+4, 1, true);                // Farbebenen
+    dv.setUint16(p+6, 32, true);               // Bit pro Bildpunkt
+    dv.setUint32(p+8, b.daten.length, true);
+    dv.setUint32(p+12, offset, true);
+    bytes.set(b.daten, offset);
+    offset += b.daten.length;
+  });
+  return new Blob([buf], { type:'image/x-icon' });
+}
+
+async function paket(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const zip = new JSZip();
+    for(let i = 0; i < GROESSEN.length; i++){
+      const g = GROESSEN[i];
+      const blob = await new Promise(r => male(g.px).toBlob(r, 'image/png'));
+      zip.file(g.datei, blob);
+      AK.bar((i+1) / (GROESSEN.length + 2));
+    }
+    zip.file('favicon.ico', await baueIco(ICO));
+    AK.bar((GROESSEN.length+1) / (GROESSEN.length+2));
+
+    const { grund } = einstellungen();
+    zip.file('site.webmanifest', JSON.stringify({
+      name: basisName, short_name: basisName, start_url: '/', display: 'standalone',
+      background_color: grund || '#ffffff', theme_color: grund || '#ffffff',
+      icons: [
+        { src:'/icon-192.png', sizes:'192x192', type:'image/png' },
+        { src:'/icon-512.png', sizes:'512x512', type:'image/png', purpose:'any maskable' }
+      ]
+    }, null, 2));
+    zip.file('einbau.html', AK.$('#snippet').textContent + '\n');
+
+    const blob = await zip.generateAsync({ type:'blob' });
+    AK.bar(1);
+    AK.offerDownload(blob, basisName + '-favicon.zip', 'Paket herunterladen');
+    AK.log(`Fertig: ${GROESSEN.length} PNG-Größen, favicon.ico mit ${ICO.join('/')} px, Manifest und HTML-Schnipsel (${AK.fmtBytes(blob.size)}).`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !bild; go.textContent = 'Paket erstellen';
+  }
+}
+
+AK.$('#hintergrund').onchange = () => {
+  AK.$('#f-farbe').hidden = AK.$('#hintergrund').value !== 'eigene';
+  if(bild) zeichneVorschau();
+};
+AK.$('#farbe').oninput = () => { if(bild) zeichneVorschau(); };
+AK.$('#rand').oninput = e => { AK.$('#randVal').textContent = e.target.value; if(bild) zeichneVorschau(); };
+AK.$('#copy').onclick = async () => {
+  await navigator.clipboard.writeText(AK.$('#snippet').textContent);
+  AK.log('Schnipsel kopiert.');
+};
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = paket;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
