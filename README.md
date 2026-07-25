@@ -62,6 +62,11 @@ python3 -m http.server 8000
 - Gemeinsames Designsystem in `css/base.css` / `css/tools.css`, geteilte Helfer unter `js/` (`AK`-Namespace)
 - Jedes Werkzeug ist eine eigenständige Seite unter `tools/<name>/index.html`
 
+## Deployment
+
+Nach jeder Änderung: `CHANGELOG.md` ergänzen → Commit → Push → `./deploy.sh`
+(SFTP-Upload auf den Strato-Webspace; Zugangsdaten in `.env`, nicht im Repo).
+
 ## Changelog
 
 Siehe [CHANGELOG.md](CHANGELOG.md).
