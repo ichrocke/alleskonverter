@@ -52,6 +52,9 @@ ErrorDocument 404 /404.html
   # Eigener Code: nie ungeprüft aus dem Cache. Der Browser fragt mit ETag nach und
   # bekommt in aller Regel ein winziges „304 unverändert“ zurück.
   Header set Cache-Control "no-cache, must-revalidate" env=EIGENER_CODE
+  # mod_expires setzt oben pauschal ein Jahr — dieser Rest widerspräche dem no-cache
+  Header unset Expires env=EIGENER_CODE
+  Header always set Expires "Thu, 01 Jan 1970 00:00:00 GMT" env=EIGENER_CODE
   # Eigene Bilder ändern sich selten, sollen aber nicht monatelang festhängen
   Header set Cache-Control "public, max-age=86400, must-revalidate" env=EIGENE_BILDER
 
