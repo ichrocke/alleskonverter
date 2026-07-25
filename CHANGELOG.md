@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 21)
+
+### Hinzugefügt
+- Werkzeug **PDF-Passwort** (`tools/pdf-passwort/`): PDFs mit AES-128 verschlüsseln (Öffnungspasswort und/oder Rechte-Passwort, mit Schaltern für Drucken, Kopieren, Ändern und Kommentare) oder einen bekannten Schutz wieder entfernen. Beim Laden wird automatisch erkannt, ob eine Datei geschützt ist, und der passende Modus vorgewählt; das Öffnungspasswort bekommt eine Stärke-Einschätzung. Passwörter werden bewusst **nicht** durchprobiert — das Werkzeug entsperrt eigene Dokumente, es knackt keine fremden. Dafür ist `vendor/pdf-lib-crypt.min.js` (@cantoo/pdf-lib, MIT) dazugekommen.
+
 ## 2026-07-26 (Werkzeug 20)
 
 ### Hinzugefügt

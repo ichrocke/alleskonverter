@@ -16,6 +16,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [PDF stempeln](tools/pdf-stempeln/index.html) | Wasserzeichen und Seitenzahlen einfügen, mit Live-Vorschau |
 | [Text auslesen](tools/pdf-text/index.html) | Textextraktion, Zwischenablage oder .txt |
 
+| [PDF-Passwort](tools/pdf-passwort/index.html) | PDF mit AES-128 verschlüsseln oder bekannten Schutz entfernen, Rechte einstellen |
 **Bilder**
 | Werkzeug | Kann |
 |---|---|

@@ -51,6 +51,7 @@ const SHELL = [
   '/tools/qr-code/js/frames.js',
   '/tools/qr-code/js/history.js',
   '/tools/qr-code/js/artqr.js',
+  '/vendor/pdf-lib-crypt.min.js',
 ];
 
 /* Werkzeugseiten aus der sitemap.xml lesen — so wächst der Cache automatisch mit. */

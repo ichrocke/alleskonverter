@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF mit Passwort schützen oder Schutz entfernen — kostenlos | Alleskonverter</title>
+<meta name="description" content="PDF mit Passwort schützen (AES-128) oder bekannten Passwortschutz entfernen — mit einstellbaren Rechten fürs Drucken und Kopieren. Ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/pdf-passwort/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="PDF mit Passwort schützen oder Schutz entfernen — kostenlos | Alleskonverter">
+<meta property="og:description" content="PDF mit Passwort schützen oder bekannten Passwortschutz entfernen — ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/pdf-passwort/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF mit Passwort schützen oder Schutz entfernen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF-Passwortschutz — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-passwort/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"PDF mit Passwort schützen oder bekannten Passwortschutz entfernen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Kommt mein Passwort irgendwo an?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Verschlüsselung passiert vollständig in deinem Browser — weder Datei noch Passwort verlassen dein Gerät."}},{"@type":"Question","name":"Kann ich ein vergessenes Passwort knacken?","acceptedAnswer":{"@type":"Answer","text":"Nein. Um den Schutz zu entfernen, musst du das Passwort kennen und eingeben. Dieses Werkzeug probiert keine Passwörter durch."}},{"@type":"Question","name":"Was ist der Unterschied zwischen Öffnungs- und Rechte-Passwort?","acceptedAnswer":{"@type":"Answer","text":"Das Öffnungspasswort wird beim Öffnen abgefragt — ohne es bleibt die Datei unlesbar. Das Rechte-Passwort schränkt nur ein, was man mit dem geöffneten Dokument tun darf, etwa Drucken oder Kopieren."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.modus{display:flex;gap:0;margin-bottom:18px}
+.modus button{flex:1;padding:12px 10px;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.modus button + button{border-left:0}
+.modus button.active{background:var(--ink);color:var(--paper)}
+fieldset{border:1px solid var(--rule);padding:12px;margin:0 0 14px}
+legend{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:0 6px}
+.check{display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:8px}
+.check input{width:auto}
+.staerke{font-family:var(--mono);font-size:10.5px;margin-top:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF-<span>Passwort</span></h1>
+  <p class="sub">Ein PDF mit einem Passwort verschlüsseln oder einen bekannten Schutz wieder entfernen. Datei und Passwort bleiben dabei auf deinem Gerät — es gibt keinen Server, der beides sehen könnte.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="modus" id="modus">
+      <button type="button" data-m="schuetzen" class="active">Passwort setzen</button>
+      <button type="button" data-m="entfernen">Passwort entfernen</button>
+    </div>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div id="p-schuetzen">
+      <fieldset>
+        <legend>Öffnungspasswort</legend>
+        <div class="field">
+          <label for="pwUser">Passwort zum Öffnen</label>
+          <input type="password" id="pwUser" placeholder="leer lassen = frei lesbar" autocomplete="new-password">
+          <div class="staerke" id="staerke"></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rechte einschränken</legend>
+        <div class="field">
+          <label for="pwOwner">Rechte-Passwort (optional)</label>
+          <input type="password" id="pwOwner" placeholder="zum Aufheben der Einschränkungen" autocomplete="new-password">
+        </div>
+        <label class="check"><input type="checkbox" id="rDrucken" checked> Drucken erlauben</label>
+        <label class="check"><input type="checkbox" id="rKopieren" checked> Text kopieren erlauben</label>
+        <label class="check"><input type="checkbox" id="rAendern"> Ändern erlauben</label>
+        <label class="check"><input type="checkbox" id="rKommentare" checked> Kommentare erlauben</label>
+      </fieldset>
+    </div>
+
+    <div id="p-entfernen" hidden>
+      <fieldset>
+        <legend>Vorhandenes Passwort</legend>
+        <div class="field">
+          <label for="pwAlt">Passwort des Dokuments</label>
+          <input type="password" id="pwAlt" placeholder="das Passwort, das du kennst" autocomplete="current-password">
+          <div class="hint">Ohne das richtige Passwort geht es nicht — Passwörter werden hier nicht durchprobiert.</div>
+        </div>
+      </fieldset>
+    </div>
+
+    <button class="primary" id="go" disabled>Speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Vertrauliche Unterlagen per E-Mail verschicken, ohne dass jeder Mitleser sie öffnen kann — oder umgekehrt ein längst nicht mehr nötiges Passwort loswerden, das bei jedem Öffnen nervt. Dieses Werkzeug erledigt beides: Es verschlüsselt PDFs nach dem Standardverfahren AES-128 und kann einen bekannten Schutz wieder entfernen. Zusätzlich lässt sich einstellen, ob Empfänger drucken, Text kopieren oder das Dokument ändern dürfen.</p>
+  <h3>Kommt mein Passwort irgendwo an?</h3>
+  <p>Nein. Die gesamte Ver- und Entschlüsselung passiert in deinem Browser. Weder die Datei noch das Passwort werden übertragen — es gibt keinen Server, der sie annehmen könnte. Das ist der entscheidende Unterschied zu Online-Diensten, denen man beim Passwortschutz sonst genau das anvertrauen müsste.</p>
+  <h3>Kann ich ein vergessenes Passwort knacken?</h3>
+  <p>Nein. Um den Schutz zu entfernen, musst du das Passwort kennen und eingeben. Dieses Werkzeug probiert bewusst keine Passwörter durch — es hilft dabei, eigene Dokumente zu entsperren, nicht fremde.</p>
+  <h3>Was ist der Unterschied zwischen den beiden Passwörtern?</h3>
+  <p>Das <strong>Öffnungspasswort</strong> wird beim Öffnen abgefragt; ohne es bleibt der Inhalt verschlüsselt und unlesbar. Das <strong>Rechte-Passwort</strong> schützt dagegen nur die Einstellungen: Das Dokument lässt sich ohne Weiteres öffnen, aber Drucken oder Kopieren sind gesperrt, bis jemand das Rechte-Passwort eingibt.</p>
+  <h3>Wie sicher sind die Rechte-Einschränkungen?</h3>
+  <p>Ehrlich gesagt: mäßig. Ein echtes Öffnungspasswort schützt zuverlässig, weil der Inhalt tatsächlich verschlüsselt ist. Die Rechte hingegen sind eher eine Bitte an das Anzeigeprogramm — die meisten halten sich daran, aber es gibt Programme, die sie ignorieren. Für wirklich Vertrauliches also immer ein Öffnungspasswort setzen.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Merke dir das Passwort gut — ohne es lässt sich die Datei nicht mehr öffnen, auch nicht von uns. Ein verlorenes Öffnungspasswort bedeutet, dass der Inhalt endgültig unzugänglich ist.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf-lib-crypt.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+const { PDFDocument } = PDFLib;
+let modus = 'schuetzen';
+let src = null;          // { name, size, bytes, verschluesselt }
+
+async function addFiles(list){
+  const file = list.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let verschluesselt = false;
+  try{
+    await PDFDocument.load(bytes.slice());
+  }catch(err){
+    verschluesselt = /encrypt/i.test(err.message || '');
+  }
+  src = { name:file.name, size:file.size, bytes, verschluesselt };
+
+  // Sinnvollen Modus vorschlagen
+  setzeModus(verschluesselt ? 'entfernen' : 'schuetzen');
+  render();
+  if(verschluesselt && modus === 'entfernen') AK.log('Dieses PDF ist geschützt — Passwort eingeben und speichern.');
+}
+
+function setzeModus(m){
+  modus = m;
+  AK.$$('#modus button').forEach(b => b.classList.toggle('active', b.dataset.m === m));
+  AK.$('#p-schuetzen').hidden = m !== 'schuetzen';
+  AK.$('#p-entfernen').hidden = m !== 'entfernen';
+  AK.$('#go').textContent = m === 'schuetzen' ? 'Verschlüsselt speichern' : 'Ohne Passwort speichern';
+  pruefe();
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    const marke = src.verschluesselt
+      ? '<span class="badge b-lock">geschützt</span>'
+      : '<span class="badge b-ok">offen lesbar</span>';
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(src.name)}</div>
+          <div class="finfo"><span>${AK.fmtBytes(src.size)}</span>${marke}</div>
+        </div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => { src = null; render(); };
+  }
+  pruefe();
+}
+
+function pruefe(){
+  const go = AK.$('#go');
+  if(!src){ go.disabled = true; return; }
+  go.disabled = modus === 'schuetzen'
+    ? !(AK.$('#pwUser').value || AK.$('#pwOwner').value)
+    : !AK.$('#pwAlt').value;
+}
+
+/* Grobe Einschätzung, damit niemand „1234“ für sicher hält */
+function staerke(pw){
+  if(!pw) return '';
+  let punkte = Math.min(4, Math.floor(pw.length / 4));
+  if(/[a-z]/.test(pw) && /[A-Z]/.test(pw)) punkte++;
+  if(/\d/.test(pw)) punkte++;
+  if(/[^\w]/.test(pw)) punkte++;
+  if(pw.length < 8) punkte = Math.min(punkte, 1);
+  const stufen = [
+    ['sehr schwach — bitte länger', 'var(--alert)'],
+    ['schwach', 'var(--alert)'],
+    ['brauchbar', 'var(--amber)'],
+    ['gut', 'var(--stamp)'],
+    ['sehr gut', 'var(--stamp)'],
+  ];
+  const [text, farbe] = stufen[Math.min(stufen.length-1, Math.max(0, punkte - 2))];
+  return `<span style="color:${farbe}">Passwortstärke: ${text}</span>`;
+}
+
+async function speichern(){
+  const go = AK.$('#go'); go.disabled = true;
+  const beschriftung = go.textContent;
+  go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.35);
+  const basis = src.name.replace(/\.pdf$/i, '');
+
+  try{
+    if(modus === 'schuetzen'){
+      const doc = await PDFDocument.load(src.bytes.slice());
+      const nutzer = AK.$('#pwUser').value;
+      const eigner = AK.$('#pwOwner').value || nutzer;
+      doc.encrypt({
+        userPassword: nutzer || undefined,
+        ownerPassword: eigner,
+        permissions: {
+          printing: AK.$('#rDrucken').checked ? 'highResolution' : undefined,
+          copying: AK.$('#rKopieren').checked,
+          modifying: AK.$('#rAendern').checked,
+          annotating: AK.$('#rKommentare').checked,
+        },
+      });
+      const bytes = await doc.save();
+      AK.bar(1);
+      AK.offerDownload(new Blob([bytes], {type:'application/pdf'}), basis + '-geschuetzt.pdf');
+      AK.log(nutzer
+        ? `Fertig: verschlüsselt mit AES-128, ${AK.fmtBytes(bytes.length)}. Ohne das Passwort lässt sich die Datei nicht mehr öffnen.`
+        : `Fertig: Rechte eingeschränkt, ${AK.fmtBytes(bytes.length)}. Die Datei öffnet weiterhin ohne Passwort.`);
+      AK.stamp(true);
+    }else{
+      let doc;
+      try{
+        doc = await PDFDocument.load(src.bytes.slice(), { password: AK.$('#pwAlt').value });
+      }catch(err){
+        AK.bar(0);
+        AK.log('Passwort stimmt nicht — oder die Datei ist beschädigt.', true);
+        return;
+      }
+      // Seiten in ein frisches Dokument übernehmen; so bleibt keine Verschlüsselung zurück
+      const neu = await PDFDocument.create();
+      const seiten = await neu.copyPages(doc, doc.getPageIndices());
+      seiten.forEach((p, i) => { neu.addPage(p); AK.bar(0.35 + 0.6*(i+1)/seiten.length); });
+      neu.setProducer('Alleskonverter');
+      const bytes = await neu.save();
+      AK.bar(1);
+      AK.offerDownload(new Blob([bytes], {type:'application/pdf'}), basis + '-ohne-passwort.pdf');
+      AK.log(`Fertig: ${seiten.length} Seiten ohne Passwortschutz, ${AK.fmtBytes(bytes.length)}.`);
+      AK.stamp(true);
+    }
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = beschriftung; pruefe();
+  }
+}
+
+AK.$$('#modus button').forEach(b => b.onclick = () => setzeModus(b.dataset.m));
+AK.$('#pwUser').addEventListener('input', e => {
+  AK.$('#staerke').innerHTML = staerke(e.target.value);
+  pruefe();
+});
+['#pwOwner','#pwAlt'].forEach(s => AK.$(s).addEventListener('input', pruefe));
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = speichern;
+render();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
