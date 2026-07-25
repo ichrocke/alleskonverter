@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilder konvertieren — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/filelist.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bilder <span>konvertieren</span></h1>
+  <p class="sub">JPG, PNG, WebP, HEIC (iPhone), GIF, BMP — Format wandeln, verkleinern und komprimieren, auch stapelweise. Metadaten (EXIF, Ortsangaben) werden dabei automatisch entfernt.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Stapel</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Bilder auswählen">
+      <strong>Bilder hierher ziehen</strong>
+      <small>oder klicken zum Auswählen — mehrere gleichzeitig möglich</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" multiple hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch nichts im Stapel.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="imgcount">0<small>Bilder im Stapel</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="format">Zielformat</label>
+      <select id="format">
+        <option value="image/jpeg" selected>JPEG — Fotos, kleine Dateien</option>
+        <option value="image/png">PNG — verlustfrei, Transparenz</option>
+        <option value="image/webp">WebP — modern, sehr klein</option>
+        <option value="image/avif">AVIF — modernste Kompression</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-quality">
+      <label for="quality">Qualität: <span id="qval">85</span> %</label>
+      <input type="range" id="quality" min="40" max="100" value="85" style="width:100%">
+    </div>
+
+    <div class="field">
+      <label for="maxedge">Längste Kante begrenzen</label>
+      <select id="maxedge">
+        <option value="0" selected>Originalgröße behalten</option>
+        <option value="3840">3840 px — 4K</option>
+        <option value="2560">2560 px</option>
+        <option value="1920">1920 px — Full HD</option>
+        <option value="1280">1280 px — Web</option>
+        <option value="800">800 px — E-Mail</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Konvertieren</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p><strong>Datenschutz inklusive:</strong> Beim Neukodieren gehen sämtliche Metadaten verloren — EXIF, Kameramodell, Aufnahmezeit und GPS-Position sind im Ergebnis nicht mehr enthalten. Transparente Flächen werden bei JPEG weiß aufgefüllt. Formate, die dein Browser nicht erzeugen kann, sind ausgegraut.</p>
+</footer>
+</div>
+
+<script>
+const entries = [];
+let uid = 0;
+
+/* Nicht unterstützte Zielformate deaktivieren */
+(async () => {
+  for(const opt of AK.$$('#format option')){
+    if(opt.value === 'image/jpeg' || opt.value === 'image/png') continue;
+    if(!await AK.canEncode(opt.value)){
+      opt.disabled = true;
+      opt.textContent += ' — von diesem Browser nicht unterstützt';
+    }
+  }
+})();
+
+function addFiles(files){
+  for(const file of files){
+    if(!/\.(jpe?g|png|webp|heic|heif|gif|bmp|avif|svg|tiff?)$/i.test(file.name) && !file.type.startsWith('image/')) continue;
+    const e = { id:++uid, file, name:file.name, size:file.size, mode:'pending', note:'wird gelesen …', w:0, h:0, bmp:null };
+    entries.push(e);
+    prepare(e);
+  }
+  list.render();
+}
+
+async function prepare(e){
+  try{
+    let blob = e.file;
+    if(/\.(heic|heif)$/i.test(e.name) || /hei[cf]/.test(e.file.type)){
+      blob = await heic2any({ blob:e.file, toType:'image/png' });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+    e.bmp = await loadBitmap(blob);
+    e.w = e.bmp.width; e.h = e.bmp.height;
+    e.mode = 'ok'; e.note = '';
+  }catch(err){
+    console.error(err);
+    e.mode = 'error'; e.note = 'Bild kann nicht gelesen werden';
+  }
+  list.render();
+}
+
+function loadBitmap(blob){
+  if('createImageBitmap' in window) return createImageBitmap(blob).catch(() => viaImg(blob));
+  return viaImg(blob);
+}
+function viaImg(blob){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+const list = AK.filelist({
+  container:'#stack', empty:'#empty', entries,
+  rowClass: e => e.mode === 'error' ? 'locked' : '',
+  meta: e => `
+    <div class="fname">${AK.esc(e.name)}</div>
+    <div class="finfo">
+      <span>${AK.fmtBytes(e.size)}</span>
+      ${e.w ? `<span>${e.w} × ${e.h} px</span>` : ''}
+      ${e.result ? `<span class="badge b-ok">→ ${AK.fmtBytes(e.result)}</span>` : ''}
+      ${e.note ? `<span class="pw-hint">${AK.esc(e.note)}</span>` : ''}
+    </div>`,
+  onChange: updateTotals
+});
+
+function updateTotals(){
+  const ok = entries.filter(e => e.mode === 'ok').length;
+  AK.$('#imgcount').innerHTML = ok + '<small>Bilder im Stapel</small>';
+  AK.$('#go').disabled = ok === 0 || entries.some(e => e.mode === 'pending');
+}
+
+AK.$('#quality').oninput = e => AK.$('#qval').textContent = e.target.value;
+AK.$('#format').onchange = () => {
+  AK.$('#f-quality').style.display = AK.$('#format').value === 'image/png' ? 'none' : '';
+};
+
+const EXT = { 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/avif':'avif' };
+
+async function convert(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+
+  const mime = AK.$('#format').value;
+  const quality = +AK.$('#quality').value / 100;
+  const maxEdge = +AK.$('#maxedge').value;
+  const jobs = entries.filter(e => e.mode === 'ok');
+  const files = [];
+
+  try{
+    for(let n = 0; n < jobs.length; n++){
+      const e = jobs[n];
+      let w = e.w, h = e.h;
+      if(maxEdge && Math.max(w, h) > maxEdge){
+        const s = maxEdge / Math.max(w, h);
+        w = Math.round(w * s); h = Math.round(h * s);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if(mime === 'image/jpeg'){ ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); }
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(e.bmp, 0, 0, w, h);
+      const blob = await new Promise(r => canvas.toBlob(r, mime, quality));
+      canvas.width = canvas.height = 0;
+      if(!blob) throw new Error('Zielformat wird nicht unterstützt');
+
+      e.result = blob.size;
+      files.push({ name: AK.withExt(e.name, EXT[mime]), data: blob });
+      AK.bar((n+1)/jobs.length);
+      AK.log(`${e.name} → ${AK.withExt(e.name, EXT[mime])} (${AK.fmtBytes(blob.size)}${w !== e.w ? `, ${w} × ${h} px` : ''})`);
+    }
+
+    list.render();
+    if(files.length === 1){
+      AK.offerDownload(files[0].data, files[0].name);
+    }else{
+      await AK.offerZip(files, 'bilder-konvertiert.zip');
+    }
+    const before = jobs.reduce((s,e) => s + e.size, 0);
+    const after = files.reduce((s,f) => s + f.data.size, 0);
+    AK.log(`Fertig: ${files.length} ${files.length === 1 ? 'Bild' : 'Bilder'}, ${AK.fmtBytes(before)} → ${AK.fmtBytes(after)}.`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Konvertieren'; updateTotals();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = convert;
+</script>
+</body>
+</html>
