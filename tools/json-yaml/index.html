@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JSON formatieren &amp; prüfen, YAML umwandeln — kostenlos | Alleskonverter</title>
+<meta name="description" content="JSON aufhübschen, prüfen und minimieren, YAML ↔ JSON umwandeln — mit klarer Fehlermeldung samt Zeilenangabe. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/json-yaml/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="JSON formatieren &amp; prüfen, YAML umwandeln — kostenlos | Alleskonverter">
+<meta property="og:description" content="JSON aufhübschen, prüfen und minimieren, YAML ↔ JSON umwandeln — ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/json-yaml/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JSON formatieren &amp; prüfen, YAML umwandeln — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"JSON & YAML — Alleskonverter","url":"https://alleskonverter.de/tools/json-yaml/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"JSON formatieren, prüfen und minimieren, YAML ↔ JSON umwandeln — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Daten übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Alles wird im Browser verarbeitet — wichtig, weil in Konfigurationsdateien oft Zugangsdaten stehen."}},{"@type":"Question","name":"Was ist der Unterschied zwischen JSON und YAML?","acceptedAnswer":{"@type":"Answer","text":"Beide beschreiben dieselbe Art von Daten. JSON arbeitet mit Klammern und ist maschinenfreundlich, YAML mit Einrückungen und ist für Menschen leichter zu lesen — deshalb wird es gern für Konfigurationsdateien verwendet."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.meldung{margin-top:12px;padding:10px 12px;border:1.5px solid var(--stamp);background:var(--card);
+  font-family:var(--mono);font-size:12px;color:var(--stamp)}
+.meldung.fehler{border-color:var(--alert);color:var(--alert)}
+.zaehler{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>JSON &amp; <span>YAML</span></h1>
+  <p class="sub">Unleserliches JSON aufhübschen, auf Fehler prüfen, für den Einsatz minimieren — und zwischen JSON und YAML wechseln. Fehler werden mit Zeilenangabe gemeldet.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Daten</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>.json- oder .yaml-Datei hierher ziehen</strong>
+      <small>oder klicken — oder unten direkt einfügen</small>
+    </div>
+    <input type="file" id="picker" accept=".json,.yaml,.yml,.txt" hidden>
+
+    <div class="twocol" style="margin-top:18px">
+      <div>
+        <h2>Eingabe</h2>
+        <textarea class="pane" id="eingabe" spellcheck="false" aria-label="Eingabe"
+          placeholder='{"name": "Beispiel", "werte": [1, 2, 3]}'></textarea>
+        <div class="zaehler" id="zaehler"></div>
+      </div>
+      <div>
+        <h2>Ergebnis</h2>
+        <textarea class="pane" id="ausgabe" spellcheck="false" readonly aria-label="Ergebnis"></textarea>
+      </div>
+    </div>
+
+    <div class="meldung" id="meldung" hidden></div>
+
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="ghost" id="kopieren">In die Zwischenablage</button>
+      <button class="ghost" id="uebernehmen">Ergebnis nach links übernehmen</button>
+      <button class="ghost" id="beispiel">Beispiel einsetzen</button>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="groesse">0<small>Zeichen Ergebnis</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="aktion">Was soll passieren?</label>
+      <select id="aktion">
+        <option value="schoen" selected>JSON aufhübschen</option>
+        <option value="klein">JSON minimieren</option>
+        <option value="jsonyaml">JSON → YAML</option>
+        <option value="yamljson">YAML → JSON</option>
+        <option value="sortiert">JSON mit sortierten Schlüsseln</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-einzug">
+      <label for="einzug">Einrückung</label>
+      <select id="einzug">
+        <option value="2" selected>2 Leerzeichen</option>
+        <option value="4">4 Leerzeichen</option>
+        <option value="tab">Tabulator</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="dateiname">Dateiname</label>
+      <input type="text" id="dateiname" value="daten">
+    </div>
+
+    <button class="primary" id="go" disabled>Herunterladen</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>JSON aus einer Programmschnittstelle kommt meist als eine einzige, endlose Zeile — unlesbar. Dieses Werkzeug bringt es in Form, prüft dabei auf Fehler und sagt genau, in welcher Zeile es hakt. Umgekehrt lässt sich formatiertes JSON wieder minimieren, wenn es kompakt in eine Konfiguration soll. Und weil viele Konfigurationsdateien in YAML geschrieben sind, geht es auch zwischen beiden Formaten hin und her.</p>
+  <h3>Werden meine Daten übertragen?</h3>
+  <p>Nein, alles läuft im Browser. Das ist hier besonders relevant: In Konfigurationsdateien stehen häufig Zugangsdaten, Schlüssel oder interne Adressen — genau das, was man keinesfalls in ein beliebiges Online-Formular kopieren sollte.</p>
+  <h3>Was unterscheidet JSON und YAML?</h3>
+  <p>Beide beschreiben dieselbe Art von Daten: Listen, Zuordnungen, Zahlen, Text. JSON nutzt geschweifte Klammern und Anführungszeichen und ist maschinenfreundlich; YAML arbeitet mit Einrückung, kommt ohne viele Sonderzeichen aus und ist dadurch für Menschen angenehmer — deshalb ist es bei Konfigurationsdateien so verbreitet.</p>
+  <h3>Warum meldet er einen Fehler, obwohl es richtig aussieht?</h3>
+  <p>Die häufigsten Stolpersteine sind ein Komma hinter dem letzten Eintrag, einfache statt doppelter Anführungszeichen und Kommentare — all das erlaubt JSON nicht, auch wenn viele Programme großzügig darüber hinwegsehen. Die Fehlermeldung nennt die Zeile, in der es klemmt.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Tabellenartige Daten lassen sich mit dem <a href="../tabellen/index.html">Tabellen-Konverter</a> auch nach CSV oder Excel bringen.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/js-yaml.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+let basisName = 'daten';
+
+const BEISPIEL = `{
+  "name": "Beispieldaten", "aktiv": true, "anzahl": 42,
+  "liste": [1, 2, 3], "verschachtelt": { "a": "eins", "b": null }
+}`;
+
+function einzug(){
+  const w = AK.$('#einzug').value;
+  return w === 'tab' ? '\t' : +w;
+}
+
+/* Schlüssel rekursiv sortieren */
+function sortiere(wert){
+  if(Array.isArray(wert)) return wert.map(sortiere);
+  if(wert && typeof wert === 'object'){
+    const neu = {};
+    for(const k of Object.keys(wert).sort((a,b) => a.localeCompare(b, 'de'))) neu[k] = sortiere(wert[k]);
+    return neu;
+  }
+  return wert;
+}
+
+/* Zeilennummer aus der Fehlermeldung des Browsers herausziehen */
+function zeileZuPosition(text, meldung){
+  const m = meldung.match(/position (\d+)/i);
+  if(!m) return null;
+  const pos = +m[1];
+  const zeile = text.slice(0, pos).split('\n').length;
+  const spalte = pos - text.lastIndexOf('\n', pos - 1);
+  return { zeile, spalte };
+}
+
+function melde(text, istFehler){
+  const el = AK.$('#meldung');
+  el.hidden = !text;
+  el.textContent = text;
+  el.classList.toggle('fehler', !!istFehler);
+}
+
+function zaehle(daten){
+  const zaehler = { Objekte:0, Listen:0, Werte:0 };
+  (function lauf(w){
+    if(Array.isArray(w)){ zaehler.Listen++; w.forEach(lauf); }
+    else if(w && typeof w === 'object'){ zaehler.Objekte++; Object.values(w).forEach(lauf); }
+    else zaehler.Werte++;
+  })(daten);
+  AK.$('#zaehler').innerHTML = Object.entries(zaehler).map(([k,v]) => `<span>${v} ${k}</span>`).join('');
+}
+
+function lauf(){
+  const text = AK.$('#eingabe').value.trim();
+  const aktion = AK.$('#aktion').value;
+  AK.$('#f-einzug').hidden = aktion === 'klein';
+
+  if(!text){
+    AK.$('#ausgabe').value = '';
+    AK.$('#groesse').innerHTML = '0<small>Zeichen Ergebnis</small>';
+    AK.$('#go').disabled = true;
+    AK.$('#zaehler').innerHTML = '';
+    melde('');
+    return;
+  }
+
+  let daten, ausgabe = '';
+  try{
+    daten = aktion === 'yamljson' ? jsyaml.load(text) : JSON.parse(text);
+  }catch(err){
+    // Bei JSON-Fehler prüfen, ob es vielleicht YAML ist — das ist der häufigste Irrtum.
+    // Nur wenn der Text gar nicht wie JSON beginnt, sonst wäre etwa ein überzähliges
+    // Komma fälschlich „YAML“ (das erlaubt es nämlich).
+    if(aktion !== 'yamljson' && !/^\s*[\{\[]/.test(text)){
+      let alsYaml = null;
+      try{ alsYaml = jsyaml.load(text); }catch(_){}
+      if(alsYaml && typeof alsYaml === 'object'){
+        melde('Das sieht nach YAML aus, nicht nach JSON. Wähle rechts „YAML → JSON“.', true);
+        AK.$('#ausgabe').value = ''; AK.$('#go').disabled = true;
+        return;
+      }
+    }
+    const ort = zeileZuPosition(text, err.message);
+    melde('Fehler: ' + err.message.replace(/^JSON\.parse: /,'').replace(/in JSON at position \d+.*/,'') +
+          (ort ? ` — Zeile ${ort.zeile}, Spalte ${ort.spalte}` : ''), true);
+    AK.$('#ausgabe').value = ''; AK.$('#go').disabled = true;
+    AK.$('#zaehler').innerHTML = '';
+    return;
+  }
+
+  try{
+    if(aktion === 'schoen')        ausgabe = JSON.stringify(daten, null, einzug());
+    else if(aktion === 'klein')    ausgabe = JSON.stringify(daten);
+    else if(aktion === 'sortiert') ausgabe = JSON.stringify(sortiere(daten), null, einzug());
+    else if(aktion === 'jsonyaml') ausgabe = jsyaml.dump(daten, { indent: typeof einzug() === 'number' ? einzug() : 2, lineWidth: 100 });
+    else if(aktion === 'yamljson') ausgabe = JSON.stringify(daten, null, einzug());
+  }catch(err){
+    melde('Umwandlung nicht möglich: ' + err.message, true);
+    return;
+  }
+
+  AK.$('#ausgabe').value = ausgabe;
+  AK.$('#groesse').innerHTML = ausgabe.length.toLocaleString('de-DE') + '<small>Zeichen Ergebnis</small>';
+  AK.$('#go').disabled = !ausgabe;
+  zaehle(daten);
+  const vorher = text.length, nachher = ausgabe.length;
+  melde(aktion === 'klein'
+    ? `Gültig. ${vorher.toLocaleString('de-DE')} → ${nachher.toLocaleString('de-DE')} Zeichen (${Math.max(0, Math.round((1 - nachher/vorher)*100))} % kleiner).`
+    : 'Gültig — keine Fehler gefunden.');
+}
+
+async function addFiles(list){
+  const file = list.find(f => /\.(json|ya?ml|txt)$/i.test(f.name));
+  if(!file) return;
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  AK.$('#dateiname').value = basisName;
+  AK.$('#eingabe').value = await file.text();
+  if(/\.ya?ml$/i.test(file.name)) AK.$('#aktion').value = 'yamljson';
+  lauf();
+}
+
+const ENDUNG = { schoen:'json', klein:'json', sortiert:'json', jsonyaml:'yaml', yamljson:'json' };
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const endung = ENDUNG[AK.$('#aktion').value];
+  const typ = endung === 'yaml' ? 'text/yaml' : 'application/json';
+  AK.offerDownload(new Blob([AK.$('#ausgabe').value], {type:typ + ';charset=utf-8'}),
+                   (AK.$('#dateiname').value || 'daten') + '.' + endung);
+  AK.stamp(true);
+};
+AK.$('#kopieren').onclick = async () => {
+  await navigator.clipboard.writeText(AK.$('#ausgabe').value);
+  AK.log('Kopiert.');
+};
+AK.$('#uebernehmen').onclick = () => { AK.$('#eingabe').value = AK.$('#ausgabe').value; lauf(); };
+AK.$('#beispiel').onclick = () => { AK.$('#eingabe').value = BEISPIEL; lauf(); };
+AK.$('#eingabe').addEventListener('input', lauf);
+['#aktion','#einzug'].forEach(s => AK.$(s).addEventListener('change', lauf));
+
+AK.dropzone('#drop', '#picker', addFiles);
+lauf();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

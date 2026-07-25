@@ -28,4 +28,6 @@
   <url><loc>https://alleskonverter.de/tools/bild-metadaten/</loc><priority>0.9</priority></url>
   <url><loc>https://alleskonverter.de/tools/farben/</loc><priority>0.8</priority></url>
   <url><loc>https://alleskonverter.de/tools/passwort/</loc><priority>0.8</priority></url>
+  <url><loc>https://alleskonverter.de/tools/einheiten/</loc><priority>0.8</priority></url>
+  <url><loc>https://alleskonverter.de/tools/json-yaml/</loc><priority>0.8</priority></url>
 </urlset>

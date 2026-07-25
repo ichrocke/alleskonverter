@@ -54,6 +54,7 @@ const SHELL = [
   '/tools/qr-code/js/frames.js',
   '/tools/qr-code/js/history.js',
   '/tools/qr-code/js/artqr.js',
+  '/vendor/js-yaml.min.js',
   '/vendor/pdf-lib-crypt.min.js',
 ];
 

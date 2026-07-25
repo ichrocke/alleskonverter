@@ -34,6 +34,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Tabellen-Konverter](tools/tabellen/index.html) | CSV/TSV/JSON/XLSX/XLS ↔ CSV/JSON/XLSX, Vorschau |
 
 | [Texterkennung (OCR)](tools/texterkennung/index.html) | Text aus Bildern und gescannten PDFs erkennen (Tesseract, deutsch/englisch) |
+| [JSON &amp; YAML](tools/json-yaml/index.html) | JSON formatieren/prüfen/minimieren, YAML ↔ JSON, Fehler mit Zeilenangabe |
 **Extras**
 | Werkzeug | Kann |
 |---|---|
@@ -45,6 +46,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Favicon-Generator](tools/favicon/index.html) | Alle Symbolgrößen, favicon.ico, Apple-Touch-Icon, Manifest und HTML-Schnipsel als ZIP |
 | [Farbwerte umrechnen](tools/farben/index.html) | HEX/RGB/HSL/CMYK, Pipette für Bilder, Abstufungen, WCAG-Kontrastprüfung |
 | [Passwort-Generator](tools/passwort/index.html) | Zeichenfolgen, Passphrasen und PINs mit echtem Zufall, Stärke- und Zeitschätzung |
+| [Einheiten &amp; Zeitzonen](tools/einheiten/index.html) | Neun Größenarten umrechnen, Uhrzeit in 20 Zeitzonen |
 **Medien**
 | Werkzeug | Kann |
 |---|---|

@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeuge 28 und 29)
+
+### Hinzugefügt
+- Werkzeug **Einheiten & Zeitzonen** (`tools/einheiten/`): neun Größenarten (Länge, Fläche, Volumen, Gewicht, Temperatur, Geschwindigkeit, Datenmenge, Zeitspanne, Druck) mit allen Einheiten auf einen Blick, dazu eine Uhrzeit gleichzeitig in 20 Zeitzonen — Sommer-/Winterzeit wird für das eingegebene Datum korrekt eingerechnet. Bewusst **ohne Währungen**, weil Wechselkurse einen Serverabruf erfordern würden.
+- Werkzeug **JSON & YAML** (`tools/json-yaml/`): JSON aufhübschen, minimieren, Schlüssel sortieren und in beide Richtungen mit YAML wandeln. Fehler werden mit Zeile und Spalte gemeldet; sieht die Eingabe nach YAML aus, kommt statt einer kryptischen Meldung ein passender Hinweis.
+
 ## 2026-07-26 (Werkzeuge 26 und 27)
 
 ### Hinzugefügt
