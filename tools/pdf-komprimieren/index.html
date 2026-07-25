@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF komprimieren — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF <span>komprimieren</span></h1>
+  <p class="sub">Zu groß für den E-Mail-Anhang? Das Dokument wird Seite für Seite neu aufgebaut — Auflösung und Qualität bestimmen die Zielgröße.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF auswählen">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul id="stack" class="stack"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="sizeinfo">—<small>Größe vorher</small></div>
+
+    <div class="field" style="margin-top:16px" id="f-pw" hidden>
+      <label for="pw">Öffnungspasswort</label>
+      <input type="password" id="pw" placeholder="Passwort eingeben, dann erneut laden">
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="dpi">Auflösung</label>
+      <select id="dpi">
+        <option value="96">96 dpi — maximal klein</option>
+        <option value="120">120 dpi — E-Mail</option>
+        <option value="150" selected>150 dpi — gut lesbar</option>
+        <option value="200">200 dpi — fein</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="quality">JPEG-Qualität: <span id="qval">75</span> %</label>
+      <input type="range" id="quality" min="40" max="95" value="75" style="width:100%">
+    </div>
+
+    <button class="primary" id="go" disabled>Komprimieren</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p><strong>Wichtig zu wissen:</strong> Beim Komprimieren werden die Seiten gerastert — das Ergebnis sieht aus wie das Original, aber Text lässt sich danach nicht mehr markieren oder durchsuchen. Wird die Datei nicht kleiner, war das Original schon stark komprimiert; dann hilft nur eine niedrigere Auflösung.</p>
+</footer>
+</div>
+
+<script>
+const { PDFDocument } = PDFLib;
+let src = null; // { name, size, bytes, pages, password }
+
+async function addFiles(files){
+  const file = files.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  try{
+    const doc = await AK.openWithPdfjs(bytes, AK.$('#pw').value);
+    src = { name:file.name, size:file.size, bytes, pages:doc.numPages, password:AK.$('#pw').value };
+    doc.destroy();
+    AK.$('#f-pw').hidden = true;
+  }catch(err){
+    src = null;
+    if(err && err.name === 'PasswordException'){
+      AK.$('#f-pw').hidden = false;
+      AK.log('Dieses PDF braucht ein Öffnungspasswort — eingeben und Datei erneut hineinziehen.', true);
+    }else{
+      AK.log('Datei kann nicht gelesen werden.', true);
+    }
+  }
+  render();
+}
+
+function render(){
+  const stack = AK.$('#stack');
+  AK.$('#empty').style.display = src ? 'none' : '';
+  stack.innerHTML = '';
+  if(src){
+    stack.innerHTML = `
+      <li class="row" style="grid-template-columns:44px 1fr auto">
+        <div class="tab" style="cursor:default">01</div>
+        <div class="meta">
+          <div class="fname">${AK.esc(src.name)}</div>
+          <div class="finfo"><span>${AK.fmtBytes(src.size)}</span><span>${src.pages} Seiten</span></div>
+        </div>
+        <div class="tools"><button class="icon del" title="Entfernen">✕</button></div>
+      </li>`;
+    stack.querySelector('.del').onclick = () => { src = null; render(); };
+  }
+  AK.$('#sizeinfo').innerHTML = (src ? AK.fmtBytes(src.size) : '—') + '<small>Größe vorher</small>';
+  AK.$('#go').disabled = !src;
+}
+
+AK.$('#quality').oninput = e => AK.$('#qval').textContent = e.target.value;
+
+async function run(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  const dpi = +AK.$('#dpi').value;
+  const quality = +AK.$('#quality').value / 100;
+
+  try{
+    const doc = await AK.openWithPdfjs(src.bytes, src.password);
+    const out = await PDFDocument.create();
+
+    for(let i = 0; i < src.pages; i++){
+      const { canvas, width, height } = await AK.renderPage(doc, i, dpi/72);
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+      AK.freeCanvas(canvas);
+      const img = await out.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+      out.addPage([width, height]).drawImage(img, { x:0, y:0, width, height });
+      AK.bar((i+1)/src.pages);
+    }
+    await doc.destroy();
+
+    out.setProducer('Alleskonverter');
+    const bytes = await out.save();
+    const blob = new Blob([bytes], { type:'application/pdf' });
+    const saved = 1 - blob.size / src.size;
+
+    AK.offerDownload(blob, src.name.replace(/\.pdf$/i,'') + '-komprimiert.pdf');
+    AK.$('#sizeinfo').innerHTML = AK.fmtBytes(blob.size) + `<small>vorher ${AK.fmtBytes(src.size)}</small>`;
+    if(saved > 0.01){
+      AK.log(`Fertig: ${AK.fmtBytes(src.size)} → ${AK.fmtBytes(blob.size)} (−${Math.round(saved*100)} %)`);
+    }else{
+      AK.log(`Fertig, aber kaum kleiner (${AK.fmtBytes(blob.size)}). Niedrigere Auflösung oder Qualität probieren.`, true);
+    }
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.disabled = !src; go.textContent = 'Komprimieren';
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = run;
+render();
+</script>
+</body>
+</html>
