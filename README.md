@@ -92,6 +92,15 @@ python3 -m http.server 8000
 Nach jeder Änderung: `CHANGELOG.md` ergänzen → Commit → Push → `./deploy.sh`
 (SFTP-Upload auf den Strato-Webspace; Zugangsdaten in `.env`, nicht im Repo).
 
+## Mitmachen
+
+Fehler gefunden oder ein Werkzeug vermisst? Gern als
+[Issue](https://github.com/ichrocke/alleskonverter/issues) melden.
+
+Der Quellcode ist bewusst offen: Bei Werkzeugen, die mit vertraulichen Dateien umgehen,
+soll niemand einem Versprechen glauben müssen. Dass nichts hochgeladen wird, lässt sich
+hier nachlesen — und im Browser unter „Netzwerk“ selbst nachmessen.
+
 ## Changelog
 
 Siehe [CHANGELOG.md](CHANGELOG.md).
