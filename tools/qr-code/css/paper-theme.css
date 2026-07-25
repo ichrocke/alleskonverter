@@ -1,0 +1,93 @@
+/* Alleskonverter-Look für das QR-Werkzeug — überschreibt die Variablen von style.css */
+:root {
+  --accent-a: #1B4D3E;
+  --accent-b: #2E6E58;
+  --accent-grad: linear-gradient(120deg, #1B4D3E, #2E6E58);
+  --radius: 0;
+  --radius-sm: 0;
+  --font: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+:root[data-theme="light"] {
+  --bg: #E6E4DE;
+  --card: #F3F2ED;
+  --card-2: #ECEAE3;
+  --text: #16191B;
+  --text-dim: #5C6268;
+  --border: #C9C6BD;
+  --shadow: 0 1px 0 rgba(0,0,0,.06), 0 8px 24px -18px rgba(0,0,0,.45);
+  --input-bg: #ffffff;
+}
+
+/* Dunkles Thema in gedeckten Papier-/Tannen-Tönen */
+:root[data-theme="dark"] {
+  --bg: #161916;
+  --card: #1E231F;
+  --card-2: #252B26;
+  --text: #E6E4DE;
+  --text-dim: #99A29A;
+  --border: #39413A;
+  --input-bg: #141814;
+  --accent-a: #4C9A7C;
+  --accent-b: #6FB598;
+  --accent-grad: linear-gradient(120deg, #3E8368, #5FA98C);
+}
+
+:root[data-theme="light"] body {
+  background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.018) 0 1px, transparent 1px 4px);
+}
+
+/* Kopf im Site-Stil */
+.app-header .brand h1 {
+  font-family: 'Anton', Impact, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  font-size: 1.3rem;
+}
+.tagline { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
+
+/* Zurück-Schaltfläche wie auf den anderen Werkzeugseiten */
+a.back-btn {
+  display: inline-block;
+  padding: 9px 14px;
+  border: 1.5px solid var(--text);
+  background: var(--card);
+  color: var(--text);
+  text-decoration: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+a.back-btn:hover { background: var(--text); color: var(--bg); }
+@media (max-width: 560px) { a.back-btn { padding: 8px 10px } }
+
+/* Kartentitel im Mono-Stil des Designsystems */
+.card-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Karten: Papier-Optik statt runder Blasen */
+.card { border: 1px solid var(--border); }
+
+/* Fußzeilen-Links */
+.app-footer .footlinks {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  justify-content: center;
+  padding: 0;
+  margin: 8px 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+}
+.app-footer .footlinks a { color: var(--accent-a); }
