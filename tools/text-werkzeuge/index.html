@@ -50,7 +50,7 @@
 <div class="grid">
   <section>
     <h2>Eingabe</h2>
-    <textarea class="pane" id="input" spellcheck="false" placeholder="Text hier eingeben oder einfügen …" style="min-height:200px"></textarea>
+    <textarea class="pane" id="input" aria-label="Eingabetext" spellcheck="false" placeholder="Text hier eingeben oder einfügen …" style="min-height:200px"></textarea>
 
     <div class="stats" style="margin-top:12px">
       <div class="stat"><b id="cChars">0</b><span>Zeichen</span></div>
@@ -67,7 +67,7 @@
       <div class="hashout"><b>SHA-1</b><span id="h1">—</span></div>
       <div class="hashout"><b>SHA-512</b><span id="h512">—</span></div>
     </div>
-    <textarea class="pane" id="output" spellcheck="false" readonly style="min-height:200px"></textarea>
+    <textarea class="pane" id="output" aria-label="Ergebnis" spellcheck="false" readonly style="min-height:200px"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       <button class="ghost" id="copy">In die Zwischenablage</button>
       <button class="ghost" id="swap">Ergebnis nach oben übernehmen</button>
