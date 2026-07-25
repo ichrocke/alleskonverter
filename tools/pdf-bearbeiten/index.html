@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF bearbeiten — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+<script src="../../js/pdf-common.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF <span>bearbeiten</span></h1>
+  <p class="sub">Alle Seiten als Miniaturen: drehen, löschen, per Ziehen umsortieren — dann als neues PDF speichern. Die Seiten selbst bleiben verlustfrei.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Seiten</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="PDF auswählen">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <ul class="tiles" id="tiles"></ul>
+    <div class="empty" id="empty">Noch kein Dokument geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="pagecount">0<small>Seiten im Ergebnis</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="outname">Dateiname</label>
+      <input type="text" id="outname" value="bearbeitet.pdf">
+    </div>
+
+    <button class="primary" id="go" disabled>Speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>Gelöschte Seiten werden nur ausgegraut und lassen sich mit <code>↩</code> zurückholen, bis gespeichert wird. Passwortgeschützte PDFs bitte zuerst mit <a href="../pdf-zusammenfuegen/index.html">PDF zusammenfügen</a> entsperren.</p>
+</footer>
+</div>
+
+<script>
+const { PDFDocument, degrees } = PDFLib;
+const THUMB_W = 200;
+let src = null;      // { name, bytes }
+let pages = [];      // { id, srcIndex, delta, removed, thumb }
+let uid = 0;
+
+async function addFiles(files){
+  const file = files.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  pages = []; render();
+
+  try{
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    await PDFDocument.load(bytes.slice(), { ignoreEncryption:false }); // prüft Kopierbarkeit
+    src = { name:file.name, bytes };
+    AK.$('#outname').value = file.name.replace(/\.pdf$/i,'') + '-bearbeitet.pdf';
+
+    const doc = await AK.openWithPdfjs(bytes);
+    AK.log(`${file.name}: ${doc.numPages} Seiten, Miniaturen werden erstellt …`);
+    for(let i = 0; i < doc.numPages; i++){
+      const page = await doc.getPage(i+1);
+      const base = page.getViewport({ scale:1 });
+      const vp = page.getViewport({ scale: THUMB_W / base.width });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      await page.render({ canvasContext:ctx, viewport:vp }).promise;
+      page.cleanup();
+      pages.push({ id:++uid, srcIndex:i, delta:0, removed:false, thumb:canvas });
+      AK.bar((i+1)/doc.numPages);
+      if(i % 4 === 3) render(); // Zwischenstand zeigen
+    }
+    await doc.destroy();
+    AK.logClear(); AK.bar(0);
+    render();
+  }catch(err){
+    console.error(err);
+    src = null; pages = []; render();
+    AK.log('Datei kann nicht gelesen werden — vermutlich verschlüsselt oder beschädigt.', true);
+  }
+}
+
+/* Miniatur mit Drehung in Ziel-Canvas zeichnen */
+function drawThumb(target, source, delta){
+  const rot = ((delta % 360) + 360) % 360;
+  const swap = rot === 90 || rot === 270;
+  target.width = swap ? source.height : source.width;
+  target.height = swap ? source.width : source.height;
+  const ctx = target.getContext('2d');
+  ctx.save();
+  ctx.translate(target.width/2, target.height/2);
+  ctx.rotate(rot * Math.PI/180);
+  ctx.drawImage(source, -source.width/2, -source.height/2);
+  ctx.restore();
+}
+
+function render(){
+  const wrap = AK.$('#tiles');
+  AK.$('#empty').style.display = pages.length ? 'none' : '';
+  wrap.innerHTML = '';
+
+  pages.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.className = 'tile' + (p.removed ? ' gone' : '');
+    li.dataset.id = p.id;
+
+    const canvas = document.createElement('canvas');
+    drawThumb(canvas, p.thumb, p.delta);
+    canvas.draggable = true;
+    li.appendChild(canvas);
+
+    const no = document.createElement('span');
+    no.className = 'tno';
+    no.textContent = p.removed ? `Seite ${p.srcIndex+1} — gelöscht` : `${i+1} · war Seite ${p.srcIndex+1}`;
+    li.appendChild(no);
+
+    const tools = document.createElement('div');
+    tools.className = 'ttools';
+    tools.innerHTML = p.removed
+      ? `<button class="icon undel" title="Wiederherstellen">↩</button>`
+      : `<button class="icon rl" title="90° links">↺</button>
+         <button class="icon rr" title="90° rechts">↻</button>
+         <button class="icon del" title="Seite löschen">✕</button>`;
+    li.appendChild(tools);
+
+    if(p.removed){
+      tools.querySelector('.undel').onclick = () => { p.removed = false; render(); };
+    }else{
+      tools.querySelector('.rl').onclick = () => { p.delta -= 90; render(); };
+      tools.querySelector('.rr').onclick = () => { p.delta += 90; render(); };
+      tools.querySelector('.del').onclick = () => { p.removed = true; render(); };
+    }
+
+    canvas.addEventListener('dragstart', ev => {
+      ev.dataTransfer.setData('text/plain', String(p.id));
+      ev.dataTransfer.effectAllowed = 'move';
+      li.classList.add('dragging');
+    });
+    canvas.addEventListener('dragend', () => li.classList.remove('dragging'));
+    li.addEventListener('dragover', ev => { ev.preventDefault(); li.classList.add('drop-target'); });
+    li.addEventListener('dragleave', () => li.classList.remove('drop-target'));
+    li.addEventListener('drop', ev => {
+      ev.preventDefault(); li.classList.remove('drop-target');
+      const from = pages.findIndex(x => x.id === +ev.dataTransfer.getData('text/plain'));
+      const to = pages.findIndex(x => x.id === p.id);
+      if(from < 0 || from === to) return;
+      pages.splice(to, 0, pages.splice(from,1)[0]);
+      render();
+    });
+
+    wrap.appendChild(li);
+  });
+
+  const kept = pages.filter(p => !p.removed).length;
+  AK.$('#pagecount').innerHTML = kept + '<small>Seiten im Ergebnis</small>';
+  AK.$('#go').disabled = !src || kept === 0;
+}
+
+async function save(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const keep = pages.filter(p => !p.removed);
+    const doc = await PDFDocument.load(src.bytes.slice(), { ignoreEncryption:false });
+    const out = await PDFDocument.create();
+    const copied = await out.copyPages(doc, keep.map(p => p.srcIndex));
+    copied.forEach((page, i) => {
+      const total = page.getRotation().angle + keep[i].delta;
+      page.setRotation(degrees(((total % 360) + 360) % 360));
+      out.addPage(page);
+      AK.bar((i+1)/copied.length);
+    });
+    out.setProducer('Alleskonverter');
+
+    const name = AK.ensureExt(AK.$('#outname').value || 'bearbeitet', 'pdf');
+    const bytes = await out.save();
+    AK.offerDownload(new Blob([bytes], {type:'application/pdf'}), name);
+    AK.log(`Fertig: ${copied.length} Seiten, ${AK.fmtBytes(bytes.length)}`);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Speichern'; render();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = save;
+render();
+</script>
+</body>
+</html>
