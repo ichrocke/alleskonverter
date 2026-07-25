@@ -6,6 +6,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 ## 2026-07-26 (Livegang: Lighthouse-Optimierung)
 
 ### Hinzugefügt
+- `SEARCH-CONSOLE.md`: Schritt-für-Schritt-Anleitung zum Einrichten der Google Search Console (Domain-Property, TXT-Eintrag bei Strato, Sitemap einreichen) — interne Datei, wird nicht mit deployt
 - `.htaccess` für den Strato-Server: eigene 404-Seite, Weiterleitung von www auf die Hauptdomain, gzip-Kompression (inkl. WASM), Cache-Regeln (Schriften/WASM ein Jahr, HTML immer frisch), Sicherheitskopfzeilen, MIME-Typen für `.wasm`/`.webmanifest`/`.webp`
 - `<main>`-Landmark auf Startseite und allen Werkzeugseiten (Barrierefreiheit)
 
@@ -16,6 +17,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 - Startseite: Reihenfolge der Kategorien korrigiert (Medien vor Extras)
 
 ### Behoben
+- `robots.txt`: Impressum und Datenschutz waren per `Disallow` gesperrt und trugen gleichzeitig ein `noindex` — dadurch hätte Google das `noindex` nie lesen können. Sperre entfernt, das Meta-Tag erledigt es korrekt.
 - Ablagefläche: irreführendes `aria-label` entfernt, das die sichtbare Beschriftung überschrieb (Sprachsteuerung fand die Schaltfläche nicht)
 - QR-Werkzeug: `role="img"` für die Vorschau (unzulässiges `aria-label` auf einem `div`), reservierte Höhen gegen Layout-Sprünge beim Aufbau
 

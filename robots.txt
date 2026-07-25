@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /impressum.html
-Disallow: /datenschutz.html
+
+# Impressum und Datenschutz sind bewusst nicht gesperrt, sondern tragen
+# ein noindex-Meta — nur so kann Google das noindex überhaupt lesen.
 
 Sitemap: https://alleskonverter.de/sitemap.xml

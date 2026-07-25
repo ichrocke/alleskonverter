@@ -17,6 +17,7 @@ mirror -R --delete \
   -x '^README\.md$' \
   -x '^CHANGELOG\.md$' \
   -x '^ideen\.txt$' \
+  -x '^SEARCH-CONSOLE\.md$' \
   . $DEPLOY_DIR
 LFTP
 echo "✓ Deploy auf $DEPLOY_HOST:$DEPLOY_DIR fertig."
