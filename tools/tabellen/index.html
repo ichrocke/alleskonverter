@@ -20,7 +20,6 @@
 <meta name="theme-color" content="#E6E4DE">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Tabellen-Konverter — Alleskonverter", "url": "https://alleskonverter.de/tools/tabellen/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "CSV, JSON und Excel (XLSX) online ineinander umwandeln — mit Tabellenvorschau und wählbarem Trennzeichen. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Warum zeigt Excel meine Umlaute kaputt an?", "acceptedAnswer": {"@type": "Answer", "text": "Klassisches CSV-Problem: Excel erwartet eine UTF-8-Kennung (BOM) am Dateianfang. Die hängt dieses Werkzeug automatisch an — und mit Semikolon als Trennzeichen öffnet deutsches Excel die Datei direkt richtig."}}, {"@type": "Question", "name": "Wie muss mein JSON aussehen?", "acceptedAnswer": {"@type": "Answer", "text": "Als Liste von Objekten: jedes Objekt eine Zeile, die Schlüssel werden zu Spaltennamen — das übliche Format von API-Exporten. Auch eine Liste von Listen (Zeilen als Arrays) wird verstanden."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
 <script src="../../vendor/xlsx.full.min.js"></script>
@@ -35,6 +34,8 @@
   <h1>Tabellen-<span>Konverter</span></h1>
   <p class="sub">CSV, JSON und Excel (XLSX) ineinander umwandeln — mit Vorschau. Auch TSV und das alte XLS-Format werden gelesen.</p>
 </header>
+
+<main>
 
 <div class="grid">
   <section>
@@ -97,6 +98,7 @@
   <h3>Was kostet das? Brauche ich ein Konto?</h3>
   <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar.</p>
 </section>
+</main>
 
 <footer>
   <p>JSON wird als Liste von Objekten gelesen und geschrieben (eine Zeile = ein Objekt, Spaltennamen aus der ersten Zeile). CSV-Dateien bekommen eine UTF-8-Kennung (BOM), damit Excel Umlaute korrekt anzeigt.</p>

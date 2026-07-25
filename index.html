@@ -25,14 +25,16 @@
 <meta name="twitter:description" content="PDF, Bilder, Word, Tabellen, Audio und Video kostenlos konvertieren — 100 % lokal im Browser. Keine Uploads, kein Konto, keine Limits.">
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 
-<link rel="stylesheet" href="vendor/fonts/fonts.css">
 <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
 <div class="wrap">
 
 <header>
-  <h1 class="brand"><img src="assets/logo-header.png" alt="Alleskonverter.de" width="1170" height="330"></h1>
+  <h1 class="brand"><picture>
+    <source srcset="assets/logo-header.webp" type="image/webp">
+    <img src="assets/logo-header.png" alt="Alleskonverter.de" width="880" height="248" fetchpriority="high">
+  </picture></h1>
   <p class="sub">Dokumente, Bilder, Tabellen und Medien konvertieren, zusammenführen und aufteilen — alles direkt auf deinem Gerät. Deine Dateien werden <strong>niemals hochgeladen</strong>: Es gibt keinen Server, der sie annehmen könnte.</p>
   <ul class="usps">
     <li>100 % lokal im Browser</li>
@@ -44,6 +46,7 @@
   <a class="donate" href="https://paypal.me/marc85444" target="_blank" rel="noopener">♥ Unterstützen — Spende per PayPal</a>
 </header>
 
+<main>
 <section class="cat">
   <h2>PDF</h2>
   <ul class="cards">
@@ -84,7 +87,6 @@
     </a></li>
   </ul>
 </section>
-
 <section class="cat">
   <h2>Bilder</h2>
   <ul class="cards">
@@ -95,7 +97,6 @@
     </a></li>
   </ul>
 </section>
-
 <section class="cat">
   <h2>Dokumente &amp; Daten</h2>
   <ul class="cards">
@@ -116,18 +117,6 @@
     </a></li>
   </ul>
 </section>
-
-<section class="cat">
-  <h2>Extras</h2>
-  <ul class="cards">
-    <li><a class="card" href="tools/qr-code/index.html">
-      <span class="no">13</span><span class="arrow">→</span>
-      <span class="name">QR-Code erstellen</span>
-      <span class="desc">Link, WLAN, vCard, GiroCode u. v. m. — mit Farben, Logos, Rahmen und Bild-im-Code.</span>
-    </a></li>
-  </ul>
-</section>
-
 <section class="cat">
   <h2>Medien</h2>
   <ul class="cards">
@@ -138,6 +127,17 @@
     </a></li>
   </ul>
 </section>
+<section class="cat">
+  <h2>Extras</h2>
+  <ul class="cards">
+    <li><a class="card" href="tools/qr-code/index.html">
+      <span class="no">13</span><span class="arrow">→</span>
+      <span class="name">QR-Code erstellen</span>
+      <span class="desc">Link, WLAN, vCard, GiroCode u. v. m. — mit Farben, Logos, Rahmen und Bild-im-Code.</span>
+    </a></li>
+  </ul>
+</section>
+</main>
 
 <footer>
   <ul class="footlinks">

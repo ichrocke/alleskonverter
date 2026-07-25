@@ -20,7 +20,6 @@
 <meta name="theme-color" content="#E6E4DE">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Markdown ↔ HTML — Alleskonverter", "url": "https://alleskonverter.de/tools/markdown-html/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau beim Tippen. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Welcher Markdown-Dialekt wird unterstützt?", "acceptedAnswer": {"@type": "Answer", "text": "GitHub-üblicher Markdown: Überschriften, Listen, Links, Bilder, Code-Blöcke, Tabellen, Zitate. Gerendert wird mit der bewährten Bibliothek marked."}}, {"@type": "Question", "name": "Was geht bei HTML → Markdown verloren?", "acceptedAnswer": {"@type": "Answer", "text": "Alles, was Markdown nicht kennt: Formulare, Skripte, komplexe Layouts und Styling. Der Textinhalt mit seiner Struktur bleibt vollständig erhalten."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
 <script src="../../vendor/marked.min.js"></script>
@@ -36,6 +35,8 @@
   <h1>Markdown <span>↔ HTML</span></h1>
   <p class="sub">In beide Richtungen umwandeln, mit Live-Vorschau beim Tippen. Datei hineinziehen oder direkt lostippen.</p>
 </header>
+
+<main>
 
 <div class="grid">
   <section>
@@ -104,6 +105,7 @@
   <h3>Was kostet das? Brauche ich ein Konto?</h3>
   <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar.</p>
 </section>
+</main>
 
 <footer>
   <p>Markdown → HTML nutzt <code>marked</code>, die Gegenrichtung <code>turndown</code>. Bei HTML → Markdown gehen Dinge verloren, die Markdown nicht kennt (Formulare, Skripte, komplexe Layouts) — der Textinhalt bleibt vollständig erhalten.</p>

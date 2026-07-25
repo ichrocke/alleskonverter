@@ -20,7 +20,6 @@
 <meta name="theme-color" content="#E6E4DE">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Text auslesen — Alleskonverter", "url": "https://alleskonverter.de/tools/pdf-text/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Kompletten Text aus einem PDF extrahieren — kopieren oder als .txt speichern, mit Seitenauswahl. Kostenlos, ohne Upload, direkt im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Warum bleibt das Ergebnis bei meinem Scan leer?", "acceptedAnswer": {"@type": "Answer", "text": "Reine Scans enthalten keine Textebene, sondern nur Bilder der Seiten. Dafür bräuchte es eine Texterkennung (OCR), die dieses Werkzeug bewusst nicht mitbringt — bei digital erstellten PDFs (Word-Export, Rechnungen, E-Books) funktioniert die Extraktion dagegen zuverlässig."}}, {"@type": "Question", "name": "Bleibt die Formatierung erhalten?", "acceptedAnswer": {"@type": "Answer", "text": "Absätze und Zeilen werden so gut wie möglich rekonstruiert; Layout, Schriften und Tabellen gehen naturgemäß verloren — es ist reiner Text."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
 <link rel="stylesheet" href="../../css/base.css">
 <link rel="stylesheet" href="../../css/tools.css">
 <script src="../../vendor/pdf.min.js"></script>
@@ -36,6 +35,8 @@
   <h1>Text <span>auslesen</span></h1>
   <p class="sub">Den kompletten Text eines PDFs extrahieren — zum Kopieren oder als .txt-Datei. Funktioniert bei allen PDFs mit echtem Text (keine reinen Scans).</p>
 </header>
+
+<main>
 
 <div class="grid">
   <section>
@@ -91,6 +92,7 @@
   <h3>Was kostet das? Brauche ich ein Konto?</h3>
   <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar.</p>
 </section>
+</main>
 
 <footer>
   <p>Bleibt das Ergebnis leer, besteht das PDF nur aus gescannten Bildern ohne Textebene — dafür bräuchte es eine Texterkennung (OCR), die dieses Werkzeug bewusst nicht mitbringt.</p>
