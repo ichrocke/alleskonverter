@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tabellen-Konverter — Alleskonverter</title>
+<link rel="stylesheet" href="../../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/tools.css">
+<script src="../../vendor/xlsx.full.min.js"></script>
+<script src="../../js/ui.js"></script>
+<script src="../../js/dropzone.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Tabellen-<span>Konverter</span></h1>
+  <p class="sub">CSV, JSON und Excel (XLSX) ineinander umwandeln — mit Vorschau. Auch TSV und das alte XLS-Format werden gelesen.</p>
+</header>
+
+<div class="grid">
+  <section>
+    <h2>Vorschau</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Tabelle auswählen">
+      <strong>Tabelle hierher ziehen</strong>
+      <small>.csv · .tsv · .json · .xlsx · .xls</small>
+    </div>
+    <input type="file" id="picker" accept=".csv,.tsv,.json,.xlsx,.xls,.ods" hidden>
+
+    <div class="tablewrap" id="tablewrap" style="margin-top:18px" hidden><table id="table"></table></div>
+    <div class="empty" id="empty">Noch keine Tabelle geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="count" id="rowcount">0<small>Zeilen</small></div>
+
+    <div class="field" style="margin-top:16px" id="f-sheet" hidden>
+      <label for="sheet">Arbeitsblatt</label>
+      <select id="sheet"></select>
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="format">Zielformat</label>
+      <select id="format">
+        <option value="csv" selected>CSV</option>
+        <option value="json">JSON</option>
+        <option value="xlsx">Excel (XLSX)</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-sep">
+      <label for="sep">CSV-Trennzeichen</label>
+      <select id="sep">
+        <option value=";" selected>Semikolon — deutsches Excel</option>
+        <option value=",">Komma — Standard</option>
+        <option value="\t">Tabulator</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Umwandeln</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+
+<footer>
+  <p>JSON wird als Liste von Objekten gelesen und geschrieben (eine Zeile = ein Objekt, Spaltennamen aus der ersten Zeile). CSV-Dateien bekommen eine UTF-8-Kennung (BOM), damit Excel Umlaute korrekt anzeigt.</p>
+</footer>
+</div>
+
+<script>
+let wb = null, fileBase = 'tabelle';
+
+async function addFiles(files){
+  const file = files[0];
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  fileBase = file.name.replace(/\.[^.]+$/, '');
+
+  try{
+    if(/\.json$/i.test(file.name)){
+      const data = JSON.parse(await file.text());
+      const rows = Array.isArray(data) ? data : [data];
+      const sheet = Array.isArray(rows[0])
+        ? XLSX.utils.aoa_to_sheet(rows)
+        : XLSX.utils.json_to_sheet(rows);
+      wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, sheet, 'Daten');
+    }else{
+      wb = XLSX.read(await file.arrayBuffer(), { type:'array' });
+    }
+    const sel = AK.$('#sheet');
+    sel.innerHTML = wb.SheetNames.map(n => `<option value="${AK.esc(n)}">${AK.esc(n)}</option>`).join('');
+    AK.$('#f-sheet').hidden = wb.SheetNames.length < 2;
+    AK.log(`${file.name} geladen (${wb.SheetNames.length} ${wb.SheetNames.length === 1 ? 'Blatt' : 'Blätter'}).`);
+    preview();
+  }catch(err){
+    console.error(err);
+    wb = null; preview();
+    AK.log('Datei kann nicht gelesen werden: ' + (err.message || 'unbekanntes Format'), true);
+  }
+}
+
+function currentSheet(){
+  return wb.Sheets[AK.$('#sheet').value || wb.SheetNames[0]];
+}
+
+function preview(){
+  const has = !!wb;
+  AK.$('#tablewrap').hidden = !has;
+  AK.$('#empty').style.display = has ? 'none' : '';
+  AK.$('#go').disabled = !has;
+  if(!has){ AK.$('#rowcount').innerHTML = '0<small>Zeilen</small>'; return; }
+
+  const rows = XLSX.utils.sheet_to_json(currentSheet(), { header:1, defval:'' });
+  AK.$('#rowcount').innerHTML = rows.length.toLocaleString('de-DE') + '<small>Zeilen</small>';
+
+  const MAXR = 100, MAXC = 30;
+  const table = AK.$('#table');
+  table.innerHTML = '';
+  rows.slice(0, MAXR).forEach((row, i) => {
+    const tr = document.createElement('tr');
+    row.slice(0, MAXC).forEach(cell => {
+      const el = document.createElement(i === 0 ? 'th' : 'td');
+      el.textContent = cell;
+      tr.appendChild(el);
+    });
+    table.appendChild(tr);
+  });
+  if(rows.length > MAXR) AK.log(`Vorschau zeigt die ersten ${MAXR} von ${rows.length} Zeilen — umgewandelt wird alles.`);
+}
+
+function run(){
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0.5);
+  const format = AK.$('#format').value;
+  const sheet = currentSheet();
+
+  try{
+    if(format === 'csv'){
+      const sep = AK.$('#sep').value === '\\t' ? '\t' : AK.$('#sep').value;
+      const csv = XLSX.utils.sheet_to_csv(sheet, { FS: sep });
+      AK.offerDownload(new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'}), fileBase + '.csv', '.csv herunterladen');
+    }else if(format === 'json'){
+      const json = JSON.stringify(XLSX.utils.sheet_to_json(sheet, { defval:null }), null, 2);
+      AK.offerDownload(new Blob([json], {type:'application/json;charset=utf-8'}), fileBase + '.json', '.json herunterladen');
+    }else{
+      const out = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(out, sheet, AK.$('#sheet').value || 'Daten');
+      const bytes = XLSX.write(out, { type:'array', bookType:'xlsx' });
+      AK.offerDownload(new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), fileBase + '.xlsx', '.xlsx herunterladen');
+    }
+    AK.bar(1); AK.log('Fertig.'); AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err.message || 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }
+}
+
+AK.$('#format').onchange = () => AK.$('#f-sep').style.display = AK.$('#format').value === 'csv' ? '' : 'none';
+AK.$('#sheet').onchange = preview;
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = run;
+</script>
+</body>
+</html>
