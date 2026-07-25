@@ -3,6 +3,15 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Messung statt Umbau, Doku)
+
+### Geprüft
+- **Web Worker waren nicht nötig.** Vor dem geplanten Umbau wurde gemessen, ob die Oberfläche überhaupt blockiert — sie tut es nicht: 120 Seiten komprimieren ergab als längste Blockade 103 ms, sechs 12-Megapixel-Fotos umwandeln 97 ms (spürbar wird es ab etwa 600 ms). Grund: pdf.js, ffmpeg, Texterkennung und Freistellen bringen jeweils eigene Stränge mit, `canvas.toBlob` kodiert nebenher, und die `await`-Punkte zwischen den Schritten geben die Oberfläche frei. Statt eines Umbaus ohne Nutzen sichert jetzt ein Testfall diesen Zustand dauerhaft ab.
+
+### Hinzugefügt
+- `vendor/VERSIONEN.md`: vollständige Übersicht aller mitgelieferten Bibliotheken mit Version, Lizenz und Verwendungszweck, dazu Hinweise zur jährlichen Aktualisierung und zur LGPL-Auslieferung von ffmpeg
+- `ideen.txt` aufgeräumt und neu gefüllt (u. a. Werkzeuge verketten, durchsuchbares PDF aus Texterkennung, EXIF anzeigen, Web Share Target, Deploy per GitHub Action)
+
 ## 2026-07-26 (Tests, Einstellungen, wichtiger Fehler behoben)
 
 ### Behoben
