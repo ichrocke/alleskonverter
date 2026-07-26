@@ -199,4 +199,18 @@ li[hidden]{display:none}
 .card .arrow{position:absolute;top:14px;right:14px;font-family:var(--mono);color:var(--ink-soft)}
 .card:hover .arrow{color:var(--stamp)}
 
+/* Stempel auf den Karten der Werkzeuge, die mit einem neuronalen Netz arbeiten.
+   Sitzt schräg über der unteren Kante, wie ein echter Gummistempel. Die Karte
+   bekommt dafür unten Luft, damit er nicht in den Text läuft. */
+.card.ki{padding-bottom:40px;overflow:hidden}
+.card .kistempel{
+  position:absolute;right:6px;bottom:4px;width:92px;
+  display:block;transform:rotate(-6deg);opacity:.88;pointer-events:none;
+}
+.card .kistempel img{display:block;width:100%;height:auto}
+.card:hover .kistempel{opacity:1}
+@media(max-width:420px){
+  .card .kistempel{width:100px}
+}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

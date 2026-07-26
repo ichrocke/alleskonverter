@@ -3,6 +3,18 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (FAQ-Seite und KI-Stempel)
+
+### Hinzugefügt
+- **Eigene FAQ-Seite** (`faq.html`) mit 43 Fragen in acht Bereichen: Grundsätzliches, Datenschutz, Beruflich & DSGVO, Künstliche Intelligenz, Technik & Offline, Dateien & Formate, Wenn etwas klemmt, Über das Projekt. Bisher standen die Antworten verstreut in 44 Erklärtexten und in der Datenschutzerklärung — Letztere ist juristisch formuliert und beantwortet damit genau die Fragen nicht, die Leute wirklich haben. Neu und vorher nirgends beantwortet sind unter anderem: „Wie kann ich das selbst überprüfen?“ (Flugmodus-Test, Netzwerk-Reiter, Quellcode), „Brauche ich einen Auftragsverarbeitungsvertrag?“ (nein — es gibt keinen Auftragsverarbeiter), „Kann ich damit Patientendaten bearbeiten?“ und „Wo ist der Haken?“.
+- Filterfeld mit Sofortsuche wie auf der Startseite, Sprungmarken zu jedem Bereich, und jede Frage ist über `#frage-N` direkt verlinkbar. Der Bereichsname zählt beim Suchen mit — wer „dsgvo“ tippt, findet auch die Fragen darunter, in denen das Wort selbst nicht vorkommt.
+- Das FAQ-Markup (JSON-LD) wird beim Bauen aus den tatsächlich auf der Seite stehenden Fragen erzeugt, damit Markup und sichtbarer Text nicht auseinanderlaufen können.
+- **Stempel „KI nur lokal“ auf den drei betroffenen Karten der Startseite.** Ein roter Gummistempel-Abdruck über der unteren Kante zeigt auf einen Blick, wo ein neuronales Netz arbeitet — und beantwortet die entscheidende Frage gleich mit. Wo kein Stempel ist, ist auch keine KI: 41 von 44 Werkzeugen. Der Stempel ist im FAQ eigens erklärt.
+- Die FAQ-Seite ist aus der Fußzeile aller 44 Werkzeugseiten, der Startseite, dem Impressum und der Datenschutzerklärung erreichbar und in Sitemap und Service-Worker eingetragen.
+
+### Geändert
+- Die Stempelvorlage aus `assets/` wurde für den Einsatz aufbereitet: „AI-Generated“-Etikett entfernt, leerer Rand weggeschnitten, auf 300 px skaliert und zusätzlich als WebP abgelegt (32 statt 573 KB).
+
 ## 2026-07-26 (KI-Aussage klargestellt)
 
 ### Hinzugefügt
