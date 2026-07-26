@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Planungsnotizen privat)
+
+### Geändert
+- **`ideen.txt` wird nicht mehr mitversioniert** und ist in `.gitignore` eingetragen — die Datei ist eine persönliche Planungsnotiz und bleibt lokal. Auf der Website war sie ohnehin nie: `deploy.sh` schließt sie seit dem ersten Deploy aus.
+- Der Verweis auf die Datei ist aus dem FAQ verschwunden. Die Aussage, dass die Seite weiterentwickelt wird, steht weiterhin dort — jetzt mit dem Hinweis auf die Änderungsliste als nachvollziehbare Quelle und der Einladung, sich Werkzeuge zu wünschen.
+- Ältere Changelog-Einträge nennen den Dateinamen nicht mehr; auf eine Datei zu verweisen, die es öffentlich nicht gibt, wäre nur verwirrend. Der Inhalt der Einträge bleibt unverändert.
+
 ## 2026-07-26 (Werkzeug 45: Subnetzrechner)
 
 ### Hinzugefügt
@@ -58,7 +65,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 - **Startseite neu gegliedert**: aus fünf Kategorien wurden sieben. „Extras“ war mit neun Werkzeugen zur Resterampe geworden — von der Passwort-Erzeugung bis zum Untertitel-Konverter stand dort alles, was sonst nirgends passte. Jetzt: PDF (12), Bilder (6), Dokumente & Text (7), Tabellen & Daten (3), Audio & Video (5), Web & Entwicklung (6), Alltag (5). Damit heißt jede Überschrift wieder etwas, und mit 44 Werkzeugen reichen Suche und Ausklappen weiterhin — Unterkategorien wären eine Ebene zu viel.
 - Verkettung und Dateierkennung um die neuen Werkzeuge erweitert: eine hineingezogene CSV schlägt jetzt auch „CSV bereinigen“ und „Vergleichen“ vor, eine EPUB das neue Lesewerkzeug, eine Markdown-Datei zusätzlich „Word-Datei erstellen“.
 - Links in den Erklärtexten waren bisher browserblau statt in der Hausfarbe (`css/tools.css`), und mehrzeilige Eingabefelder in der Seitenspalte nutzten die Breite nicht aus.
-- `ideen.txt` aufgeräumt und neu gefüllt
+- Ideenliste aufgeräumt und neu gefüllt
 
 ## 2026-07-26 (Verkettung, Tastatur, Wartung)
 
@@ -74,7 +81,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 ### Geändert (Wartung)
 - Bibliotheken gegen die Registry geprüft: mammoth und turndown aktualisiert. **pdf.js bleibt bewusst auf der letzten 3er-Fassung** — ab 4.0 gibt es nur noch ES-Module, was den Betrieb über `file://` beenden würde; Begründung in `vendor/VERSIONEN.md`, jährlich neu zu bewerten. **ffmpeg wurde zurückgerollt**, weil die neuere Fassung sich im Browser nicht mehr laden ließ.
 - **Texterkennung um 9,5 MB verschlankt**: Die beiden Kernfassungen ohne LSTM wurden entfernt — die verwendeten schnellen Sprachmodelle sind LSTM-only, die Dateien wurden also nie angefordert. Erkennung danach unverändert.
-- `ideen.txt` aufgeräumt und neu gefüllt
+- Ideenliste aufgeräumt und neu gefüllt
 
 ## 2026-07-26 (Werkzeug 36)
 
@@ -132,7 +139,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
 ### Hinzugefügt
 - `vendor/VERSIONEN.md`: vollständige Übersicht aller mitgelieferten Bibliotheken mit Version, Lizenz und Verwendungszweck, dazu Hinweise zur jährlichen Aktualisierung und zur LGPL-Auslieferung von ffmpeg
-- `ideen.txt` aufgeräumt und neu gefüllt (u. a. Werkzeuge verketten, durchsuchbares PDF aus Texterkennung, EXIF anzeigen, Web Share Target, Deploy per GitHub Action)
+- Ideenliste aufgeräumt und neu gefüllt (u. a. Werkzeuge verketten, durchsuchbares PDF aus Texterkennung, EXIF anzeigen, Web Share Target, Deploy per GitHub Action)
 
 ## 2026-07-26 (Tests, Einstellungen, wichtiger Fehler behoben)
 
@@ -220,7 +227,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 - `.htaccess`: `sw.js` vom Zwischenspeichern ausgenommen, damit Nutzer nie auf veralteter Logik festhängen
 
 ### Geändert
-- `ideen.txt` und README auf den aktuellen Stand gebracht (Erledigtes gestrichen, Anleitung zum Hinzufügen neuer Werkzeuge ergänzt)
+- Ideenliste und README auf den aktuellen Stand gebracht (Erledigtes gestrichen, Anleitung zum Hinzufügen neuer Werkzeuge ergänzt)
 
 ### Geprüft
 - Offline-Test gegen die Live-Seite: Service Worker aktiv (54 Dateien im Cache), bei abgeschaltetem Netz laden Startseite und Werkzeugseiten samt Gestaltung und Bibliotheken — zwei PDFs wurden ohne Internetverbindung erfolgreich zusammengefügt
@@ -283,13 +290,13 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 - ffmpeg wird jetzt selbst gehostet (`vendor/ffmpeg/`, ~32 MB) statt von jsDelivr geladen — die Website kontaktiert damit gar keine Drittserver mehr; Datenschutzerklärung (§ 5), README, Startseite und Medien-Werkzeug entsprechend angepasst. Das Medien-Werkzeug braucht dafür einen Webserver und zeigt bei `file://` einen Hinweis.
 
 ### Hinzugefügt (Deploy)
-- `deploy.sh`: lädt die Website per SFTP (lftp mirror, mit Löschabgleich) auf den Strato-Webspace; Zugangsdaten liegen in der git-ignorierten `.env`. Interne Dateien (README, CHANGELOG, ideen.txt, deploy.sh, .git) werden nicht mit hochgeladen. Erster Deploy ist erfolgt — Arbeitsablauf ist ab jetzt: Änderung → Changelog → Commit → Push → `./deploy.sh`
+- `deploy.sh`: lädt die Website per SFTP (lftp mirror, mit Löschabgleich) auf den Strato-Webspace; Zugangsdaten liegen in der git-ignorierten `.env`. Interne Dateien (README, CHANGELOG, Notizen, deploy.sh, .git) werden nicht mit hochgeladen. Erster Deploy ist erfolgt — Arbeitsablauf ist ab jetzt: Änderung → Changelog → Commit → Push → `./deploy.sh`
 
 ### Geändert (QR-Werkzeug)
 - QR-Seite neu aufgebaut: nur noch die Engine (js/, vendor/) aus QR Studio übernommen — die Seite selbst nutzt jetzt das Standard-Gerüst der Site (base.css-Kopf mit Zurück-Schaltfläche, Anton-Überschrift, Site-Footer, „Gut zu wissen“-FAQ wie bei allen Werkzeugen). Eigener App-Header, Theme-Umschalter und App-Footer entfernt, helles Papier-Theme fest eingestellt, Bedienelemente kantig statt rund. Das Ursprungsprojekt `sonstiges-qr` blieb unverändert (war nur kopiert worden).
 
 ### Geändert (Roadmap)
-- `ideen.txt` aktualisiert: erledigte Punkte (Livegang-Dateien, SEO-Ausbau, ffmpeg-Selbsthosting, QR-Code-Werkzeug) gestrichen, Search-Console-Punkt ergänzt
+- Ideenliste aktualisiert: erledigte Punkte (Livegang-Dateien, SEO-Ausbau, ffmpeg-Selbsthosting, QR-Code-Werkzeug) gestrichen, Search-Console-Punkt ergänzt
 
 ### Hinzugefügt (Werkzeug 13)
 - **QR-Code erstellen** (`tools/qr-code/`), portiert aus dem Projekt „QR Studio“: 12 QR-Typen (Link, WLAN, vCard, GiroCode …), Stile/Farben/Verläufe, Logos, Bild-im-Code (Halftone), Rahmen, PNG/SVG/JPEG/WebP-Export, Verlauf in localStorage. Design per `paper-theme.css` an den Papier-Look angepasst (hell und dunkel), Zurück-Schaltfläche und Rechtslinks ergänzt, SEO/OG-Metadaten gesetzt, Karte in neuer Hub-Kategorie „Extras“, Sitemap- und README-Eintrag; Datenschutzerklärung um localStorage-Hinweis ergänzt
@@ -306,7 +313,7 @@ Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 ## 2026-07-25 (dritter Wurf: Feinschliff)
 
 ### Hinzugefügt
-- `ideen.txt`: Roadmap mit Ideen für Livegang, SEO, neue Werkzeuge, PWA/Offline, Reichweite und Wartung
+- Ideenliste angelegt: Roadmap mit Ideen für Livegang, SEO, neue Werkzeuge, PWA/Offline, Reichweite und Wartung
 
 ### Behoben
 - „← Alle Werkzeuge“ auf den Unterseiten ist jetzt eine echte Schaltfläche mit großer Trefferfläche (vorher winziger 11-px-Textlink)

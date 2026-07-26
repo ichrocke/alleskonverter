@@ -1,3 +1,6 @@
 .DS_Store
 Thumbs.db
 .env
+
+# Persönliche Planungsnotizen — bleiben lokal
+ideen.txt
