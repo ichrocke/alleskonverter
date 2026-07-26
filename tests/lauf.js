@@ -328,6 +328,29 @@ const FAELLE = [
       const gruppen = await p.$$eval('#liste small', els => els.map(e => e.textContent));
       if(!gruppen.some(g => g.includes('2026'))) throw new Error('Gruppe fehlt: ' + gruppen.join('|'));
     } },
+  { werkzeug:'subnetz',
+    vorher: async p => {
+      await p.$eval('#ip', e => { e.value = '192.168.10.0/22'; e.dispatchEvent(new Event('input')); });
+      // Aus dem CIDR im Adressfeld muss die Präfixlänge übernommen werden
+      const pfx = await p.$eval('#praefix', e => e.value);
+      if(pfx !== '22') throw new Error('Präfix aus CIDR nicht übernommen: ' + pfx);
+      const werte = await p.$$eval('#werte .wert', els => els.map(e => e.textContent));
+      if(!werte.some(w => w.includes('255.255.252.0'))) throw new Error('Netzmaske falsch: ' + werte.join('|'));
+      if(!werte.some(w => w.includes('192.168.8.0/22'))) throw new Error('nicht auf Netzadresse gerundet: ' + werte.join('|'));
+      // Ausschluss rechnen lassen und gegen die erwartete Blockzahl prüfen
+      await p.click('#tab-ausschluss');
+      await p.$eval('#exeingabe', e => { e.value = '192.168.9.0/24'; });
+      await p.click('#exhinzu');
+      const rest = await p.$$eval('#exergebnis .netzkarte:not(.raus) .cidr', els => els.map(e => e.textContent));
+      // /24 aus /22 herausgeschnitten ergibt genau 2 Blöcke
+      if(rest.length !== 2) throw new Error('Rest: ' + JSON.stringify(rest));
+      if(!rest.includes('192.168.8.0/24') || !rest.includes('192.168.10.0/23'))
+        throw new Error('falsche Restblöcke: ' + JSON.stringify(rest));
+    },
+    pruefen: async p => {
+      const name = await p.$eval('a.download', e => e.getAttribute('download'));
+      if(!/^subnetze-192-168-8-0-22\.csv$/.test(name)) throw new Error('Dateiname: ' + name);
+    } },
   { werkzeug:'vergleichen',        kein_download:true,
     pruefen: async p => {
       await p.$eval('#a', e => { e.value = 'eins\nzwei\ndrei\n'; e.dispatchEvent(new Event('input')); });
@@ -410,6 +433,33 @@ async function randfaelle(browser){
    müsste bei einer eingefrorenen Seite große Lücken zeigen. Solange die
    schwere Arbeit in eigenen Strängen läuft (pdf.js, canvas.toBlob, ffmpeg,
    Texterkennung) und zwischen den Schritten pausiert wird, bleibt alles flüssig. */
+/* ---------- Seitenbreite auf dem Handy ----------
+   Eine Gitterzelle, die nicht schrumpfen kann (breite Tabelle, lange Zeile
+   ohne Umbruch), zieht die ganze Seite auseinander. Auf dem Rechner sieht man
+   davon nichts — deshalb wird jede Werkzeugseite bei 390 px nachgemessen. */
+async function handybreite(browser){
+  const seiten = fs.readdirSync(path.join(WURZEL, 'tools'))
+    .filter(n => fs.existsSync(path.join(WURZEL, 'tools', n, 'index.html')));
+  const page = await browser.newPage();
+  await page.setViewport({ width:390, height:840 });
+  const zuBreit = [];
+  for(const seite of ['', ...seiten.map(n => 'tools/' + n + '/')]){
+    try{
+      await page.goto(`http://localhost:${PORT}/${seite}`, { waitUntil:'load', timeout:45000 });
+      const mass = await page.evaluate(() => ({
+        dok: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+      if(mass.dok > mass.fenster + 1) zuBreit.push(`${seite || '/'} (${mass.dok} px)`);
+    }catch(err){ zuBreit.push(`${seite} — ${err.message.slice(0,40)}`); }
+  }
+  await page.close();
+  if(zuBreit.length){
+    console.log(`  FEHLT Seitenbreite bei 390 px — läuft über: ${zuBreit.join(', ').slice(0,160)}`);
+    return false;
+  }
+  console.log(`  ok    Seitenbreite bei 390 px (${seiten.length + 1} Seiten, kein Überlauf)`);
+  return true;
+}
+
 async function bedienbarkeit(browser){
   const page = await browser.newPage();
   const grenze = 600;   // ab hier merkt man ein Ruckeln deutlich
@@ -501,10 +551,11 @@ async function bedienbarkeit(browser){
 
   fehler += await randfaelle(browser);
   if(!await bedienbarkeit(browser)) fehler++;
+  if(!await handybreite(browser)) fehler++;
 
   await browser.close();
   srv.close();
-  const gesamt = FAELLE.length + 8;
+  const gesamt = FAELLE.length + 9;
   console.log(`\n${gesamt - fehler} von ${gesamt} Prüfungen in Ordnung.`);
   process.exit(fehler ? 1 : 0);
 })();

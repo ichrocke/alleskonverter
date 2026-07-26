@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subnetzrechner IPv4 — CIDR, Netzmaske, Subnetze aufteilen | Alleskonverter</title>
+<meta name="description" content="IPv4-Subnetze berechnen: Netzmaske, Broadcast, Hostbereich und CIDR. Netze in Teilnetze aufteilen, einzelne Bereiche ausschließen, als CSV speichern. Kostenlos, ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/subnetz/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Subnetzrechner IPv4 — CIDR, Netzmaske, Subnetze aufteilen | Alleskonverter">
+<meta property="og:description" content="IPv4-Subnetze berechnen, aufteilen und Bereiche ausschließen — mit CSV-Export. Kostenlos, ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/subnetz/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Subnetzrechner IPv4 — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Subnetzrechner — Alleskonverter","url":"https://alleskonverter.de/tools/subnetz/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"IPv4-Subnetze berechnen, in Teilnetze aufteilen und Bereiche ausschließen — mit CSV-Export, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Netzdaten übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Berechnung läuft vollständig in deinem Browser. Das ist hier durchaus relevant: Ein Adressplan verrät einiges über den inneren Aufbau eines Netzes und gehört nicht in ein fremdes Formular."}},{"@type":"Question","name":"Warum sind bei /24 nur 254 Hosts nutzbar und nicht 256?","acceptedAnswer":{"@type":"Answer","text":"Weil die erste Adresse das Netz selbst bezeichnet und die letzte die Broadcast-Adresse ist. Beide lassen sich keinem Gerät zuweisen, deshalb bleiben von 256 Adressen 254 übrig."}},{"@type":"Question","name":"Was bedeutet Netz ausschließen?","acceptedAnswer":{"@type":"Answer","text":"Du gibst ein Basisnetz an und einzelne Teilnetze, die schon vergeben sind. Berechnet wird die kleinstmögliche Liste von CIDR-Blöcken, die den gesamten Rest lückenlos und überschneidungsfrei abdeckt — nützlich für Firewall-Regeln und Routen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tabs button{padding:8px 13px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tabs button:hover{border-color:var(--ink)}
+.tabs button.active{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+
+/* Übersicht */
+.werte{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+@media(max-width:440px){.werte{grid-template-columns:1fr}}
+.wert{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:10px 12px}
+.wert b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:500;margin-bottom:3px}
+.wert span{font-family:var(--mono);font-size:15px;color:var(--ink);word-break:break-all}
+.wert.gross span{font-family:var(--display);font-size:24px;line-height:1.1;letter-spacing:.02em}
+.wert.betont{border-color:var(--stamp)}
+.wert.betont span{color:var(--stamp)}
+.binaer{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px 14px;margin-top:12px;
+  font-family:var(--mono);font-size:12.5px;line-height:2;overflow-x:auto;white-space:nowrap}
+.binaer i{font-style:normal;color:var(--ink-soft)}
+.binaer u{text-decoration:none;background:#CFE3D8;color:var(--stamp);font-weight:500}
+.binaer em{font-style:normal;background:#F1E2C8;color:var(--amber)}
+.binaer .zeile{display:flex;gap:12px;align-items:baseline}
+.binaer .zeile > i:first-child{display:inline-block;min-width:96px;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase}
+.merker{border-left:3px solid var(--stamp);background:var(--card);padding:9px 12px;margin-top:12px;
+  font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+.merker.warn{border-left-color:var(--amber)}
+
+/* Baum */
+.netzkarte{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);
+  border-left:4px solid var(--rule);padding:10px 12px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.knoten{margin-bottom:8px}
+.knoten.t0 > .netzkarte{border-left-color:var(--ink)}
+.knoten.t1 > .netzkarte{border-left-color:var(--stamp)}
+.knoten.t2 > .netzkarte{border-left-color:var(--amber)}
+.knoten.t3 > .netzkarte{border-left-color:var(--alert)}
+.kinder{margin-left:18px;padding-left:12px;border-left:1px dashed var(--rule);margin-top:8px}
+@media(max-width:520px){.kinder{margin-left:6px;padding-left:8px}}
+.zelle{min-width:0}
+.zelle b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:500}
+.zelle span{font-family:var(--mono);font-size:12.5px}
+.cidr{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--stamp);flex:0 0 auto}
+.knopfleiste{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.knopfleiste button{padding:5px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.knopfleiste button:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.knopfleiste button.weg:hover{background:var(--alert);border-color:var(--alert)}
+.teilform{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--paper);
+  border:1px dashed var(--stamp);padding:10px 12px;margin-top:8px}
+.teilform label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.teilform select{flex:1;min-width:200px}
+
+/* Ausschließen */
+.exliste{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.exzeile{display:flex;align-items:center;gap:10px;background:#F7E9E6;border:1px solid #D9B5AE;padding:6px 10px}
+.exzeile span{font-family:var(--mono);font-size:12.5px;color:var(--alert);flex:1}
+.exzeile button{background:none;border:0;color:var(--alert);font-family:var(--mono);font-size:11px;
+  text-decoration:underline;cursor:pointer;padding:2px 0}
+.gruppe{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);margin:18px 0 8px;display:flex;align-items:center;gap:10px}
+.gruppe::after{content:"";flex:1;height:1px;background:var(--rule)}
+.netzkarte.raus{background:#F7E9E6;border-color:#D9B5AE;border-left-color:var(--alert);opacity:.85}
+.netzkarte.raus .cidr{color:var(--alert)}
+.marke{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--alert);color:var(--alert);padding:0 5px;margin-left:8px;vertical-align:1px}
+.fehler{color:var(--alert);font-family:var(--mono);font-size:12px;margin-top:8px;min-height:1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Subnetz<span>rechner</span></h1>
+  <p class="sub">IPv4-Netze durchrechnen: Netzmaske, Broadcast und Hostbereich auf einen Blick, Netze in gleich große Teilnetze zerlegen und schon vergebene Bereiche ausschließen — mit CSV für die Dokumentation.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="tabs" role="tablist">
+      <button class="active" id="tab-uebersicht" role="tab" aria-selected="true">Übersicht</button>
+      <button id="tab-teilen" role="tab" aria-selected="false">Unterteilen</button>
+      <button id="tab-ausschluss" role="tab" aria-selected="false">Netz ausschließen</button>
+    </div>
+
+    <!-- Übersicht -->
+    <div id="b-uebersicht">
+      <h2>Das Netz im Überblick</h2>
+      <div class="werte" id="werte"></div>
+      <div class="binaer" id="binaer"></div>
+      <p class="merker" id="merker" hidden></p>
+    </div>
+
+    <!-- Unterteilen -->
+    <div id="b-teilen" hidden>
+      <h2>In Teilnetze zerlegen</h2>
+      <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 14px;max-width:70ch">
+        „Teilen“ zerlegt einen Block in gleich große Teilnetze. Die entstehenden Blöcke lassen sich
+        einzeln weiter zerlegen — so entsteht auch ein ungleichmäßiger Plan (VLSM).</p>
+      <div id="baum"></div>
+    </div>
+
+    <!-- Ausschließen -->
+    <div id="b-ausschluss" hidden>
+      <h2>Vergebene Netze ausschließen</h2>
+      <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 14px;max-width:70ch">
+        Trag ein, welche Teilnetze schon belegt sind. Berechnet wird die kürzestmögliche Liste von
+        CIDR-Blöcken, die den gesamten Rest lückenlos abdeckt — genau das, was man für Firewall-Regeln
+        und Routen braucht.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">
+        <input type="text" id="exeingabe" placeholder="192.168.1.0/24" aria-label="Teilnetz in CIDR-Schreibweise"
+          style="flex:1;min-width:190px;font-size:14px;padding:10px 12px">
+        <button id="exhinzu" style="padding:10px 16px">Hinzufügen</button>
+      </div>
+      <p class="fehler" id="exfehler"></p>
+      <div class="exliste" id="exliste"></div>
+      <div id="exergebnis"></div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Basisnetz</h2>
+    <div class="count" id="anzahl">0<small>nutzbare Hosts</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="ip">IP-Adresse oder CIDR</label>
+      <input type="text" id="ip" value="192.168.0.0" spellcheck="false" autocomplete="off"
+        placeholder="192.168.0.0 oder 10.0.0.0/8">
+    </div>
+
+    <div class="field">
+      <label for="praefix">Präfixlänge</label>
+      <select id="praefix"></select>
+    </div>
+
+    <div class="field">
+      <label>Häufige Netze</label>
+      <select id="vorlagen">
+        <option value="">— auswählen —</option>
+        <option value="192.168.0.0/24">192.168.0.0/24 — Heimnetz</option>
+        <option value="192.168.0.0/16">192.168.0.0/16 — privat, klein</option>
+        <option value="172.16.0.0/12">172.16.0.0/12 — privat, mittel</option>
+        <option value="10.0.0.0/8">10.0.0.0/8 — privat, groß</option>
+        <option value="10.0.0.0/16">10.0.0.0/16 — Standort</option>
+        <option value="100.64.0.0/10">100.64.0.0/10 — Carrier-NAT</option>
+        <option value="169.254.0.0/16">169.254.0.0/16 — APIPA</option>
+      </select>
+    </div>
+
+    <p class="fehler" id="fehler"></p>
+
+    <div class="field">
+      <label for="ausgabe">Speichern als</label>
+      <select id="ausgabe">
+        <option value="csv">CSV (Semikolon, für Excel)</option>
+        <option value="csv-komma">CSV (Komma)</option>
+        <option value="txt">Textliste (nur CIDR)</option>
+        <option value="json">JSON</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go">Liste herunterladen</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Der Klassiker unter den Netzwerkaufgaben: Ein Adressbereich soll auf Standorte, VLANs oder Kunden aufgeteilt werden, und am Ende muss die Rechnung stimmen. Dieses Werkzeug zeigt zu jedem Netz sofort Netzmaske, Broadcast und den nutzbaren Hostbereich, zerlegt Netze beliebig tief in Teilnetze und rechnet aus, was übrig bleibt, wenn bestimmte Bereiche schon vergeben sind. Das Ergebnis lässt sich als CSV für die Dokumentation speichern.</p>
+  <h3>Werden meine Netzdaten übertragen?</h3>
+  <p>Nein, gerechnet wird ausschließlich in deinem Browser. Das ist hier durchaus relevant: Ein Adressplan verrät viel über den inneren Aufbau eines Netzes — welche Standorte es gibt, wie groß sie sind, wo die Server stehen. Solche Angaben gehören nicht in ein Formular auf einer fremden Seite.</p>
+  <h3>Warum sind bei einem /24 nur 254 Hosts nutzbar?</h3>
+  <p>Weil die erste Adresse das Netz selbst bezeichnet und die letzte für den Broadcast reserviert ist. Beide lassen sich keinem Gerät zuweisen — von 256 Adressen bleiben also 254 übrig. Ausnahmen sind /31 und /32: Ein /31 wird nach RFC 3021 für Punkt-zu-Punkt-Verbindungen mit beiden Adressen genutzt, ein /32 bezeichnet eine einzelne Adresse, etwa eine Loopback-Adresse oder einen Host in einer Firewall-Regel.</p>
+  <h3>Was bedeutet „Netz ausschließen“?</h3>
+  <p>Angenommen, dir gehört 10.0.0.0/8, aber 10.5.0.0/16 und 10.20.0.0/16 sind bereits vergeben. Die Frage „was ist noch frei?“ von Hand zu beantworten ist mühsam und fehleranfällig. Das Werkzeug zerlegt das Basisnetz dafür so weit, dass die belegten Blöcke genau herausfallen, und gibt den Rest als möglichst wenige CIDR-Blöcke aus — lückenlos und überschneidungsfrei. Genau diese Liste braucht man für Firewall-Regeln, Routen und DHCP-Bereiche.</p>
+  <h3>Was ist der Unterschied zwischen /24 und 255.255.255.0?</h3>
+  <p>Nichts — es sind zwei Schreibweisen derselben Sache. Die Präfixlänge zählt, wie viele Bits von links den Netzanteil bilden; die Netzmaske schreibt dieselben Bits als Adresse aus. Beides wird hier nebeneinander angezeigt, dazu die Wildcard-Maske, die manche Systeme (etwa Cisco-Zugriffslisten) stattdessen erwarten.</p>
+  <h3>Rechnet das auch IPv6?</h3>
+  <p>Nein, nur IPv4. IPv6-Netze werden praktisch nie so knapp bemessen, dass sich das Rechnen lohnt — dort bekommt üblicherweise jedes Netz ein /64, und die Frage nach den nutzbaren Hosts stellt sich nicht mehr.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Beim Ausschließen wird das Basisnetz binär so lange halbiert, bis der belegte Block exakt herausfällt — dadurch ist das Ergebnis immer die kürzestmögliche Liste. Präfixlängen von /0 bis /32 werden gerechnet, das Unterteilen endet bei /30.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+/* ---------- IPv4-Rechnen: alles als vorzeichenlose 32-Bit-Zahl ---------- */
+function ipZuZahl(ip){
+  const t = ip.split('.');
+  if(t.length !== 4) return null;
+  const z = t.map(x => /^\d{1,3}$/.test(x.trim()) ? parseInt(x, 10) : NaN);
+  if(z.some(x => isNaN(x) || x < 0 || x > 255)) return null;
+  return ((z[0] << 24) | (z[1] << 16) | (z[2] << 8) | z[3]) >>> 0;
+}
+function zahlZuIp(n){
+  return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+}
+function maske(praefix){
+  return praefix === 0 ? 0 : (0xFFFFFFFF << (32 - praefix)) >>> 0;
+}
+function netzAdresse(ip, praefix){ return (ipZuZahl(ip) & maske(praefix)) >>> 0; }
+function broadcast(netz, praefix){ return (netz | (~maske(praefix) >>> 0)) >>> 0; }
+
+/* Adressen insgesamt — ab /0 wird 2^32 zu groß für 32-Bit-Schiebung */
+function adressen(praefix){ return Math.pow(2, 32 - praefix); }
+
+/* Nutzbare Hosts: /31 ist Punkt-zu-Punkt (RFC 3021), /32 eine einzelne Adresse */
+function hosts(praefix){
+  if(praefix >= 31) return praefix === 32 ? 1 : 2;
+  return adressen(praefix) - 2;
+}
+
+function netzInfo(netz, praefix){
+  const bc = broadcast(netz, praefix);
+  return {
+    cidr: zahlZuIp(netz) + '/' + praefix,
+    netz: zahlZuIp(netz),
+    broadcast: zahlZuIp(bc),
+    ersterHost: zahlZuIp(praefix >= 31 ? netz : netz + 1),
+    letzterHost: zahlZuIp(praefix >= 31 ? bc : bc - 1),
+    maske: zahlZuIp(maske(praefix)),
+    wildcard: zahlZuIp(~maske(praefix) >>> 0),
+    hosts: hosts(praefix),
+    adressen: adressen(praefix),
+    praefix, netzInt: netz,
+  };
+}
+
+function leseCidr(text){
+  const m = String(text).trim().match(/^(\d{1,3}(?:\.\d{1,3}){3})\s*\/\s*(\d{1,2})$/);
+  if(!m) return null;
+  const praefix = parseInt(m[2], 10);
+  if(praefix < 0 || praefix > 32) return null;
+  if(ipZuZahl(m[1]) === null) return null;
+  return {netzInt: netzAdresse(m[1], praefix), praefix};
+}
+
+/* Einordnung der Adresse — was den meisten Leuten beim Planen wirklich hilft */
+function einordnen(netz, praefix){
+  const bc = broadcast(netz, praefix);
+  const drin = (a, p) => netz >= netzAdresse(a, p) && bc <= broadcast(netzAdresse(a, p), p);
+  if(drin('10.0.0.0', 8) || drin('172.16.0.0', 12) || drin('192.168.0.0', 16))
+    return {art: 'privat', text: 'Privater Bereich nach RFC 1918 — im Internet nicht geroutet.'};
+  if(drin('127.0.0.0', 8))      return {art: 'sonder', text: 'Loopback-Bereich — verlässt das Gerät nie.'};
+  if(drin('169.254.0.0', 16))   return {art: 'sonder', text: 'APIPA: Adressen, die ein Gerät sich selbst gibt, wenn kein DHCP antwortet.'};
+  if(drin('100.64.0.0', 10))    return {art: 'sonder', text: 'Carrier-Grade-NAT nach RFC 6598 — für Provider-Netze, nicht für eigene.'};
+  if(drin('224.0.0.0', 4))      return {art: 'sonder', text: 'Multicast-Bereich — keine normalen Hosts.'};
+  if(drin('240.0.0.0', 4))      return {art: 'sonder', text: 'Reserviert (ehemals Klasse E) — nicht nutzbar.'};
+  if(drin('0.0.0.0', 8))        return {art: 'sonder', text: 'Reservierter Bereich „dieses Netz“.'};
+  if(drin('198.18.0.0', 15))    return {art: 'sonder', text: 'Reserviert für Messungen und Tests (RFC 2544).'};
+  if(drin('192.0.2.0', 24) || drin('198.51.100.0', 24) || drin('203.0.113.0', 24))
+    return {art: 'sonder', text: 'Dokumentationsbereich — ausdrücklich für Beispiele gedacht.'};
+  return {art: 'oeffentlich', text: 'Öffentlicher Bereich — solche Adressen werden vergeben und sind im Internet erreichbar.'};
+}
+
+/* ---------- Zustand ---------- */
+let knoten = {}, wurzelId = null, naechsteId = 0;
+let ausschluesse = [], restBloecke = [], blaetter = [];
+
+function neuerKnoten(netz, praefix, tiefe){
+  const id = 'k' + (naechsteId++);
+  knoten[id] = {id, netzInt: netz, praefix, tiefe, kinder: [], formOffen: false};
+  return id;
+}
+
+/* ---------- Übersicht ---------- */
+function bitsZeile(beschriftung, zahl, praefix, farbe){
+  const bits = (zahl >>> 0).toString(2).padStart(32, '0');
+  const oktette = bits.match(/.{8}/g);
+  let gesetzt = 0, teile = [];
+  for(const okt of oktette){
+    let s = '';
+    for(const bit of okt){
+      const netzteil = gesetzt < praefix;
+      s += netzteil ? `<${farbe}>${bit}</${farbe}>` : bit;
+      gesetzt++;
+    }
+    teile.push(s);
+  }
+  return `<div class="zeile"><i>${beschriftung}</i><span>${teile.join('<i>.</i>')}</span></div>`;
+}
+
+function zeigeUebersicht(info){
+  const e = einordnen(info.netzInt, info.praefix);
+  const werte = [
+    ['CIDR', info.cidr, 'betont'],
+    ['Netzmaske', info.maske, ''],
+    ['Wildcard-Maske', info.wildcard, ''],
+    ['Netzadresse', info.netz, ''],
+    ['Broadcast', info.praefix >= 31 ? '—' : info.broadcast, ''],
+    ['Erster Host', info.ersterHost, ''],
+    ['Letzter Host', info.letzterHost, ''],
+    ['Nutzbare Hosts', info.hosts.toLocaleString('de-DE'), 'gross'],
+    ['Adressen gesamt', info.adressen.toLocaleString('de-DE'), ''],
+    ['Adressbereich', info.netz + ' – ' + info.broadcast, ''],
+  ];
+  AK.$('#werte').innerHTML = werte.map(([b, w, kl]) =>
+    `<div class="wert ${kl}"><b>${b}</b><span>${AK.esc(w)}</span></div>`).join('');
+
+  AK.$('#binaer').innerHTML =
+    bitsZeile('Netzadresse', info.netzInt, info.praefix, 'u') +
+    bitsZeile('Netzmaske',  maske(info.praefix), info.praefix, 'u') +
+    (info.praefix < 31 ? bitsZeile('Broadcast', broadcast(info.netzInt, info.praefix), info.praefix, 'u') : '') +
+    `<div class="zeile" style="margin-top:6px"><i></i><span style="font-size:11px;color:var(--ink-soft)">` +
+    `<u style="padding:0 3px">grün</u> = Netzanteil (${info.praefix} Bit) · übrig = Hostanteil (${32 - info.praefix} Bit)</span></div>`;
+
+  const m = AK.$('#merker');
+  const zusatz = info.praefix === 31 ? ' Bei /31 gibt es nach RFC 3021 keine Netz- und Broadcast-Adresse — beide Adressen sind nutzbar.'
+    : info.praefix === 32 ? ' Ein /32 bezeichnet genau eine Adresse, etwa für eine Firewall-Regel oder eine Loopback-Adresse.'
+    : '';
+  m.hidden = false;
+  m.className = 'merker' + (e.art === 'sonder' ? ' warn' : '');
+  m.textContent = e.text + zusatz;
+
+  AK.$('#anzahl').innerHTML = info.hosts.toLocaleString('de-DE') +
+    `<small>${info.hosts === 1 ? 'nutzbare Adresse' : 'nutzbare Hosts'}</small>`;
+}
+
+/* ---------- Baum ---------- */
+function baumZeichnen(){
+  const ziel = AK.$('#baum');
+  ziel.innerHTML = '';
+  if(!wurzelId) return;
+  ziel.appendChild(knotenBauen(wurzelId));
+
+  blaetter = [];
+  (function sammeln(id){
+    const n = knoten[id];
+    if(!n.kinder.length) blaetter.push({netzInt: n.netzInt, praefix: n.praefix});
+    else n.kinder.forEach(sammeln);
+  })(wurzelId);
+}
+
+function zellen(info){
+  return `<div class="cidr">${info.cidr}</div>` +
+    `<div class="zelle"><b>Maske</b><span>${info.maske}</span></div>` +
+    `<div class="zelle"><b>Erster Host</b><span>${info.ersterHost}</span></div>` +
+    `<div class="zelle"><b>Letzter Host</b><span>${info.letzterHost}</span></div>` +
+    `<div class="zelle"><b>Broadcast</b><span>${info.praefix >= 31 ? '—' : info.broadcast}</span></div>` +
+    `<div class="zelle"><b>Hosts</b><span>${info.hosts.toLocaleString('de-DE')}</span></div>`;
+}
+
+function knotenBauen(id){
+  const n = knoten[id], info = netzInfo(n.netzInt, n.praefix), geteilt = n.kinder.length > 0;
+  const wrap = document.createElement('div');
+  wrap.className = 'knoten t' + Math.min(n.tiefe, 3);
+
+  const karte = document.createElement('div');
+  karte.className = 'netzkarte';
+  karte.innerHTML = zellen(info);
+  const leiste = document.createElement('div');
+  leiste.className = 'knopfleiste';
+  karte.appendChild(leiste);
+  wrap.appendChild(karte);
+
+  if(geteilt){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'weg'; b.textContent = 'Zurücksetzen';
+    b.onclick = () => {
+      (function loeschen(kid){
+        knoten[kid].kinder.forEach(loeschen);
+        if(kid !== id) delete knoten[kid];
+      })(id);
+      n.kinder = []; n.formOffen = false;
+      baumZeichnen();
+    };
+    leiste.appendChild(b);
+  }else if(n.praefix < 30){
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = n.formOffen ? 'Abbrechen' : 'Teilen';
+    b.onclick = () => { n.formOffen = !n.formOffen; baumZeichnen(); };
+    leiste.appendChild(b);
+  }
+
+  if(n.formOffen && !geteilt){
+    const form = document.createElement('div');
+    form.className = 'teilform';
+    let optionen = '';
+    for(let p = n.praefix + 1; p <= Math.min(30, n.praefix + 8); p++){
+      optionen += `<option value="${p}">/${p} → ${(1 << (p - n.praefix)).toLocaleString('de-DE')} Netze mit je ${hosts(p).toLocaleString('de-DE')} Hosts</option>`;
+    }
+    form.innerHTML = `<label for="w-${id}">Teilen in</label><select id="w-${id}">${optionen}</select>`;
+    const ok = document.createElement('button');
+    ok.type = 'button'; ok.textContent = 'Aufteilen';
+    ok.onclick = () => teilen(id, parseInt(AK.$('#w-' + id).value, 10));
+    const ab = document.createElement('button');
+    ab.type = 'button'; ab.textContent = 'Abbrechen';
+    ab.onclick = () => { n.formOffen = false; baumZeichnen(); };
+    const knoepfe = document.createElement('div');
+    knoepfe.className = 'knopfleiste';
+    knoepfe.style.marginLeft = '0';
+    knoepfe.append(ok, ab);
+    form.appendChild(knoepfe);
+    wrap.appendChild(form);
+  }
+
+  if(geteilt){
+    const kinder = document.createElement('div');
+    kinder.className = 'kinder';
+    n.kinder.forEach(kid => kinder.appendChild(knotenBauen(kid)));
+    wrap.appendChild(kinder);
+  }
+  return wrap;
+}
+
+function teilen(id, neuesPraefix){
+  const n = knoten[id];
+  if(neuesPraefix <= n.praefix || neuesPraefix > 30) return;
+  n.kinder = [];
+  const groesse = Math.pow(2, 32 - neuesPraefix);
+  const anzahl = Math.pow(2, 32 - n.praefix) / groesse;
+  if(anzahl > 4096){
+    AK.log(`So fein aufgeteilt wären es ${anzahl.toLocaleString('de-DE')} Netze — das würde die Seite unbenutzbar machen. Teile lieber schrittweise.`, true);
+    return;
+  }
+  for(let i = 0; i < anzahl; i++){
+    n.kinder.push(neuerKnoten((n.netzInt + i * groesse) >>> 0, neuesPraefix, n.tiefe + 1));
+  }
+  n.formOffen = false;
+  baumZeichnen();
+  AK.logClear();
+  AK.log(`In ${anzahl.toLocaleString('de-DE')} Teilnetze mit je /${neuesPraefix} zerlegt.`);
+}
+
+/* ---------- Ausschließen: binär halbieren, bis der Block herausfällt ---------- */
+function abziehen(bloecke, exInt, exPraefix){
+  const raus = [];
+  for(const b of bloecke){
+    const bBc = broadcast(b.netzInt, b.praefix), exBc = broadcast(exInt, exPraefix);
+    if(exInt > bBc || exBc < b.netzInt){ raus.push(b); continue; }      // keine Überschneidung
+    if(b.netzInt === exInt && b.praefix === exPraefix) continue;        // deckungsgleich → weg
+
+    let intNow = b.netzInt, praefixNow = b.praefix;
+    while(praefixNow < exPraefix){
+      const p = praefixNow + 1;
+      const haelfte = Math.pow(2, 32 - p);
+      const links = intNow, rechts = (intNow + haelfte) >>> 0;
+      if(exInt >= rechts){ raus.push({netzInt: links, praefix: p}); intNow = rechts; }
+      else               { raus.push({netzInt: rechts, praefix: p}); intNow = links; }
+      praefixNow = p;
+    }
+    // intNow/praefixNow entspricht jetzt dem ausgeschlossenen Block — nicht übernehmen
+  }
+  return raus;
+}
+
+function ausschlussHinzu(){
+  const feld = AK.$('#exeingabe'), fehler = AK.$('#exfehler');
+  const wert = feld.value.trim();
+  fehler.textContent = '';
+  if(!wert) return;
+
+  const gelesen = leseCidr(wert);
+  if(!gelesen){ fehler.textContent = 'Bitte in CIDR-Schreibweise angeben, z. B. 192.168.1.0/24.'; return; }
+
+  const w = knoten[wurzelId];
+  const {netzInt: exInt, praefix: exPraefix} = gelesen;
+  if(exPraefix <= w.praefix){
+    fehler.textContent = `Das Teilnetz muss kleiner sein als das Basisnetz (/${w.praefix}).`; return;
+  }
+  if(exInt < w.netzInt || broadcast(exInt, exPraefix) > broadcast(w.netzInt, w.praefix)){
+    fehler.textContent = 'Das Teilnetz liegt nicht vollständig im Basisnetz.'; return;
+  }
+  for(const ex of ausschluesse){
+    if(exInt <= broadcast(ex.netzInt, ex.praefix) && broadcast(exInt, exPraefix) >= ex.netzInt){
+      fehler.textContent = `Überschneidet sich mit ${ex.cidr}.`; return;
+    }
+  }
+
+  ausschluesse.push({netzInt: exInt, praefix: exPraefix, cidr: zahlZuIp(exInt) + '/' + exPraefix});
+  feld.value = '';
+  ausschlussZeichnen();
+}
+
+function ausschlussZeichnen(){
+  const liste = AK.$('#exliste');
+  liste.innerHTML = '';
+  ausschluesse.forEach((ex, i) => {
+    const z = document.createElement('div');
+    z.className = 'exzeile';
+    z.innerHTML = `<span>${ex.cidr}</span>`;
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = 'entfernen';
+    b.onclick = () => { ausschluesse.splice(i, 1); ausschlussZeichnen(); };
+    z.appendChild(b);
+    liste.appendChild(z);
+  });
+
+  const ziel = AK.$('#exergebnis');
+  ziel.innerHTML = '';
+  restBloecke = [];
+  if(!wurzelId || !ausschluesse.length){
+    ziel.innerHTML = '<p class="empty" style="margin-top:20px">Noch nichts ausgeschlossen — das ganze Basisnetz ist frei.</p>';
+    return;
+  }
+
+  const w = knoten[wurzelId];
+  let bloecke = [{netzInt: w.netzInt, praefix: w.praefix}];
+  for(const ex of ausschluesse) bloecke = abziehen(bloecke, ex.netzInt, ex.praefix);
+  bloecke.sort((a, b) => a.netzInt - b.netzInt);
+  restBloecke = bloecke;
+
+  const sortiert = [...ausschluesse].sort((a, b) => a.netzInt - b.netzInt);
+  ziel.insertAdjacentHTML('beforeend',
+    `<p class="gruppe">Ausgeschlossen (${sortiert.length})</p>`);
+  sortiert.forEach(ex => {
+    const info = netzInfo(ex.netzInt, ex.praefix);
+    ziel.insertAdjacentHTML('beforeend',
+      `<div class="netzkarte raus knoten" style="margin-bottom:8px">${zellen(info)
+        .replace('</div>', '<span class="marke">belegt</span></div>')}</div>`);
+  });
+
+  if(!bloecke.length){
+    ziel.insertAdjacentHTML('beforeend',
+      '<p class="gruppe">Verbleibend (0)</p><p class="empty">Das gesamte Basisnetz ist ausgeschlossen — es bleibt nichts übrig.</p>');
+    return;
+  }
+  const restHosts = bloecke.reduce((s, b) => s + hosts(b.praefix), 0);
+  ziel.insertAdjacentHTML('beforeend',
+    `<p class="gruppe">Verbleibend (${bloecke.length}) — ${restHosts.toLocaleString('de-DE')} Hosts</p>`);
+  bloecke.forEach(b => {
+    ziel.insertAdjacentHTML('beforeend',
+      `<div class="netzkarte knoten" style="margin-bottom:8px">${zellen(netzInfo(b.netzInt, b.praefix))}</div>`);
+  });
+}
+
+/* ---------- Berechnen ---------- */
+function berechnen(){
+  const fehler = AK.$('#fehler');
+  fehler.textContent = '';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+
+  let text = AK.$('#ip').value.trim();
+  let praefix = parseInt(AK.$('#praefix').value, 10);
+
+  // CIDR direkt im Adressfeld erlauben — spart einen Handgriff beim Einfügen
+  const alsCidr = leseCidr(text);
+  if(alsCidr){
+    praefix = alsCidr.praefix;
+    AK.$('#praefix').value = String(praefix);
+    AK.$('#ip').value = zahlZuIp(alsCidr.netzInt);
+    text = zahlZuIp(alsCidr.netzInt);
+  }
+  if(ipZuZahl(text) === null){
+    fehler.textContent = 'Das ist keine gültige IPv4-Adresse.';
+    return false;
+  }
+
+  const netz = netzAdresse(text, praefix);
+  const info = netzInfo(netz, praefix);
+  if(zahlZuIp(netz) !== text){
+    AK.log(`Auf die Netzadresse ${info.netz} gerundet — ${text} liegt innerhalb dieses Netzes.`);
+  }
+
+  knoten = {}; naechsteId = 0;
+  wurzelId = neuerKnoten(netz, praefix, 0);
+  ausschluesse = [];
+  AK.$('#exfehler').textContent = '';
+
+  zeigeUebersicht(info);
+  baumZeichnen();
+  ausschlussZeichnen();
+  return true;
+}
+
+/* ---------- Speichern ---------- */
+function zeilenFuerAusgabe(){
+  // Was gespeichert wird, richtet sich nach dem gerade sichtbaren Reiter
+  if(!AK.$('#b-ausschluss').hidden && restBloecke.length)
+    return {bloecke: restBloecke, was: 'verbleibende Netze'};
+  if(!AK.$('#b-teilen').hidden && blaetter.length > 1)
+    return {bloecke: blaetter, was: 'Teilnetze'};
+  const w = knoten[wurzelId];
+  return {bloecke: [{netzInt: w.netzInt, praefix: w.praefix}], was: 'Basisnetz'};
+}
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false); AK.logClear();
+  if(!wurzelId) return;
+  const {bloecke, was} = zeilenFuerAusgabe();
+  const format = AK.$('#ausgabe').value;
+  const w = netzInfo(knoten[wurzelId].netzInt, knoten[wurzelId].praefix);
+  const daten = bloecke.map(b => netzInfo(b.netzInt, b.praefix));
+  const name = 'subnetze-' + w.cidr.replace(/[./]/g, '-');
+  let blob, dateiname;
+
+  if(format === 'json'){
+    blob = new Blob([JSON.stringify({
+      basisnetz: w.cidr,
+      ausgeschlossen: ausschluesse.map(e => e.cidr),
+      netze: daten.map(d => ({cidr: d.cidr, netzadresse: d.netz, netzmaske: d.maske,
+        wildcard: d.wildcard, ersterHost: d.ersterHost, letzterHost: d.letzterHost,
+        broadcast: d.praefix >= 31 ? null : d.broadcast, hosts: d.hosts})),
+    }, null, 2)], {type: 'application/json;charset=utf-8'});
+    dateiname = name + '.json';
+  }else if(format === 'txt'){
+    blob = new Blob([daten.map(d => d.cidr).join('\n') + '\n'], {type: 'text/plain;charset=utf-8'});
+    dateiname = name + '.txt';
+  }else{
+    const t = format === 'csv-komma' ? ',' : ';';
+    const kopf = ['CIDR','Netzadresse','Netzmaske','Wildcard','Erster Host','Letzter Host','Broadcast','Hosts'];
+    const zeilen = daten.map(d => [d.cidr, d.netz, d.maske, d.wildcard, d.ersterHost, d.letzterHost,
+      d.praefix >= 31 ? '' : d.broadcast, d.hosts].join(t));
+    const kopfzeilen = [
+      '# Subnetzplan — erstellt mit alleskonverter.de',
+      '# Basisnetz: ' + w.cidr,
+      '# Ausgeschlossen: ' + (ausschluesse.map(e => e.cidr).join(' ') || '—'),
+      '# Netze: ' + daten.length,
+    ];
+    // BOM voran, damit Excel die Datei richtig öffnet
+    blob = new Blob(['﻿' + [...kopfzeilen, kopf.join(t), ...zeilen].join('\r\n') + '\r\n'],
+      {type: 'text/csv;charset=utf-8'});
+    dateiname = name + '.csv';
+  }
+  AK.offerDownload(blob, dateiname);
+  AK.log(`${daten.length.toLocaleString('de-DE')} ${was} gespeichert.`);
+  AK.stamp(true);
+};
+
+/* ---------- Bedienung ---------- */
+const praefixFeld = AK.$('#praefix');
+for(let p = 0; p <= 32; p++){
+  const o = document.createElement('option');
+  o.value = p;
+  o.textContent = '/' + p + '  —  ' + zahlZuIp(maske(p)) + '  —  ' +
+    hosts(p).toLocaleString('de-DE') + (hosts(p) === 1 ? ' Adresse' : ' Hosts');
+  if(p === 24) o.selected = true;
+  praefixFeld.appendChild(o);
+}
+
+function reiter(welcher){
+  const alle = ['uebersicht', 'teilen', 'ausschluss'];
+  alle.forEach(n => {
+    const knopf = AK.$('#tab-' + n);
+    knopf.classList.toggle('active', n === welcher);
+    knopf.setAttribute('aria-selected', String(n === welcher));
+    AK.$('#b-' + n).hidden = n !== welcher;
+  });
+  const beschriftung = welcher === 'ausschluss' ? 'Verbleibende Netze speichern'
+    : welcher === 'teilen' ? 'Teilnetze speichern' : 'Netz speichern';
+  AK.$('#go').textContent = beschriftung;
+}
+['uebersicht','teilen','ausschluss'].forEach(n => AK.$('#tab-' + n).onclick = () => reiter(n));
+
+AK.$('#ip').addEventListener('input', berechnen);
+AK.$('#praefix').addEventListener('change', berechnen);
+AK.$('#vorlagen').onchange = e => {
+  if(!e.target.value) return;
+  AK.$('#ip').value = e.target.value;
+  berechnen();
+  e.target.value = '';
+};
+AK.$('#exhinzu').onclick = ausschlussHinzu;
+AK.$('#exeingabe').addEventListener('keydown', e => { if(e.key === 'Enter') ausschlussHinzu(); });
+
+berechnen();
+reiter('uebersicht');
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

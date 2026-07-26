@@ -3,6 +3,23 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (Werkzeug 45: Subnetzrechner)
+
+### Hinzugefügt
+- Werkzeug **Subnetzrechner** (`tools/subnetz/`) — die Kernlogik stammt aus dem eigenen Projekt `work-subnetcalc`, Oberfläche und Speicherwege sind neu gebaut. Drei Betriebsarten:
+  - **Übersicht:** Netzmaske, Wildcard-Maske, Netz- und Broadcast-Adresse, Hostbereich, Adressenzahl — dazu die Bitdarstellung mit farblich abgesetztem Netzanteil und eine Einordnung der Adresse (privat nach RFC 1918, Loopback, APIPA, Carrier-NAT, Multicast, Dokumentationsbereich oder öffentlich).
+  - **Unterteilen:** Ein Netz in gleich große Teilnetze zerlegen, jeden Block einzeln weiter — so entsteht auch ein ungleichmäßiger Plan (VLSM). Die Verschachtelungstiefe ist an der Farbe der linken Kante ablesbar.
+  - **Netz ausschließen:** Belegte Teilnetze eintragen, heraus kommt die kürzestmögliche Liste von CIDR-Blöcken, die den Rest lückenlos abdeckt — die Liste, die man für Firewall-Regeln und Routen braucht.
+- Export als CSV (mit Kopfzeilen zum Basisnetz), CSV mit Komma, reine CIDR-Liste oder JSON. Präfixlängen von /0 bis /32, mit korrekter Behandlung von /31 (RFC 3021: beide Adressen nutzbar) und /32.
+- Ein CIDR lässt sich direkt ins Adressfeld einfügen — die Präfixlänge wird dann übernommen. Adressen, die nicht auf der Netzgrenze liegen, werden gerundet und das wird gesagt statt still gemacht.
+- **Neue Dauerprüfung „Seitenbreite bei 390 px“** in der Testsuite: Jede Seite wird in Handybreite geladen und nachgemessen, ob sie waagerecht überläuft. Die Suite umfasst jetzt 54 Prüfungen.
+
+### Behoben
+- **Gitterzellen konnten nicht schmaler werden als ihr Inhalt** (`css/tools.css`). Ohne `min-width:0` zieht eine breite Tabelle oder eine lange Zeile ohne Umbruch die ganze Seite auseinander, statt im eigenen Kasten zu scrollen. Aufgefallen ist das beim Subnetzrechner, dessen Bitdarstellung nicht umbrechen darf — betroffen waren latent aber alle Werkzeuge mit breiten Tabellen. Auf dem Rechner ist davon nichts zu sehen, deshalb die neue Dauerprüfung.
+
+### Geändert
+- Die Zählungen im FAQ auf 45 Werkzeuge angepasst (42 davon ohne KI).
+
 ## 2026-07-26 (FAQ-Seite und KI-Stempel)
 
 ### Hinzugefügt

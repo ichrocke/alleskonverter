@@ -71,6 +71,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Favicon-Generator](tools/favicon/index.html) | Alle Symbolgrößen, favicon.ico, Apple-Touch-Icon, Manifest und HTML-Schnipsel als ZIP |
 | [Farbwerte umrechnen](tools/farben/index.html) | HEX/RGB/HSL/CMYK, Pipette für Bilder, Abstufungen, WCAG-Kontrastprüfung |
 | [Regex ausprobieren](tools/regex/index.html) | Treffer live hervorgehoben, Gruppen aufgelistet, Erklärung auf Deutsch, Ersetzen |
+| [Subnetzrechner](tools/subnetz/index.html) | IPv4: Netzmaske, Broadcast, Hostbereich; Netze in Teilnetze zerlegen (VLSM), belegte Bereiche ausschließen, Export als CSV/JSON/Liste |
 | [Testdaten & Blindtext](tools/testdaten/index.html) | Lorem Ipsum in drei Sorten; Namen, Adressen, IBAN mit Prüfziffer als CSV/JSON/SQL |
 
 **Alltag**

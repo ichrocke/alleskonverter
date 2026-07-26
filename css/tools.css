@@ -3,6 +3,10 @@
 /* Zweispaltiges Arbeitslayout */
 .grid{display:grid;grid-template-columns:1fr 320px;gap:26px;align-items:start}
 @media(max-width:860px){.grid{grid-template-columns:1fr}}
+/* Ohne min-width:0 kann eine Gitterzelle nicht unter die Breite ihres Inhalts
+   schrumpfen — breite Tabellen und lange Zeilen würden dann die ganze Seite
+   auseinanderziehen, statt in ihrem eigenen Kasten zu scrollen. */
+.grid > *{min-width:0}
 
 /* Ablagefläche */
 .drop{
