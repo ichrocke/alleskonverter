@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-07-26 (KI-Aussage klargestellt)
+
+### Hinzugefügt
+- **Neues Argument auf der Startseite: „Deine Dateien trainieren keine KI.“** Anlass war die Nachfrage, ob die Seite ganz ohne KI auskommt. Das tut sie nicht — Hintergrund entfernen (U²-Net), Texterkennung und PDF durchsuchbar machen (Tesseract) arbeiten mit neuronalen Netzen. Ein Werbeversprechen „keine KI“ wäre also falsch gewesen, und ausgerechnet auf einer Seite, die mit Nachprüfbarkeit wirbt, wäre das der teuerste denkbare Fehler. Die zutreffende und für Besucher wichtigere Aussage ist: Es wird kein KI-Dienst angefragt, die Modelle liegen als Datei auf dieser Website und rechnen im Browser, und nichts fließt in ein Training ein.
+- **Datenschutzerklärung, neuer Abschnitt 6** („Künstliche Intelligenz: kein Dienst, kein Training“) — nennt die drei betroffenen Werkzeuge samt Modell beim Namen und hält fest, dass alle übrigen ganz ohne KI rechnen. Die folgenden Abschnitte wurden weitergezählt.
+- Die drei KI-Werkzeuge beantworten die Frage jetzt auch auf der eigenen Seite. Bisher stand dort nur „wird nicht hochgeladen“ — bei KI ist „wird nicht zum Training benutzt“ aber die Frage, die zuerst kommt. Bei Freistellen und Texterkennung wandert sie zusätzlich ins FAQ-Markup.
+
 ## 2026-07-26 (Acht Werkzeuge, LICENSE, neue Gliederung)
 
 ### Hinzugefügt
