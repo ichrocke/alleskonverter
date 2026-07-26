@@ -39,6 +39,19 @@ ul.stack{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:c
 .row .tools{display:flex;gap:4px;align-items:center;padding-right:2px}
 .rowextra{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
 .pw-hint{font-family:var(--mono);font-size:11px;color:var(--alert)}
+
+/* Hinweis auf den Werkzeugen, die mit einem neuronalen Netz arbeiten.
+   Bewusst auffällig, aber nicht in Alarmfarbe: Die Aussage ist eine
+   Entwarnung, keine Warnung. */
+.ki-hinweis{
+  border:1.5px solid var(--stamp);background:var(--card);box-shadow:var(--shadow);
+  padding:12px 15px;margin:0 0 24px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);
+}
+.ki-hinweis b{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--stamp);font-weight:500;margin-bottom:3px;
+}
+.ki-hinweis a{color:var(--stamp)}
 .empty{padding:26px 4px;color:var(--ink-soft);font-size:14px}
 
 /* Seitenkacheln (PDF bearbeiten / Bild-Vorschau) */
