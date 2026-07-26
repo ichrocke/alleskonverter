@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSV bereinigen: Spalten wählen, Duplikate entfernen, filtern — kostenlos | Alleskonverter</title>
+<meta name="description" content="CSV aufräumen ohne Excel: Spalten auswählen und sortieren, doppelte Zeilen entfernen, Zeilen filtern, Leerraum trimmen. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/csv-bereinigen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="CSV bereinigen: Spalten wählen, Duplikate entfernen, filtern | Alleskonverter">
+<meta property="og:description" content="CSV aufräumen ohne Excel: Spalten wählen, Duplikate entfernen, Zeilen filtern. Ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/csv-bereinigen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CSV bereinigen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"CSV bereinigen — Alleskonverter","url":"https://alleskonverter.de/tools/csv-bereinigen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"CSV-Dateien aufräumen: Spalten wählen, Duplikate entfernen, Zeilen filtern — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Wie groß darf die Datei sein?","acceptedAnswer":{"@type":"Answer","text":"Bis etwa 100.000 Zeilen läuft alles flüssig. Begrenzt wird das nur vom Arbeitsspeicher deines Geräts, nicht von einem Server-Limit."}},{"@type":"Question","name":"Warum zeigt Excel meine Umlaute falsch an?","acceptedAnswer":{"@type":"Answer","text":"Weil Excel CSV-Dateien ohne Kennung als Windows-1252 liest. Die hier erzeugte Datei bekommt eine UTF-8-Kennung (BOM), damit Excel sie richtig öffnet."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.spalten{border:1px solid var(--rule);background:var(--card);max-height:250px;overflow:auto;margin-top:8px}
+.spalten div{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--rule);
+  font-size:13.5px;cursor:grab}
+.spalten div:last-child{border-bottom:0}
+.spalten div.zieht{opacity:.4}
+.spalten div.ziel{border-top:2px solid var(--stamp)}
+.spalten input{width:auto;margin:0}
+.spalten .griff{color:#AAA;font-family:var(--mono);cursor:grab;user-select:none}
+.spalten .typ{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);
+  text-transform:uppercase;letter-spacing:.06em}
+.filter{border:1px solid var(--rule);background:var(--card);padding:9px;margin-bottom:7px}
+.filter .reihe{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.filter select,.filter input{margin:0;font-size:13px;padding:7px 8px}
+.filter .weg{background:none;border:0;color:var(--alert);font-size:12px;cursor:pointer;padding:2px 0;
+  font-family:var(--mono);text-decoration:underline}
+.zusatz{background:none;border:1px dashed var(--rule);color:var(--ink-soft);width:100%;padding:8px;
+  font-family:var(--mono);font-size:12px;cursor:pointer}
+.zusatz:hover{border-color:var(--stamp);color:var(--stamp)}
+.bilanz{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:10px;line-height:1.7}
+.bilanz b{color:var(--stamp);font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>CSV <span>bereinigen</span></h1>
+  <p class="sub">Spalten auswählen und in die richtige Reihenfolge bringen, doppelte Zeilen entfernen, nach Werten filtern und Leerraum trimmen — ohne dass die Datei je dein Gerät verlässt.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="CSV-Datei auswählen">
+      <strong>CSV, TSV oder Excel hineinziehen</strong>
+      <small>oder klicken zum Auswählen · auch mehrere Dateien nacheinander</small>
+    </div>
+    <input type="file" id="picker" hidden accept=".csv,.tsv,.txt,.xlsx,.xls,text/csv">
+
+    <h2 style="margin-top:22px">Vorschau</h2>
+    <div class="tablewrap" id="vorschau"><p class="empty">Noch keine Datei geladen.</p></div>
+    <p class="bilanz" id="bilanz"></p>
+  </section>
+
+  <aside>
+    <h2>Bereinigen</h2>
+    <div class="count" id="anzahl">0<small>Zeilen übrig</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label>Spalten <small style="text-transform:none;letter-spacing:0;color:var(--ink-soft)">— abwählen oder ziehen zum Sortieren</small></label>
+      <div class="spalten" id="spalten"><div style="color:var(--ink-soft);cursor:default">—</div></div>
+    </div>
+
+    <div class="field">
+      <label for="doppelt">Doppelte Zeilen</label>
+      <select id="doppelt">
+        <option value="">behalten</option>
+        <option value="*">entfernen (ganze Zeile identisch)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Zeilen filtern</label>
+      <div id="filterliste"></div>
+      <button class="zusatz" id="filterneu" type="button">+ Filter hinzufügen</button>
+    </div>
+
+    <div class="field" id="verknuepffeld" hidden>
+      <label for="verknuepfung">Filter verknüpfen</label>
+      <select id="verknuepfung">
+        <option value="und">alle müssen zutreffen (UND)</option>
+        <option value="oder">eine reicht (ODER)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Aufräumen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="trim" checked style="width:auto"> Leerraum am Zellenrand entfernen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="leerzeilen" checked style="width:auto"> komplett leere Zeilen entfernen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="leerspalten" style="width:auto"> komplett leere Spalten entfernen</label>
+    </div>
+
+    <div class="field">
+      <label for="format">Speichern als</label>
+      <select id="format">
+        <option value="csv">CSV (Semikolon, für Excel)</option>
+        <option value="csv-komma">CSV (Komma)</option>
+        <option value="tsv">TSV (Tabulator)</option>
+        <option value="xlsx">Excel (XLSX)</option>
+        <option value="json">JSON</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Bereinigt speichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>CSV-Exporte aus Shops, Newslettern und Buchhaltungsprogrammen sind selten so, wie man sie braucht: dreißig Spalten, von denen fünf interessieren, Adressen doppelt drin, Leerzeichen am Zeilenanfang, Testbestellungen dazwischen. Hier räumst du das in einem Durchgang auf — Spalten abwählen und per Ziehen sortieren, Duplikate entfernen, nach Werten filtern — und speicherst das Ergebnis als CSV, Excel oder JSON.</p>
+  <h3>Werden meine Dateien hochgeladen?</h3>
+  <p>Nein. Alles läuft in deinem Browser. Das ist bei CSV besonders wichtig, weil dort typischerweise Kundendaten, E-Mail-Adressen und Umsätze stehen — Daten, die man nicht auf einer beliebigen Webseite einwerfen sollte.</p>
+  <h3>Wie groß darf die Datei sein?</h3>
+  <p>Bis etwa 100.000 Zeilen läuft alles flüssig; die Vorschau zeigt aus Geschwindigkeitsgründen nur die ersten 200 Zeilen, gespeichert wird aber immer alles. Die Grenze setzt der Arbeitsspeicher deines Geräts, nicht ein Server-Limit.</p>
+  <h3>Welches Trennzeichen wird erkannt?</h3>
+  <p>Semikolon, Komma und Tabulator werden automatisch erkannt, ebenso Anführungszeichen um Felder mit Trennzeichen darin. Beim Speichern kannst du das Trennzeichen selbst wählen — Semikolon ist die richtige Wahl, wenn die Datei anschließend in ein deutsches Excel soll.</p>
+  <h3>Warum zeigt Excel meine Umlaute falsch an?</h3>
+  <p>Weil Excel eine CSV-Datei ohne Kennung als Windows-1252 statt UTF-8 liest, wodurch aus „Müller“ ein „MÃ¼ller“ wird. Die hier erzeugten Dateien bekommen deshalb eine UTF-8-Kennung (BOM) vorangestellt. Umgekehrt erkennt dieses Werkzeug auch eingelesene Windows-1252-Dateien und wandelt sie still um.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Beim Filtern werden Zahlen als Zahlen verglichen, sobald beide Seiten wie eine Zahl aussehen — „größer als 100“ macht also auch bei Textspalten das Richtige.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/xlsx.full.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+const VORSCHAU_ZEILEN = 200;
+let kopf = [], rumpf = [], dateiname = 'tabelle', reihenfolge = [], aktiv = new Set(), ergebnis = null;
+
+const OPERATOREN = {
+  'enthaelt':   ['enthält',              (z, w) => z.toLowerCase().includes(w.toLowerCase())],
+  'nichtent':   ['enthält nicht',        (z, w) => !z.toLowerCase().includes(w.toLowerCase())],
+  'gleich':     ['ist gleich',           (z, w) => vergleich(z, w) === 0],
+  'ungleich':   ['ist nicht gleich',     (z, w) => vergleich(z, w) !== 0],
+  'beginnt':    ['beginnt mit',          (z, w) => z.toLowerCase().startsWith(w.toLowerCase())],
+  'endet':      ['endet mit',            (z, w) => z.toLowerCase().endsWith(w.toLowerCase())],
+  'groesser':   ['ist größer als',       (z, w) => vergleich(z, w) > 0],
+  'kleiner':    ['ist kleiner als',      (z, w) => vergleich(z, w) < 0],
+  'leer':       ['ist leer',             z => z.trim() === ''],
+  'nichtleer':  ['ist nicht leer',       z => z.trim() !== ''],
+  'regex':      ['passt auf Regex',      (z, w) => { try{ return new RegExp(w, 'i').test(z); }catch(_){ return false; } }],
+};
+
+/* Zahlen als Zahlen vergleichen, sobald beide Seiten wie eine aussehen —
+   sonst wäre "9" größer als "100". Deutsches Komma wird mitgenommen. */
+function zahl(w){
+  const t = String(w).trim().replace(/\s/g,'').replace(/\.(?=\d{3}\b)/g,'').replace(',', '.');
+  return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null;
+}
+function vergleich(a, b){
+  const za = zahl(a), zb = zahl(b);
+  if(za !== null && zb !== null) return za - zb;
+  return String(a).localeCompare(String(b), 'de', {sensitivity:'base'});
+}
+
+/* ---------- Einlesen ---------- */
+async function addFiles(dateien){
+  const datei = dateien[0];
+  AK.logClear();
+  dateiname = datei.name.replace(/\.[^.]+$/, '');
+  try{
+    let grid;
+    if(/\.xlsx?$/i.test(datei.name)){
+      const wb = XLSX.read(await datei.arrayBuffer(), {type:'array'});
+      grid = raster(wb.Sheets[wb.SheetNames[0]]);
+      if(wb.SheetNames.length > 1) AK.log(`Nur das erste Blatt („${wb.SheetNames[0]}“) wurde gelesen.`);
+    }else{
+      const text = await leseText(datei);
+      const wb = XLSX.read(text, {type:'string', raw:true, FS:trennerRaten(text)});
+      grid = raster(wb.Sheets[wb.SheetNames[0]]);
+    }
+    if(!grid.length) throw new Error('Die Datei enthält keine Daten.');
+    kopf = grid[0].map((c, i) => String(c).trim() || 'Spalte ' + (i + 1));
+    rumpf = grid.slice(1);
+    reihenfolge = kopf.map((_, i) => i);
+    aktiv = new Set(reihenfolge);
+    spaltenlisteBauen();
+    filterSpaltenFuellen();
+    doppeltFuellen();
+    AK.log(`„${datei.name}“ gelesen: ${rumpf.length.toLocaleString('de-DE')} Zeilen, ${kopf.length} Spalten.`);
+    rechnen();
+  }catch(err){
+    AK.log('Datei konnte nicht gelesen werden: ' + err.message, true);
+  }
+}
+window.addFiles = addFiles;
+
+function raster(blatt){
+  return XLSX.utils.sheet_to_json(blatt, {header:1, defval:'', blankrows:true})
+    .map(r => r.map(c => c === null || c === undefined ? '' : String(c)));
+}
+
+function trennerRaten(text){
+  const probe = text.split(/\r?\n/).slice(0, 20).join('\n');
+  const zaehl = t => (probe.split(t).length - 1);
+  const kandidaten = [[';', zaehl(';')], [',', zaehl(',')], ['\t', zaehl('\t')]];
+  kandidaten.sort((a, b) => b[1] - a[1]);
+  return kandidaten[0][1] > 0 ? kandidaten[0][0] : ';';
+}
+
+/* UTF-8 mit Rückfall auf Windows-1252 — sonst wird aus „Müller“ ein „MÃ¼ller“ */
+async function leseText(datei){
+  const buf = await datei.arrayBuffer();
+  try{ return new TextDecoder('utf-8', {fatal:true}).decode(buf); }
+  catch(_){ AK.log('Datei ist nicht UTF-8 — als Windows-1252 gelesen.'); return new TextDecoder('windows-1252').decode(buf); }
+}
+
+/* ---------- Spaltenliste mit Ziehen ---------- */
+function spaltenlisteBauen(){
+  const wrap = AK.$('#spalten');
+  wrap.innerHTML = '';
+  reihenfolge.forEach(idx => {
+    const d = document.createElement('div');
+    d.draggable = true;
+    d.dataset.idx = idx;
+    const zahlen = rumpf.filter(r => (r[idx] ?? '') !== '').every(r => zahl(r[idx]) !== null);
+    const gefuellt = rumpf.some(r => (r[idx] ?? '').trim() !== '');
+    d.innerHTML = `<span class="griff" aria-hidden="true">⠿</span>
+      <input type="checkbox" ${aktiv.has(idx) ? 'checked' : ''} id="sp${idx}">
+      <label for="sp${idx}" style="cursor:pointer;flex:1;text-transform:none;letter-spacing:0;margin:0;font-size:13.5px;color:var(--ink)">${AK.esc(kopf[idx])}</label>
+      <span class="typ">${!gefuellt ? 'leer' : zahlen ? 'Zahl' : 'Text'}</span>`;
+    d.querySelector('input').onchange = e => {
+      if(e.target.checked) aktiv.add(idx); else aktiv.delete(idx);
+      rechnen();
+    };
+    d.addEventListener('dragstart', e => {
+      d.classList.add('zieht');
+      e.dataTransfer.setData('text/plain', String(idx));
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    d.addEventListener('dragend', () => {
+      d.classList.remove('zieht');
+      AK.$$('.spalten div').forEach(x => x.classList.remove('ziel'));
+    });
+    d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('ziel'); });
+    d.addEventListener('dragleave', () => d.classList.remove('ziel'));
+    d.addEventListener('drop', e => {
+      e.preventDefault();
+      const von = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      if(von === idx) return;
+      const alt = reihenfolge.indexOf(von), neu = reihenfolge.indexOf(idx);
+      reihenfolge.splice(alt, 1);
+      reihenfolge.splice(neu, 0, von);
+      spaltenlisteBauen();
+      rechnen();
+    });
+    wrap.appendChild(d);
+  });
+}
+
+function doppeltFuellen(){
+  const sel = AK.$('#doppelt');
+  const vorher = sel.value;
+  sel.innerHTML = '<option value="">behalten</option><option value="*">entfernen (ganze Zeile identisch)</option>';
+  kopf.forEach((k, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = 'entfernen (gleich in „' + k + '“)';
+    sel.appendChild(o);
+  });
+  sel.value = vorher;
+}
+
+/* ---------- Filter ---------- */
+function filterNeu(){
+  const box = document.createElement('div');
+  box.className = 'filter';
+  box.innerHTML = `
+    <div class="reihe">
+      <select class="fspalte" aria-label="Spalte"></select>
+      <select class="fop" aria-label="Bedingung">${
+        Object.entries(OPERATOREN).map(([k, v]) => `<option value="${k}">${v[0]}</option>`).join('')}</select>
+    </div>
+    <input type="text" class="fwert" placeholder="Wert" aria-label="Vergleichswert">
+    <button class="weg" type="button">entfernen</button>`;
+  box.querySelector('.weg').onclick = () => { box.remove(); filterZahl(); rechnen(); };
+  box.querySelectorAll('select, input').forEach(el => el.addEventListener('input', () => {
+    const op = box.querySelector('.fop').value;
+    box.querySelector('.fwert').hidden = op === 'leer' || op === 'nichtleer';
+    rechnen();
+  }));
+  AK.$('#filterliste').appendChild(box);
+  filterSpaltenFuellen();
+  filterZahl();
+}
+
+function filterSpaltenFuellen(){
+  AK.$$('#filterliste .fspalte').forEach(sel => {
+    const vorher = sel.value;
+    sel.innerHTML = kopf.map((k, i) => `<option value="${i}">${AK.esc(k)}</option>`).join('');
+    if(vorher !== '') sel.value = vorher;
+  });
+}
+
+function filterZahl(){
+  AK.$('#verknuepffeld').hidden = AK.$$('#filterliste .filter').length < 2;
+}
+
+function filterLesen(){
+  return AK.$$('#filterliste .filter').map(box => ({
+    spalte: parseInt(box.querySelector('.fspalte').value, 10),
+    op:     box.querySelector('.fop').value,
+    wert:   box.querySelector('.fwert').value,
+  })).filter(f => !isNaN(f.spalte));
+}
+
+/* ---------- Rechnen ---------- */
+function rechnen(){
+  if(!kopf.length) return;
+  const trim = AK.$('#trim').checked;
+  const zeilen = rumpf.map(r => kopf.map((_, i) => {
+    const v = r[i] ?? '';
+    return trim ? String(v).trim() : String(v);
+  }));
+
+  const bilanz = {gelesen: zeilen.length, leer: 0, gefiltert: 0, doppelt: 0};
+  let uebrig = zeilen;
+
+  if(AK.$('#leerzeilen').checked){
+    const vor = uebrig.length;
+    uebrig = uebrig.filter(r => r.some(c => c.trim() !== ''));
+    bilanz.leer = vor - uebrig.length;
+  }
+
+  const filter = filterLesen();
+  if(filter.length){
+    const oder = AK.$('#verknuepfung').value === 'oder';
+    const vor = uebrig.length;
+    uebrig = uebrig.filter(r => {
+      const treffer = filter.map(f => {
+        const pruef = OPERATOREN[f.op][1];
+        try{ return !!pruef(r[f.spalte] ?? '', f.wert); }catch(_){ return false; }
+      });
+      return oder ? treffer.some(Boolean) : treffer.every(Boolean);
+    });
+    bilanz.gefiltert = vor - uebrig.length;
+  }
+
+  const dop = AK.$('#doppelt').value;
+  if(dop !== ''){
+    const gesehen = new Set();
+    const vor = uebrig.length;
+    uebrig = uebrig.filter(r => {
+      const s = dop === '*' ? JSON.stringify(spaltenAuswahl(r)) : (r[parseInt(dop, 10)] ?? '').toLowerCase();
+      if(gesehen.has(s)) return false;
+      gesehen.add(s);
+      return true;
+    });
+    bilanz.doppelt = vor - uebrig.length;
+  }
+
+  // Spalten in gewählter Reihenfolge, abgewählte fallen weg
+  let spaltenIdx = reihenfolge.filter(i => aktiv.has(i));
+  if(AK.$('#leerspalten').checked){
+    spaltenIdx = spaltenIdx.filter(i => uebrig.some(r => (r[i] ?? '').trim() !== ''));
+  }
+  const ausKopf = spaltenIdx.map(i => kopf[i]);
+  const ausZeilen = uebrig.map(r => spaltenIdx.map(i => r[i] ?? ''));
+
+  ergebnis = {kopf: ausKopf, zeilen: ausZeilen};
+  vorschauZeigen(ausKopf, ausZeilen);
+
+  AK.$('#anzahl').innerHTML = ausZeilen.length.toLocaleString('de-DE') +
+    `<small>${ausZeilen.length === 1 ? 'Zeile übrig' : 'Zeilen übrig'}</small>`;
+  AK.$('#go').disabled = !ausZeilen.length && !ausKopf.length;
+
+  const teile = [`<b>${bilanz.gelesen.toLocaleString('de-DE')}</b> Zeilen gelesen`];
+  if(bilanz.leer)      teile.push(`<b>${bilanz.leer.toLocaleString('de-DE')}</b> leer entfernt`);
+  if(bilanz.gefiltert) teile.push(`<b>${bilanz.gefiltert.toLocaleString('de-DE')}</b> weggefiltert`);
+  if(bilanz.doppelt)   teile.push(`<b>${bilanz.doppelt.toLocaleString('de-DE')}</b> doppelt entfernt`);
+  const wegSpalten = kopf.length - ausKopf.length;
+  if(wegSpalten > 0) teile.push(`<b>${wegSpalten}</b> ${wegSpalten === 1 ? 'Spalte' : 'Spalten'} entfernt`);
+  teile.push(`bleibt <b>${ausZeilen.length.toLocaleString('de-DE')} × ${ausKopf.length}</b>`);
+  AK.$('#bilanz').innerHTML = teile.join(' · ');
+}
+
+function spaltenAuswahl(r){
+  return reihenfolge.filter(i => aktiv.has(i)).map(i => (r[i] ?? '').toLowerCase());
+}
+
+function vorschauZeigen(k, z){
+  const wrap = AK.$('#vorschau');
+  if(!k.length){ wrap.innerHTML = '<p class="empty">Keine Spalte ausgewählt.</p>'; return; }
+  const teil = z.slice(0, VORSCHAU_ZEILEN);
+  wrap.innerHTML = '<table><thead><tr>' + k.map(c => `<th>${AK.esc(c)}</th>`).join('') +
+    '</tr></thead><tbody>' +
+    teil.map(r => '<tr>' + r.map(c => `<td>${AK.esc(c)}</td>`).join('') + '</tr>').join('') +
+    '</tbody></table>' +
+    (z.length > teil.length
+      ? `<p class="empty" style="text-align:left;padding:8px 4px">… und ${(z.length - teil.length).toLocaleString('de-DE')} weitere Zeilen (werden mitgespeichert)</p>`
+      : '');
+}
+
+/* ---------- Speichern ---------- */
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const format = AK.$('#format').value;
+  const aoa = [ergebnis.kopf, ...ergebnis.zeilen];
+  const blatt = XLSX.utils.aoa_to_sheet(aoa);
+  let blob, name;
+  if(format === 'xlsx'){
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, blatt, 'Daten');
+    const buf = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+    blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    name = dateiname + '-bereinigt.xlsx';
+  }else if(format === 'json'){
+    const objekte = ergebnis.zeilen.map(r => Object.fromEntries(ergebnis.kopf.map((k, i) => [k, r[i]])));
+    blob = new Blob([JSON.stringify(objekte, null, 2)], {type:'application/json;charset=utf-8'});
+    name = dateiname + '-bereinigt.json';
+  }else{
+    const fs = format === 'tsv' ? '\t' : format === 'csv-komma' ? ',' : ';';
+    // BOM voran, damit Excel die Umlaute richtig liest
+    blob = new Blob(['﻿' + XLSX.utils.sheet_to_csv(blatt, {FS: fs})],
+      {type:'text/csv;charset=utf-8'});
+    name = dateiname + '-bereinigt.' + (format === 'tsv' ? 'tsv' : 'csv');
+  }
+  AK.offerDownload(blob, name);
+  AK.log(`Gespeichert: ${ergebnis.zeilen.length.toLocaleString('de-DE')} Zeilen, ${ergebnis.kopf.length} Spalten.`);
+  AK.stamp(true);
+};
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#filterneu').onclick = filterNeu;
+['#doppelt','#verknuepfung','#trim','#leerzeilen','#leerspalten']
+  .forEach(s => AK.$(s).addEventListener('change', rechnen));
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

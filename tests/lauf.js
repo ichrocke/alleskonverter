@@ -105,15 +105,8 @@ const SRT  = Buffer.from('1\n00:00:01,000 --> 00:00:03,500\nErster Untertitel\n'
 const TXT  = Buffer.from('Hallo Welt mit Umlauten: äöü\n', 'utf8').toString('base64');
 const JSON_B64 = Buffer.from('{"b":2,"a":{"z":1,"y":[3,4]}}', 'utf8').toString('base64');
 
-/* docx: kleinstmögliches gültiges Dokument */
-function docx(){
-  const zlib = require('zlib');
-  const dateien = [
-    ['[Content_Types].xml', '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
-    ['_rels/.rels', '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
-    ['word/document.xml', '<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Testdokument mit Umlauten äöü</w:t></w:r></w:p></w:body></w:document>'],
-  ];
-  // ZIP ohne Kompression von Hand
+/* ZIP ohne Kompression von Hand — Grundlage für die DOCX- und EPUB-Testdateien */
+function zipBauen(dateien){
   const lokale = [], zentrale = []; let offset = 0;
   function crc32(buf){
     let c, t = [];
@@ -142,6 +135,46 @@ function docx(){
   return Buffer.concat([lBuf, zBuf, ende]).toString('base64');
 }
 
+/* docx: kleinstmögliches gültiges Dokument */
+function docx(){
+  return zipBauen([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
+    ['_rels/.rels', '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+    ['word/document.xml', '<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Testdokument mit Umlauten äöü</w:t></w:r></w:p></w:body></w:document>'],
+  ]);
+}
+
+/* epub: EPUB 3 mit zwei Kapiteln und Navigationsdatei */
+function epub(){
+  const kapitel = n => `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Kapitel ${n}</title></head>
+<body><h1>Kapitel ${n}</h1><p>Text des ${n}. Kapitels mit Umlauten: Größe, Straße.</p></body></html>`;
+  return zipBauen([
+    ['mimetype', 'application/epub+zip'],
+    ['META-INF/container.xml', '<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/inhalt.opf" media-type="application/oebps-package+xml"/></rootfiles></container>'],
+    ['OEBPS/inhalt.opf', `<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="id">
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:identifier id="id">urn:uuid:test-1234</dc:identifier>
+<dc:title>Testbuch mit Umlauten</dc:title>
+<dc:creator>Marc Schüßler</dc:creator>
+<dc:language>de</dc:language>
+</metadata>
+<manifest>
+<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+<item id="k1" href="k1.xhtml" media-type="application/xhtml+xml"/>
+<item id="k2" href="k2.xhtml" media-type="application/xhtml+xml"/>
+</manifest>
+<spine><itemref idref="k1"/><itemref idref="k2"/></spine>
+</package>`],
+    ['OEBPS/nav.xhtml', `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"><head><title>Inhalt</title></head>
+<body><nav epub:type="toc"><ol><li><a href="k1.xhtml">Kapitel 1</a></li><li><a href="k2.xhtml">Kapitel 2</a></li></ol></nav></body></html>`],
+    ['OEBPS/k1.xhtml', kapitel(1)],
+    ['OEBPS/k2.xhtml', kapitel(2)],
+  ]);
+}
+
 /* ---------- Was wird geprüft ---------- */
 const PDF3 = pdf(3, 'Seite');
 /* PDF mit Formularfeldern — mit pdf-lib aus dem Projekt erzeugt */
@@ -160,6 +193,7 @@ function formularPdf(){
   })();
 }
 const PNG  = png();
+const EPUB = epub();
 
 const FAELLE = [
   { werkzeug:'pdf-zusammenfuegen', dateien:[['a.pdf', PDF3, 'application/pdf'], ['b.pdf', PDF3, 'application/pdf']] },
@@ -236,6 +270,72 @@ const FAELLE = [
       await p.waitForSelector('#typeForm input', {timeout:15000});
       await p.type('#typeForm input', 'https://alleskonverter.de');
       await p.waitForFunction(() => !!document.querySelector('#qrPreview canvas, #qrPreview svg'), {timeout:15000});
+    } },
+
+  { werkzeug:'epub',               dateien:[['buch.epub', EPUB, 'application/epub+zip']],
+    pruefen: async p => {
+      const titel = await p.$eval('#kopfzeile h3', e => e.textContent);
+      if(!titel.includes('Testbuch')) throw new Error('Titel nicht gelesen: ' + titel);
+      const kapitel = await p.$$eval('#inhalt button', els => els.length);
+      if(kapitel !== 2) throw new Error('Inhaltsverzeichnis hat ' + kapitel + ' statt 2 Einträge');
+    } },
+  { werkzeug:'csv-bereinigen',     dateien:[['t.csv', CSV, 'text/csv']],
+    vorher: async p => {
+      // Umlaute müssen die CSV-Erkennung überleben
+      const zellen = await p.$$eval('#vorschau td', els => els.map(e => e.textContent));
+      if(!zellen.includes('Müller')) throw new Error('Umlaute zerlegt: ' + zellen.join('|'));
+    } },
+  { werkzeug:'word-erstellen',     kein_download:false,
+    vorher: async p => {
+      await p.$eval('#quelle', e => { e.value = '# Titel\n\nEin **Test** mit Umlauten: Größe.\n\n- eins\n- zwei\n'; e.dispatchEvent(new Event('input')); });
+    } },
+  { werkzeug:'bildergalerie',      dateien:[['b.png', PNG, 'image/png'], ['c.png', PNG, 'image/png']],
+    pruefen: async p => {
+      const quelle = await p.$eval('#quelle', e => e.textContent);
+      if(!/ak-galerie/.test(quelle)) throw new Error('kein Galerie-HTML erzeugt');
+    } },
+  { werkzeug:'termin',
+    pruefen: async p => {
+      const ics = await p.$eval('#quelle', e => e.textContent);
+      if(!/^BEGIN:VCALENDAR/.test(ics)) throw new Error('kein VCALENDAR');
+      if(!/DTSTART;TZID=Europe\/Berlin:\d{8}T\d{6}/.test(ics)) throw new Error('DTSTART fehlt oder falsch');
+      // Zeilen dürfen 75 Oktette nicht überschreiten (RFC 5545)
+      const zulang = ics.split('\r\n').find(z => Buffer.byteLength(z, 'utf8') > 75);
+      if(zulang) throw new Error('Zeile zu lang: ' + zulang.slice(0, 40));
+    } },
+  { werkzeug:'testdaten',
+    vorher: async p => {
+      await p.$eval('#seed', e => { e.value = 'test'; e.dispatchEvent(new Event('input')); });
+      await p.click('#tab-daten');
+      await p.$eval('#f-iban', e => { if(!e.checked) e.click(); });
+    },
+    pruefen: async p => {
+      const ibans = await p.$$eval('#tabellenvorschau tbody tr td:last-child', els => els.map(e => e.textContent));
+      const mod97 = t => { let r = 0; for(const c of t) r = (r * 10 + parseInt(c, 10)) % 97; return r; };
+      for(const roh of ibans){
+        const s = roh.replace(/ /g, '');
+        if(!/^DE\d{20}$/.test(s)) throw new Error('keine IBAN: ' + roh);
+        if(mod97(s.slice(4) + '1314' + s.slice(2, 4)) !== 1) throw new Error('Prüfziffer falsch: ' + roh);
+      }
+      if(!ibans.length) throw new Error('keine Datensätze erzeugt');
+    } },
+  { werkzeug:'regex',              kein_download:true,
+    pruefen: async p => {
+      await p.$eval('#muster', e => { e.value = '\\d{2}\\.\\d{2}\\.(\\d{4})'; e.dispatchEvent(new Event('input')); });
+      await p.$eval('#text', e => { e.value = 'am 15.08.2026 und am 01.09.2027'; e.dispatchEvent(new Event('input')); });
+      const treffer = await p.$$eval('#hervorgehoben mark', els => els.map(e => e.textContent));
+      if(treffer.length !== 2) throw new Error('Treffer: ' + JSON.stringify(treffer));
+      const gruppen = await p.$$eval('#liste small', els => els.map(e => e.textContent));
+      if(!gruppen.some(g => g.includes('2026'))) throw new Error('Gruppe fehlt: ' + gruppen.join('|'));
+    } },
+  { werkzeug:'vergleichen',        kein_download:true,
+    pruefen: async p => {
+      await p.$eval('#a', e => { e.value = 'eins\nzwei\ndrei\n'; e.dispatchEvent(new Event('input')); });
+      await p.$eval('#b', e => { e.value = 'eins\nZWEI\ndrei\nvier\n'; e.dispatchEvent(new Event('input')); });
+      const weg = await p.$$eval('#ausgabe td.weg', els => els.map(e => e.textContent));
+      const neu = await p.$$eval('#ausgabe td.neu', els => els.map(e => e.textContent));
+      if(!weg.includes('zwei')) throw new Error('entfernte Zeile fehlt: ' + weg.join('|'));
+      if(!neu.includes('vier')) throw new Error('neue Zeile fehlt: ' + neu.join('|'));
     } },
 ];
 

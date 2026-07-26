@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regex testen mit Treffer-Hervorhebung — kostenlos | Alleskonverter</title>
+<meta name="description" content="Reguläre Ausdrücke ausprobieren: Treffer werden live hervorgehoben, Gruppen aufgelistet, Ersetzen inklusive. Mit deutscher Erklärung. Ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/regex/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Regex testen mit Treffer-Hervorhebung — kostenlos | Alleskonverter">
+<meta property="og:description" content="Reguläre Ausdrücke ausprobieren, Treffer live hervorgehoben, mit deutscher Erklärung. Ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/regex/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Regex testen mit Treffer-Hervorhebung — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Regex ausprobieren — Alleskonverter","url":"https://alleskonverter.de/tools/regex/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Reguläre Ausdrücke testen mit Treffer-Hervorhebung und Ersetzen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Daten übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Ausdruck wird von deinem eigenen Browser ausgewertet — wichtig, weil man beim Testen oft mit echten Daten arbeitet."}},{"@type":"Question","name":"Welche Regex-Variante wird verwendet?","acceptedAnswer":{"@type":"Answer","text":"Die von JavaScript. Sie ist weitgehend deckungsgleich mit PCRE, kennt aber keine Lookbehind-Beschränkungen älterer Umgebungen und keine possessiven Quantoren."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#muster{width:100%;font-family:var(--mono);font-size:16px;padding:11px 12px}
+.trefferflaeche{background:#fff;color:#16191B;border:1px solid var(--rule);box-shadow:var(--shadow);
+  padding:14px;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:13px;
+  line-height:1.65;min-height:150px;max-height:340px;overflow:auto;margin-top:8px}
+.trefferflaeche mark{background:#FFE08A;color:#16191B;padding:1px 0;border-radius:2px}
+.trefferflaeche mark.b{background:#B8E6C8}
+.liste{margin-top:14px;max-height:260px;overflow:auto}
+.liste div{background:var(--card);border:1px solid var(--rule);padding:7px 10px;margin-bottom:5px;
+  font-family:var(--mono);font-size:12px}
+.liste b{color:var(--stamp);font-weight:500}
+.liste small{color:var(--ink-soft);display:block;margin-top:2px}
+.meldung{margin-top:10px;padding:9px 11px;border:1.5px solid var(--stamp);background:var(--card);
+  font-family:var(--mono);font-size:12px;color:var(--stamp)}
+.meldung.fehler{border-color:var(--alert);color:var(--alert)}
+.bausteine{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.bausteine button{padding:5px 8px;border:1px solid var(--rule);background:var(--card);color:var(--ink);
+  font-family:var(--mono);font-size:11px;cursor:pointer}
+.bausteine button:hover{background:var(--ink);color:var(--paper)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Regex <span>ausprobieren</span></h1>
+  <p class="sub">Reguläre Ausdrücke testen, ohne raten zu müssen: Treffer werden live im Text hervorgehoben, Gruppen einzeln aufgelistet, und der Ausdruck wird in verständlichem Deutsch erklärt.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Ausdruck</h2>
+    <input type="text" id="muster" spellcheck="false" aria-label="Regulärer Ausdruck" placeholder="\d{4}-\d{2}-\d{2}">
+    <div class="bausteine" id="bausteine"></div>
+    <div class="meldung" id="meldung" hidden></div>
+
+    <h2 style="margin-top:24px">Text</h2>
+    <textarea class="pane" id="text" spellcheck="false" aria-label="Testtext" style="min-height:150px"
+      placeholder="Hier den Text einfügen, in dem gesucht werden soll …"></textarea>
+
+    <h2 style="margin-top:24px">Treffer im Text</h2>
+    <div class="trefferflaeche" id="hervorgehoben"></div>
+
+    <h2 style="margin-top:24px" id="listekopf" hidden>Einzelne Treffer</h2>
+    <div class="liste" id="liste"></div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="anzahl">0<small>Treffer gefunden</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label>Zusätze (Flags)</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="f_g" checked style="width:auto"> <code>g</code> — alle Treffer</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="f_i" style="width:auto"> <code>i</code> — Groß/klein egal</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="f_m" style="width:auto"> <code>m</code> — ^ und $ je Zeile</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="f_s" style="width:auto"> <code>s</code> — Punkt trifft Umbrüche</label>
+    </div>
+
+    <div class="field">
+      <label for="ersetzen">Ersetzen durch</label>
+      <input type="text" id="ersetzen" placeholder="$1 für die erste Gruppe">
+    </div>
+
+    <div class="field">
+      <label for="beispiel">Fertiges Beispiel</label>
+      <select id="beispiel">
+        <option value="">— auswählen —</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go" disabled>Ersetztes speichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Reguläre Ausdrücke sind mächtig und gleichzeitig schwer zu lesen. Hier siehst du sofort, was dein Ausdruck tatsächlich trifft: Die Fundstellen werden im Text hervorgehoben, jede Gruppe wird einzeln aufgelistet, und darunter steht eine Erklärung in normalem Deutsch. Dazu gibt es fertige Beispiele für die üblichen Fälle — E-Mail-Adressen, Datumsangaben, IBAN, Postleitzahlen.</p>
+  <h3>Werden meine Daten übertragen?</h3>
+  <p>Nein, alles wertet dein eigener Browser aus. Das ist hier durchaus relevant: Beim Testen arbeitet man oft mit echten Kundendaten, Protokollauszügen oder Adressen — nichts davon sollte in ein fremdes Formular wandern.</p>
+  <h3>Welche Regex-Variante wird verwendet?</h3>
+  <p>Die von JavaScript. Sie ist weitgehend deckungsgleich mit dem, was PHP, Python und Editoren verstehen. Unterschiede gibt es bei Feinheiten wie possessiven Quantoren, die JavaScript nicht kennt.</p>
+  <h3>Warum hängt sich mein Ausdruck auf?</h3>
+  <p>Verschachtelte Wiederholungen wie <code>(a+)+b</code> können bei bestimmten Eingaben in eine Endlosschleife geraten — im Fachjargon „katastrophales Zurücksetzen“. Dieses Werkzeug bricht die Auswertung nach kurzer Zeit ab und sagt Bescheid, statt den Tab einfrieren zu lassen.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Die Erklärung deckt die gebräuchlichen Bausteine ab und ersetzt keine Referenz — sie soll beim Lesen fremder Ausdrücke helfen.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+const BEISPIELE = {
+  'E-Mail-Adressen':        ['[\\w.+-]+@[\\w-]+\\.[\\w.]{2,}', 'Schreib an anna.mueller@beispiel.de oder an info@firma.com — nicht an kaputt@@x.'],
+  'Datum (TT.MM.JJJJ)':     ['(\\d{2})\\.(\\d{2})\\.(\\d{4})', 'Rechnung vom 15.08.2026, fällig am 01.09.2026. Ungültig: 32.13.2026.'],
+  'Datum (JJJJ-MM-TT)':     ['(\\d{4})-(\\d{2})-(\\d{2})', 'Termine: 2026-08-15, 2026-09-01 und 2026-12-24.'],
+  'Deutsche Postleitzahl':  ['\\b\\d{5}\\b', '33609 Bielefeld, 10115 Berlin, 80331 München. Keine PLZ: 1234 oder 123456.'],
+  'IBAN (deutsch)':         ['DE\\d{2}\\s?(?:\\d{4}\\s?){4}\\d{2}', 'Konto: DE89 3704 0044 0532 0130 00 — bitte prüfen.'],
+  'Telefonnummern':         ['(?:\\+49|0)\\s?\\d{2,5}[\\s/-]?\\d{3,9}', 'Erreichbar unter 0521 123456 oder +49 30 9876543.'],
+  'HTML-Tags':              ['</?(\\w+)[^>]*>', '<p class="text">Hallo <strong>Welt</strong></p>'],
+  'Doppelte Leerzeichen':   [' {2,}', 'Hier  stehen   mehrere    Leerzeichen hintereinander.'],
+  'Wörter mit Umlaut':      ['\\w*[äöüÄÖÜß]\\w*', 'Größe, Straße und Müller — aber nicht Haus oder Tisch.'],
+  'Zeilen mit Zahl am Ende':['^.*\\d$', 'Zeile ohne Zahl\nZeile mit Zahl 42\nnoch eine 7'],
+};
+
+const BAUSTEINE = [
+  ['\\d','Ziffer'], ['\\w','Buchstabe/Ziffer'], ['\\s','Leerraum'], ['.','beliebiges Zeichen'],
+  ['+','ein- oder mehrmals'], ['*','beliebig oft'], ['?','optional'], ['{2,4}','2 bis 4 mal'],
+  ['[a-z]','Bereich'], ['(…)','Gruppe'], ['|','oder'], ['^','Anfang'], ['$','Ende'], ['\\b','Wortgrenze'],
+];
+
+/* Ausdruck in verständliches Deutsch übersetzen — die gebräuchlichen Bausteine */
+const ERKLAERUNG = [
+  [/\\d/g, 'eine Ziffer'], [/\\D/g, 'keine Ziffer'],
+  [/\\w/g, 'ein Buchstabe, eine Ziffer oder ein Unterstrich'], [/\\W/g, 'kein Wortzeichen'],
+  [/\\s/g, 'ein Leerzeichen oder Umbruch'], [/\\S/g, 'kein Leerraum'],
+  [/\\b/g, 'eine Wortgrenze'],
+];
+
+function erklaere(quelle){
+  const teile = [];
+  if(/^\^/.test(quelle)) teile.push('beginnt am Zeilen- bzw. Textanfang');
+  if(/\$$/.test(quelle)) teile.push('endet am Zeilen- bzw. Textende');
+  const gruppen = (quelle.match(/\((?!\?)/g) || []).length;
+  if(gruppen) teile.push(`${gruppen} ${gruppen === 1 ? 'Gruppe wird' : 'Gruppen werden'} eingefangen`);
+  const benannt = quelle.match(/\(\?<(\w+)>/g);
+  if(benannt) teile.push('benannte Gruppen: ' + benannt.map(b => b.match(/<(\w+)>/)[1]).join(', '));
+  for(const [muster, text] of ERKLAERUNG){
+    const treffer = quelle.match(muster);
+    if(treffer) teile.push(`${treffer.length}× ${text}`);
+  }
+  const wieder = quelle.match(/\{(\d+)(,(\d*))?\}/g);
+  if(wieder) teile.push('Wiederholungsangaben: ' + wieder.join(', '));
+  if(/\(\?=/.test(quelle)) teile.push('enthält eine Vorausschau (muss folgen, wird aber nicht mitgenommen)');
+  if(/\(\?!/.test(quelle)) teile.push('enthält eine verneinte Vorausschau (darf nicht folgen)');
+  if(/\[\^/.test(quelle)) teile.push('enthält ausgeschlossene Zeichen');
+  return teile.length ? teile.join(' · ') : 'einfache Zeichenfolge ohne besondere Bausteine';
+}
+
+function flags(){
+  return ['g','i','m','s'].filter(f => AK.$('#f_' + f).checked).join('');
+}
+
+function esc(t){
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function melde(text, fehler){
+  const el = AK.$('#meldung');
+  el.hidden = !text;
+  el.textContent = text;
+  el.classList.toggle('fehler', !!fehler);
+}
+
+function lauf(){
+  const quelle = AK.$('#muster').value;
+  const text = AK.$('#text').value;
+  AK.$('#hervorgehoben').innerHTML = '';
+  AK.$('#liste').innerHTML = '';
+  AK.$('#listekopf').hidden = true;
+  AK.$('#anzahl').innerHTML = '0<small>Treffer gefunden</small>';
+  AK.$('#go').disabled = true;
+
+  if(!quelle){ melde(''); AK.$('#hervorgehoben').textContent = text; return; }
+
+  let re;
+  try{
+    re = new RegExp(quelle, flags());
+  }catch(err){
+    melde('Ungültiger Ausdruck: ' + err.message.replace(/^Invalid regular expression:?\s*/,''), true);
+    AK.$('#hervorgehoben').textContent = text;
+    return;
+  }
+  melde('Gültig — ' + erklaere(quelle));
+  if(!text) return;
+
+  // Auswertung zeitlich begrenzen: verschachtelte Wiederholungen können hängen bleiben
+  const start = performance.now();
+  const treffer = [];
+  try{
+    if(re.global){
+      let m, letzte = -1;
+      while((m = re.exec(text)) !== null){
+        if(m.index === letzte && m[0] === ''){ re.lastIndex++; continue; }
+        letzte = m.index;
+        treffer.push(m);
+        if(m[0] === '') re.lastIndex++;
+        if(treffer.length > 5000) break;
+        if(performance.now() - start > 1500) throw new Error('zu langsam');
+      }
+    }else{
+      const m = re.exec(text);
+      if(m) treffer.push(m);
+    }
+  }catch(err){
+    melde('Die Auswertung dauert zu lange — der Ausdruck enthält vermutlich verschachtelte Wiederholungen wie (a+)+.', true);
+    return;
+  }
+
+  // Hervorheben
+  let html = '', pos = 0, wechsel = false;
+  for(const m of treffer){
+    html += esc(text.slice(pos, m.index));
+    html += `<mark class="${wechsel ? 'b' : ''}">${esc(m[0]) || '␣'}</mark>`;
+    pos = m.index + (m[0].length || 0);
+    wechsel = !wechsel;
+  }
+  html += esc(text.slice(pos));
+  AK.$('#hervorgehoben').innerHTML = html;
+
+  // Einzelne Treffer samt Gruppen
+  const liste = AK.$('#liste');
+  treffer.slice(0, 200).forEach((m, i) => {
+    const div = document.createElement('div');
+    const gruppen = m.slice(1).map((g, j) => `<small>Gruppe ${j+1}: ${g === undefined ? '(leer)' : esc(g)}</small>`).join('');
+    const benannt = m.groups
+      ? Object.entries(m.groups).map(([k,v]) => `<small>${esc(k)}: ${v === undefined ? '(leer)' : esc(v)}</small>`).join('')
+      : '';
+    div.innerHTML = `<b>${i+1}.</b> ${esc(m[0]) || '(leerer Treffer)'} <small>Position ${m.index}</small>${gruppen}${benannt}`;
+    liste.appendChild(div);
+  });
+  if(treffer.length > 200) liste.insertAdjacentHTML('beforeend',
+    `<div style="color:var(--ink-soft)">… und ${treffer.length - 200} weitere</div>`);
+
+  AK.$('#listekopf').hidden = !treffer.length;
+  AK.$('#anzahl').innerHTML = treffer.length.toLocaleString('de-DE') + '<small>Treffer gefunden</small>';
+  AK.$('#go').disabled = !treffer.length;
+}
+
+/* Bausteine und Beispiele aufbauen */
+const bWrap = AK.$('#bausteine');
+BAUSTEINE.forEach(([b, titel]) => {
+  const el = document.createElement('button');
+  el.type = 'button'; el.textContent = b; el.title = titel;
+  el.onclick = () => {
+    const f = AK.$('#muster');
+    const p = f.selectionStart ?? f.value.length;
+    const einfuegen = b === '(…)' ? '()' : b;
+    f.value = f.value.slice(0, p) + einfuegen + f.value.slice(f.selectionEnd ?? p);
+    const versatz = b === '(…)' ? 1 : einfuegen.length;
+    f.focus(); f.setSelectionRange(p + versatz, p + versatz);
+    lauf();
+  };
+  bWrap.appendChild(el);
+});
+
+const sel = AK.$('#beispiel');
+Object.keys(BEISPIELE).forEach(k => {
+  const o = document.createElement('option'); o.value = k; o.textContent = k; sel.appendChild(o);
+});
+sel.onchange = () => {
+  if(!sel.value) return;
+  const [muster, text] = BEISPIELE[sel.value];
+  AK.$('#muster').value = muster;
+  AK.$('#text').value = text;
+  lauf();
+};
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  try{
+    const ergebnis = AK.$('#text').value.replace(new RegExp(AK.$('#muster').value, flags()), AK.$('#ersetzen').value);
+    AK.offerDownload(new Blob([ergebnis], {type:'text/plain;charset=utf-8'}), 'ersetzt.txt');
+    AK.log(`Ersetzt gespeichert (${ergebnis.length.toLocaleString('de-DE')} Zeichen).`);
+    AK.stamp(true);
+  }catch(err){
+    AK.log('Ersetzen nicht möglich: ' + err.message, true);
+  }
+};
+
+['#muster','#text','#ersetzen'].forEach(s => AK.$(s).addEventListener('input', lauf));
+['f_g','f_i','f_m','f_s'].forEach(id => AK.$('#' + id).addEventListener('change', lauf));
+lauf();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

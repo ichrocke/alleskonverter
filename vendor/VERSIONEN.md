@@ -18,6 +18,7 @@ Stand: 26.07.2026 (Bibliotheken geprüft und teilweise aktualisiert)
 | `mammoth.browser.min.js` | mammoth | 1.12.0 | BSD-2-Clause | Word-Dokumente lesen |
 | `marked.min.js` | marked | 12.0.2 | MIT | Markdown zu HTML |
 | `turndown.min.js` | turndown | 7.2.4 | MIT | HTML zu Markdown |
+| `docx.min.js` | docx | 9.7.1 | MIT | Word-Dokumente schreiben |
 | `xlsx.full.min.js` | SheetJS | 0.20.3 | Apache-2.0 | Tabellen (CSV, XLSX, JSON) |
 | `ffmpeg/ffmpeg.js`, `util.js` | @ffmpeg/ffmpeg, @ffmpeg/util | 0.12.10 / 0.12.1 | MIT | Ansteuerung des Konverters |
 | `ffmpeg/ffmpeg-core.*` | @ffmpeg/core (ffmpeg als WebAssembly) | 0.12.6 | LGPL-2.1 | Audio und Video umwandeln |
@@ -31,6 +32,14 @@ Stand: 26.07.2026 (Bibliotheken geprüft und teilweise aktualisiert)
 | `tools/qr-code/vendor/qr-code-styling.js` | qr-code-styling | gevendort | MIT | QR-Codes gestalten |
 | `tools/qr-code/vendor/qrcode-*.js` | qrcode-generator | gevendort | MIT | QR-Codes berechnen |
 | `fonts/anton-*`, `archivo-*`, `ibm-plex-mono-*` | Anton, Archivo, IBM Plex Mono | — | SIL Open Font License 1.1 | Schriften |
+
+## Neu hinzugekommen (26.07.2026)
+
+- **docx 9.7.1** für das Werkzeug „Word-Datei erstellen“. Der Anbieter liefert
+  keine minimierte Fassung aus; eingebunden ist deshalb `dist/index.iife.js`
+  mit 1,1 MB. Das ist viel für das, was es tut, aber es ist die einzige
+  gepflegte Bibliothek, die DOCX im Browser *schreiben* kann — alles andere
+  wäre gewesen, das Office-Open-XML-Format von Hand zu bauen.
 
 ## Stand der Aktualisierung (26.07.2026)
 

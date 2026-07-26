@@ -16,6 +16,7 @@ window.AK = window.AK || {};
     'bilder-zusammenfuegen': ['bild-konvertieren','bild-zuschneiden'],
     'bild-metadaten':        ['bild-konvertieren','bild-zuschneiden'],
     'bild-base64':           ['text-werkzeuge'],
+    'bildergalerie':         ['zip'],
     'favicon':               ['zip'],
 
     'texterkennung':         ['text-werkzeuge','markdown-html'],
@@ -33,11 +34,16 @@ window.AK = window.AK || {};
     'bild-zu-pdf':           ['pdf-komprimieren','pdf-stempeln','pdf-zusammenfuegen'],
     'pdf-kontaktabzug':      ['pdf-komprimieren'],
 
-    'word-zu-html':          ['markdown-html','text-werkzeuge'],
-    'markdown-html':         ['text-werkzeuge'],
-    'tabellen':              ['json-yaml'],
+    'word-zu-html':          ['markdown-html','word-erstellen','text-werkzeuge'],
+    'word-erstellen':        ['word-zu-html'],
+    'markdown-html':         ['word-erstellen','text-werkzeuge'],
+    'epub':                  ['word-erstellen','markdown-html','text-werkzeuge'],
+    'tabellen':              ['csv-bereinigen','json-yaml'],
+    'csv-bereinigen':        ['tabellen','vergleichen'],
+    'testdaten':             ['csv-bereinigen','tabellen'],
     'json-yaml':             ['tabellen','text-werkzeuge'],
-    'untertitel':            ['text-werkzeuge'],
+    'untertitel':            ['text-werkzeuge','vergleichen'],
+    'vergleichen':           ['text-werkzeuge'],
 
     'medien':                ['medien-schneiden','ton-verbessern'],
     'medien-schneiden':      ['medien','ton-verbessern'],
@@ -64,6 +70,10 @@ window.AK = window.AK || {};
     'ton-verbessern':'Ton verbessern', 'gif-erstellen':'GIF erstellen',
     'zip':'ZIP entpacken & packen', 'text-werkzeuge':'Text-Werkzeuge',
     'favicon':'Favicon-Generator', 'bilder-umbenennen':'Dateien umbenennen',
+    'word-erstellen':'Word-Datei erstellen', 'epub':'EPUB lesen & umwandeln',
+    'csv-bereinigen':'CSV bereinigen', 'vergleichen':'Texte & Tabellen vergleichen',
+    'bildergalerie':'Bildergalerie als HTML', 'testdaten':'Testdaten & Blindtext',
+    'termin':'Termin als ICS', 'regex':'Regex ausprobieren',
   };
 
   const eigenes = () => {

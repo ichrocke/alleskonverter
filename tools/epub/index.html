@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EPUB lesen und umwandeln (EPUB zu HTML, Text, Markdown) — kostenlos | Alleskonverter</title>
+<meta name="description" content="EPUB im Browser öffnen, kapitelweise lesen und als HTML, Text oder Markdown speichern. Ohne E-Book-Reader, ohne Konto, ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/epub/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="EPUB lesen und umwandeln (EPUB zu HTML, Text, Markdown) | Alleskonverter">
+<meta property="og:description" content="EPUB im Browser öffnen, kapitelweise lesen und als HTML, Text oder Markdown speichern. Ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/epub/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EPUB lesen und umwandeln — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"EPUB lesen und umwandeln — Alleskonverter","url":"https://alleskonverter.de/tools/epub/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"EPUB-Dateien im Browser lesen und als HTML, Text oder Markdown speichern — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Bücher hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die EPUB-Datei wird im Browser entpackt und gelesen; es gibt keinen Server, der sie annehmen könnte."}},{"@type":"Question","name":"Funktionieren Bücher mit Kopierschutz?","acceptedAnswer":{"@type":"Answer","text":"Nein. EPUBs mit DRM (Adobe ADEPT oder Kindle) sind verschlüsselt und lassen sich hier nicht öffnen. Das Werkzeug arbeitet ausschließlich mit ungeschützten Dateien."}},{"@type":"Question","name":"Welche EPUB-Versionen werden unterstützt?","acceptedAnswer":{"@type":"Answer","text":"EPUB 2 und EPUB 3. Das Inhaltsverzeichnis wird aus der nav-Datei (EPUB 3) oder aus toc.ncx (EPUB 2) gelesen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.buch{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+.buch[hidden]{display:none}
+.kopfzeile{display:flex;gap:16px;align-items:flex-start;background:var(--card);
+  border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px}
+.kopfzeile img{width:88px;height:auto;border:1px solid var(--rule);background:#fff;flex:0 0 auto}
+.kopfzeile h3{font-family:var(--display);font-size:24px;margin:0 0 4px;line-height:1.15}
+.kopfzeile dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:13px}
+.kopfzeile dt{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--ink-soft);padding-top:2px}
+.kopfzeile dd{margin:0}
+.leser{display:grid;grid-template-columns:230px 1fr;gap:0;border:1px solid var(--rule);
+  box-shadow:var(--shadow);background:#fff;min-height:480px}
+@media(max-width:760px){.leser{grid-template-columns:1fr}}
+.inhalt{border-right:1px solid var(--rule);background:var(--card);max-height:620px;overflow:auto}
+@media(max-width:760px){.inhalt{border-right:0;border-bottom:1px solid var(--rule);max-height:200px}}
+.inhalt button{display:block;width:100%;text-align:left;background:none;border:0;
+  border-bottom:1px solid var(--rule);padding:9px 12px;font-size:13px;color:var(--ink);cursor:pointer;
+  font-family:var(--sans);line-height:1.4}
+.inhalt button:hover{background:#EAE8E2}
+.inhalt button.aktiv{background:var(--stamp);color:var(--stamp-text)}
+.inhalt button.stufe2{padding-left:26px;font-size:12.5px;color:var(--ink-soft)}
+.inhalt button.stufe2.aktiv{color:var(--stamp-text)}
+.seite{padding:26px 30px;max-height:620px;overflow:auto;line-height:1.7;font-size:16px;color:#16191B}
+@media(max-width:520px){.seite{padding:18px}}
+.seite h1,.seite h2,.seite h3{font-family:var(--display);font-weight:400;line-height:1.2;margin:1.4em 0 .5em}
+.seite h1{font-size:28px}.seite h2{font-size:23px}.seite h3{font-size:19px}
+.seite p{margin:0 0 1em}
+.seite img{max-width:100%;height:auto}
+.seite blockquote{border-left:3px solid var(--rule);margin:1em 0;padding-left:1em;color:#555}
+.seite a{color:var(--stamp)}
+.seite pre{background:#F3F2ED;padding:10px;overflow:auto;font-size:13px}
+.blaettern{display:flex;justify-content:space-between;gap:10px;margin-top:12px}
+.blaettern button{flex:0 0 auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>EPUB <span>lesen &amp; umwandeln</span></h1>
+  <p class="sub">E-Books öffnen, kapitelweise lesen und als HTML, reinen Text oder Markdown weiterverwenden — ohne E-Book-Programm und ohne dass das Buch dein Gerät verlässt.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="EPUB-Datei auswählen">
+      <strong>EPUB hineinziehen</strong>
+      <small>oder klicken zum Auswählen · Dateien mit Kopierschutz (DRM) funktionieren nicht</small>
+    </div>
+    <input type="file" id="picker" hidden accept=".epub,application/epub+zip">
+
+    <div class="buch" id="buch" hidden>
+      <div class="kopfzeile" id="kopfzeile"></div>
+      <div class="leser">
+        <nav class="inhalt" id="inhalt" aria-label="Inhaltsverzeichnis"></nav>
+        <article class="seite" id="seite"></article>
+      </div>
+      <div class="blaettern">
+        <button id="zurueck">← Vorheriges Kapitel</button>
+        <button id="vor">Nächstes Kapitel →</button>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Umwandeln</h2>
+    <div class="count" id="anzahl">0<small>Kapitel</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="format">Speichern als</label>
+      <select id="format">
+        <option value="html">HTML — eine Datei</option>
+        <option value="txt">Reiner Text (.txt)</option>
+        <option value="md">Markdown (.md)</option>
+        <option value="zip">ZIP — je Kapitel eine HTML-Datei</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="umfang">Umfang</label>
+      <select id="umfang">
+        <option value="alles">ganzes Buch</option>
+        <option value="kapitel">nur das angezeigte Kapitel</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Beim Umwandeln</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="bilder" checked style="width:auto"> Bilder mitnehmen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="kapitelmarken" checked style="width:auto"> Kapitelüberschriften einfügen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="seitenumbruch" style="width:auto"> Seitenumbruch vor jedem Kapitel (zum Drucken)</label>
+    </div>
+
+    <button class="primary" id="go" disabled>Herunterladen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>EPUB ist im Kern ein ZIP-Archiv voller HTML-Dateien — trotzdem braucht man normalerweise ein eigenes Programm, um hineinzuschauen. Hier öffnest du das Buch direkt im Browser, blätterst durch die Kapitel und speicherst den Inhalt als HTML, reinen Text oder Markdown. Praktisch, wenn du aus einem E-Book zitieren, es durchsuchen oder den Text weiterverarbeiten willst.</p>
+  <h3>Werden meine Bücher hochgeladen?</h3>
+  <p>Nein. Die Datei wird in deinem Browser entpackt und dargestellt. Es gibt keinen Server, der sie annehmen könnte — deine Bibliothek bleibt deine Sache.</p>
+  <h3>Funktionieren Bücher mit Kopierschutz?</h3>
+  <p>Nein. EPUBs mit DRM — etwa aus dem Adobe-Ökosystem oder von Amazon — sind verschlüsselt, und dieses Werkzeug entfernt keinen Kopierschutz. Erkennt es eine geschützte Datei, sagt es das und bricht ab. Ungeschützte Bücher, wie sie viele Verlage, Projekt Gutenberg und der eigene Export aus Schreibprogrammen liefern, funktionieren dagegen problemlos.</p>
+  <h3>Welche EPUB-Versionen werden unterstützt?</h3>
+  <p>EPUB 2 und EPUB 3. Das Inhaltsverzeichnis wird aus der Navigationsdatei (EPUB 3) oder aus <code>toc.ncx</code> (EPUB 2) gelesen; fehlt beides, wird die Lesereihenfolge aus dem Buch selbst verwendet.</p>
+  <h3>Was passiert mit dem Layout?</h3>
+  <p>Die Textstruktur bleibt erhalten — Überschriften, Absätze, Listen, Zitate, Kursiv und Fett, Links und Bilder. Die buchspezifischen Schriftarten und Randeinstellungen werden entfernt, weil sie außerhalb des E-Book-Programms meist mehr stören als helfen. Bei Markdown und reinem Text bleibt naturgemäß nur die Struktur übrig.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Skripte und externe Verweise aus dem Buch werden beim Anzeigen entfernt — ein EPUB kann HTML enthalten, und fremdes HTML gehört nicht ungefiltert in eine Seite.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../vendor/turndown.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+let zip = null, buch = null, aktuell = 0, blobUrls = [];
+
+/* ---------- Pfadhilfen: EPUB-Verweise sind relativ zur jeweiligen Datei ---------- */
+function ordner(pfad){
+  const i = pfad.lastIndexOf('/');
+  return i < 0 ? '' : pfad.slice(0, i + 1);
+}
+function aufloesen(basis, ziel){
+  if(/^[a-z]+:/i.test(ziel)) return ziel;
+  const teile = (basis + ziel).split('/');
+  const raus = [];
+  for(const t of teile){
+    if(t === '.' || t === '') continue;
+    if(t === '..') raus.pop();
+    else raus.push(t);
+  }
+  return raus.join('/');
+}
+function xml(text){
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if(doc.querySelector('parsererror')) throw new Error('Die Datei ist nicht wohlgeformt.');
+  return doc;
+}
+
+/* ---------- EPUB einlesen ---------- */
+async function addFiles(dateien){
+  const datei = dateien[0];
+  if(!datei) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+  blobUrls.forEach(u => URL.revokeObjectURL(u));
+  blobUrls = [];
+  AK.bar(0.05);
+  try{
+    zip = await JSZip.loadAsync(datei);
+    if(zip.file('META-INF/encryption.xml')){
+      throw new Error('Diese Datei ist mit einem Kopierschutz (DRM) versehen und lässt sich nicht öffnen.');
+    }
+    const containerDatei = zip.file('META-INF/container.xml');
+    if(!containerDatei) throw new Error('Keine gültige EPUB-Datei — META-INF/container.xml fehlt.');
+    const container = xml(await containerDatei.async('string'));
+    const opfPfad = container.querySelector('rootfile')?.getAttribute('full-path');
+    if(!opfPfad) throw new Error('Im Archiv ist keine Inhaltsdatei eingetragen.');
+
+    AK.bar(0.15);
+    const opf = xml(await zip.file(opfPfad).async('string'));
+    const basis = ordner(opfPfad);
+
+    // Kopfdaten
+    const meta = tag => opf.getElementsByTagNameNS('http://purl.org/dc/elements/1.1/', tag)[0]?.textContent?.trim() || '';
+    const titel = meta('title') || datei.name.replace(/\.epub$/i, '');
+    const autor = meta('creator');
+    const sprache = meta('language');
+    const verlag = meta('publisher');
+    const datum = meta('date').slice(0, 10);
+
+    // Manifest: id → {pfad, typ}
+    const manifest = new Map();
+    opf.querySelectorAll('manifest > item').forEach(el => {
+      manifest.set(el.getAttribute('id'), {
+        pfad: aufloesen(basis, el.getAttribute('href')),
+        typ: el.getAttribute('media-type') || '',
+        eigenschaften: el.getAttribute('properties') || '',
+      });
+    });
+
+    // Lesereihenfolge
+    const spine = [];
+    opf.querySelectorAll('spine > itemref').forEach(el => {
+      if(el.getAttribute('linear') === 'no') return;
+      const eintrag = manifest.get(el.getAttribute('idref'));
+      if(eintrag && /html/.test(eintrag.typ)) spine.push(eintrag.pfad);
+    });
+    if(!spine.length) throw new Error('Das Buch enthält keine lesbaren Kapitel.');
+
+    AK.bar(0.3);
+    // Bilder als Blob-Adressen bereitstellen
+    const bildKarte = new Map();
+    for(const [, eintrag] of manifest){
+      if(!eintrag.typ.startsWith('image/')) continue;
+      const eintragDatei = zip.file(eintrag.pfad);
+      if(!eintragDatei) continue;
+      const blob = await eintragDatei.async('blob');
+      const url = URL.createObjectURL(new Blob([blob], {type: eintrag.typ}));
+      blobUrls.push(url);
+      bildKarte.set(eintrag.pfad, {url, typ: eintrag.typ, blob});
+    }
+
+    AK.bar(0.55);
+    // Titelbild
+    let coverPfad = null;
+    for(const [, eintrag] of manifest){
+      if(/cover-image/.test(eintrag.eigenschaften)){ coverPfad = eintrag.pfad; break; }
+    }
+    if(!coverPfad){
+      const metaCover = opf.querySelector('meta[name="cover"]')?.getAttribute('content');
+      if(metaCover && manifest.get(metaCover)) coverPfad = manifest.get(metaCover).pfad;
+    }
+
+    // Kapitel laden
+    const kapitel = [];
+    for(let i = 0; i < spine.length; i++){
+      const pfad = spine[i];
+      const eintragDatei = zip.file(pfad);
+      if(!eintragDatei) continue;
+      const roh = await eintragDatei.async('string');
+      kapitel.push({pfad, roh, titel: null});
+      AK.bar(0.55 + 0.35 * (i + 1) / spine.length);
+    }
+
+    // Inhaltsverzeichnis: erst EPUB 3 (nav), dann EPUB 2 (ncx)
+    const verzeichnis = await inhaltsverzeichnis(opf, manifest, basis, spine);
+
+    buch = {titel, autor, sprache, verlag, datum, kapitel, bildKarte, coverPfad, verzeichnis,
+            dateiname: datei.name.replace(/\.epub$/i, '')};
+    aufbauen();
+    AK.bar(1);
+    AK.log(`„${titel}“ geöffnet — ${kapitel.length} Kapitel, ${bildKarte.size} Bilder.`);
+  }catch(err){
+    AK.bar(0);
+    AK.log(err.message, true);
+    console.error(err);
+  }
+}
+window.addFiles = addFiles;
+
+async function inhaltsverzeichnis(opf, manifest, basis, spine){
+  // EPUB 3: item mit properties="nav"
+  for(const [, eintrag] of manifest){
+    if(!/\bnav\b/.test(eintrag.eigenschaften)) continue;
+    const d = zip.file(eintrag.pfad);
+    if(!d) continue;
+    try{
+      const doc = new DOMParser().parseFromString(await d.async('string'), 'application/xhtml+xml');
+      const nav = Array.from(doc.querySelectorAll('nav')).find(n =>
+        (n.getAttribute('epub:type') || n.getAttribute('type') || '').includes('toc')) ||
+        doc.querySelector('nav');
+      if(!nav) continue;
+      const eintraege = [];
+      nav.querySelectorAll('li > a').forEach(a => {
+        const stufe = a.closest('ol')?.parentElement?.closest('ol') ? 2 : 1;
+        eintraege.push({
+          text: a.textContent.trim(),
+          ziel: aufloesen(ordner(eintrag.pfad), a.getAttribute('href') || '').split('#')[0],
+          stufe,
+        });
+      });
+      if(eintraege.length) return eintraege;
+    }catch(_){ }
+  }
+  // EPUB 2: toc.ncx
+  const ncxId = opf.querySelector('spine')?.getAttribute('toc');
+  const ncx = ncxId ? manifest.get(ncxId) : null;
+  if(ncx && zip.file(ncx.pfad)){
+    try{
+      const doc = xml(await zip.file(ncx.pfad).async('string'));
+      const eintraege = [];
+      const lauf = (knoten, stufe) => {
+        Array.from(knoten.children).filter(k => k.localName === 'navPoint').forEach(np => {
+          const text = np.querySelector('navLabel > text')?.textContent?.trim() || '';
+          const href = np.querySelector('content')?.getAttribute('src') || '';
+          eintraege.push({text, ziel: aufloesen(ordner(ncx.pfad), href).split('#')[0], stufe});
+          lauf(np, Math.min(stufe + 1, 2));
+        });
+      };
+      const map = doc.querySelector('navMap');
+      if(map) lauf(map, 1);
+      if(eintraege.length) return eintraege;
+    }catch(_){ }
+  }
+  return spine.map((p, i) => ({text: 'Kapitel ' + (i + 1), ziel: p, stufe: 1}));
+}
+
+/* ---------- Anzeige ---------- */
+function saeubern(rohHtml, pfad){
+  const doc = new DOMParser().parseFromString(rohHtml, 'text/html');
+  doc.querySelectorAll('script, style, link, iframe, object, embed, form').forEach(el => el.remove());
+  doc.querySelectorAll('*').forEach(el => {
+    Array.from(el.attributes).forEach(a => {
+      if(/^on/i.test(a.name)) el.removeAttribute(a.name);
+      if(a.name === 'style' && /url\s*\(/i.test(a.value)) el.removeAttribute('style');
+    });
+  });
+  const eigenerOrdner = ordner(pfad);
+  doc.querySelectorAll('img, image').forEach(el => {
+    const quelle = el.getAttribute('src') || el.getAttribute('xlink:href') || el.getAttribute('href');
+    if(!quelle) return;
+    const ziel = buch.bildKarte.get(aufloesen(eigenerOrdner, quelle));
+    if(ziel){ el.setAttribute('src', ziel.url); el.removeAttribute('xlink:href'); }
+    else el.remove();
+  });
+  // Verweise innerhalb des Buchs auf Kapitelsprünge umbiegen, externe öffnen im neuen Tab
+  doc.querySelectorAll('a[href]').forEach(a => {
+    const href = a.getAttribute('href');
+    if(/^[a-z]+:/i.test(href)){
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener nofollow');
+      return;
+    }
+    const ziel = aufloesen(eigenerOrdner, href).split('#')[0];
+    const nummer = buch.kapitel.findIndex(k => k.pfad === ziel);
+    if(nummer >= 0){ a.setAttribute('href', '#'); a.dataset.kapitel = String(nummer); }
+    else a.removeAttribute('href');
+  });
+  return doc.body ? doc.body.innerHTML : '';
+}
+
+function kapitelTitel(i){
+  const k = buch.kapitel[i];
+  if(k.titel !== null) return k.titel;
+  const eintrag = buch.verzeichnis.find(v => v.ziel === k.pfad);
+  if(eintrag && eintrag.text){ k.titel = eintrag.text; return k.titel; }
+  const doc = new DOMParser().parseFromString(k.roh, 'text/html');
+  const ueber = doc.querySelector('h1, h2, h3, title');
+  k.titel = (ueber?.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 90) || 'Kapitel ' + (i + 1);
+  return k.titel;
+}
+
+function aufbauen(){
+  AK.$('#buch').hidden = false;
+
+  const cover = buch.coverPfad ? buch.bildKarte.get(buch.coverPfad) : null;
+  AK.$('#kopfzeile').innerHTML =
+    (cover ? `<img src="${cover.url}" alt="Titelbild">` : '') +
+    `<div><h3>${AK.esc(buch.titel)}</h3>` +
+    (buch.autor ? `<p style="margin:0;color:var(--ink-soft)">${AK.esc(buch.autor)}</p>` : '') +
+    '<dl>' +
+    (buch.verlag  ? `<dt>Verlag</dt><dd>${AK.esc(buch.verlag)}</dd>` : '') +
+    (buch.datum   ? `<dt>Datum</dt><dd>${AK.esc(buch.datum)}</dd>` : '') +
+    (buch.sprache ? `<dt>Sprache</dt><dd>${AK.esc(buch.sprache)}</dd>` : '') +
+    `<dt>Umfang</dt><dd>${buch.kapitel.length} Kapitel</dd>` +
+    '</dl></div>';
+
+  const nav = AK.$('#inhalt');
+  nav.innerHTML = '';
+  buch.verzeichnis.forEach(v => {
+    const nummer = buch.kapitel.findIndex(k => k.pfad === v.ziel);
+    if(nummer < 0) return;
+    const b = document.createElement('button');
+    b.textContent = v.text || kapitelTitel(nummer);
+    b.className = v.stufe === 2 ? 'stufe2' : '';
+    b.dataset.kapitel = String(nummer);
+    b.onclick = () => zeigen(nummer);
+    nav.appendChild(b);
+  });
+  if(!nav.children.length){
+    buch.kapitel.forEach((_, i) => {
+      const b = document.createElement('button');
+      b.textContent = kapitelTitel(i);
+      b.dataset.kapitel = String(i);
+      b.onclick = () => zeigen(i);
+      nav.appendChild(b);
+    });
+  }
+
+  AK.$('#anzahl').innerHTML = buch.kapitel.length +
+    `<small>${buch.kapitel.length === 1 ? 'Kapitel' : 'Kapitel'}</small>`;
+  AK.$('#go').disabled = false;
+  zeigen(0);
+}
+
+function zeigen(i){
+  if(!buch || i < 0 || i >= buch.kapitel.length) return;
+  aktuell = i;
+  const k = buch.kapitel[i];
+  const seite = AK.$('#seite');
+  seite.innerHTML = saeubern(k.roh, k.pfad);
+  seite.scrollTop = 0;
+  seite.querySelectorAll('a[data-kapitel]').forEach(a => {
+    a.onclick = e => { e.preventDefault(); zeigen(parseInt(a.dataset.kapitel, 10)); };
+  });
+  AK.$$('#inhalt button').forEach(b => b.classList.toggle('aktiv', b.dataset.kapitel === String(i)));
+  const aktivesEl = AK.$(`#inhalt button.aktiv`);
+  if(aktivesEl) aktivesEl.scrollIntoView({block:'nearest'});
+  AK.$('#zurueck').disabled = i === 0;
+  AK.$('#vor').disabled = i === buch.kapitel.length - 1;
+}
+
+/* ---------- Umwandeln ---------- */
+function bildAlsDatenUrl(blob, typ){
+  return new Promise(res => {
+    const leser = new FileReader();
+    leser.onload = () => res(leser.result);
+    leser.readAsDataURL(new Blob([blob], {type}));
+  });
+}
+
+async function kapitelHtml(i, bilderEinbetten, datenUrls){
+  const k = buch.kapitel[i];
+  const doc = new DOMParser().parseFromString(saeubern(k.roh, k.pfad), 'text/html');
+  for(const img of Array.from(doc.querySelectorAll('img'))){
+    if(!bilderEinbetten){ img.remove(); continue; }
+    const quelle = img.getAttribute('src');
+    const treffer = [...buch.bildKarte.values()].find(v => v.url === quelle);
+    if(!treffer){ img.remove(); continue; }
+    if(!datenUrls.has(quelle)) datenUrls.set(quelle, await bildAlsDatenUrl(treffer.blob, treffer.typ));
+    img.setAttribute('src', datenUrls.get(quelle));
+    img.removeAttribute('width'); img.removeAttribute('height');
+  }
+  doc.querySelectorAll('a[data-kapitel]').forEach(a => {
+    a.setAttribute('href', '#kapitel-' + a.dataset.kapitel);
+    a.removeAttribute('data-kapitel');
+  });
+  return doc.body.innerHTML;
+}
+
+function alsText(html){
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+  doc.querySelectorAll('p, div, li, h1, h2, h3, h4, h5, h6, blockquote, tr')
+     .forEach(el => el.append('\n'));
+  return doc.body.textContent.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+AK.$('#go').onclick = async () => {
+  AK.clearDownloads(); AK.stamp(false); AK.logClear();
+  AK.$('#go').disabled = true;
+  try{
+    const format = AK.$('#format').value;
+    const nurEins = AK.$('#umfang').value === 'kapitel';
+    const bilderMit = AK.$('#bilder').checked && format !== 'txt';
+    const marken = AK.$('#kapitelmarken').checked;
+    const umbruch = AK.$('#seitenumbruch').checked;
+    const nummern = nurEins ? [aktuell] : buch.kapitel.map((_, i) => i);
+    const datenUrls = new Map();
+    const stuecke = [];
+
+    for(let n = 0; n < nummern.length; n++){
+      const i = nummern[n];
+      stuecke.push({i, titel: kapitelTitel(i), html: await kapitelHtml(i, bilderMit, datenUrls)});
+      AK.bar((n + 1) / nummern.length);
+    }
+
+    const grundname = buch.dateiname + (nurEins ? '-kapitel-' + (aktuell + 1) : '');
+
+    if(format === 'zip'){
+      const neu = new JSZip();
+      stuecke.forEach((s, n) => {
+        const name = String(n + 1).padStart(2, '0') + '-' +
+          (s.titel.toLowerCase().replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'kapitel') + '.html';
+        neu.file(name, huelle(s.titel, (marken ? `<h1>${AK.esc(s.titel)}</h1>\n` : '') + s.html));
+      });
+      neu.file('inhalt.html', huelle(buch.titel,
+        '<h1>' + AK.esc(buch.titel) + '</h1>\n<ol>' +
+        stuecke.map((s, n) => `<li><a href="${String(n+1).padStart(2,'0')}-${
+          (s.titel.toLowerCase().replace(/[^a-z0-9äöüß]+/g,'-').replace(/^-|-$/g,'').slice(0,50) || 'kapitel')
+        }.html">${AK.esc(s.titel)}</a></li>`).join('') + '</ol>'));
+      AK.offerDownload(await neu.generateAsync({type:'blob'}), grundname + '.zip', 'ZIP herunterladen');
+      AK.log(`${stuecke.length} Kapitel als einzelne HTML-Dateien.`);
+    }else if(format === 'txt'){
+      const text = stuecke.map(s =>
+        (marken ? s.titel + '\n' + '='.repeat(Math.min(s.titel.length, 60)) + '\n\n' : '') + alsText(s.html)
+      ).join('\n\n\n');
+      const kopf = `${buch.titel}${buch.autor ? '\n' + buch.autor : ''}\n\n\n`;
+      AK.offerDownload(new Blob([kopf + text], {type:'text/plain;charset=utf-8'}),
+        grundname + '.txt', '.txt herunterladen');
+      AK.log(`${(kopf + text).length.toLocaleString('de-DE')} Zeichen Text.`);
+    }else if(format === 'md'){
+      const dienst = new TurndownService({headingStyle:'atx', codeBlockStyle:'fenced', bulletListMarker:'-'});
+      const text = stuecke.map(s =>
+        (marken ? '# ' + s.titel + '\n\n' : '') + dienst.turndown(s.html)
+      ).join('\n\n');
+      const kopf = `---\ntitel: ${JSON.stringify(buch.titel)}\n` +
+        (buch.autor ? `autor: ${JSON.stringify(buch.autor)}\n` : '') +
+        (buch.sprache ? `sprache: ${JSON.stringify(buch.sprache)}\n` : '') + '---\n\n';
+      AK.offerDownload(new Blob([kopf + text], {type:'text/markdown;charset=utf-8'}),
+        grundname + '.md', '.md herunterladen');
+      AK.log('Markdown mit Kopfdaten erstellt.');
+    }else{
+      const inhalt =
+        `<h1 class="buchtitel">${AK.esc(buch.titel)}</h1>` +
+        (buch.autor ? `<p class="autor">${AK.esc(buch.autor)}</p>` : '') +
+        (nurEins ? '' : '<nav class="toc"><h2>Inhalt</h2><ol>' +
+          stuecke.map(s => `<li><a href="#kapitel-${s.i}">${AK.esc(s.titel)}</a></li>`).join('') +
+          '</ol></nav>') +
+        stuecke.map(s =>
+          `<section id="kapitel-${s.i}"${umbruch ? ' class="umbruch"' : ''}>` +
+          (marken ? `<h1>${AK.esc(s.titel)}</h1>` : '') + s.html + '</section>').join('\n');
+      AK.offerDownload(new Blob([huelle(buch.titel, inhalt, umbruch)], {type:'text/html;charset=utf-8'}),
+        grundname + '.html', '.html herunterladen');
+      AK.log(bilderMit && datenUrls.size
+        ? `HTML mit ${datenUrls.size} eingebetteten Bildern.`
+        : 'HTML erstellt.');
+    }
+    AK.stamp(true);
+  }catch(err){
+    AK.log('Umwandeln fehlgeschlagen: ' + err.message, true);
+    console.error(err);
+  }finally{
+    AK.$('#go').disabled = false;
+    AK.bar(0);
+  }
+};
+
+function huelle(titel, inhalt, umbruch){
+  return `<!DOCTYPE html>
+<html lang="${AK.esc(buch.sprache || 'de')}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${AK.esc(titel)}</title>
+<style>
+body{max-width:38em;margin:0 auto;padding:2rem 1.2rem;font:17px/1.7 Georgia,'Times New Roman',serif;color:#16191B;background:#fff}
+h1,h2,h3{font-family:system-ui,sans-serif;line-height:1.25;margin:1.6em 0 .5em}
+h1{font-size:1.8em}h2{font-size:1.4em}h3{font-size:1.15em}
+p{margin:0 0 1em}
+img{max-width:100%;height:auto;display:block;margin:1.5em auto}
+blockquote{border-left:3px solid #DDD;margin:1em 0;padding-left:1em;color:#555}
+a{color:#1B4D3E}
+.buchtitel{font-size:2.2em;margin-top:0}
+.autor{color:#666;font-style:italic;margin-top:-.6em}
+.toc{border:1px solid #DDD;padding:1em 1.4em;margin:2em 0;background:#FAFAF7}
+.toc h2{margin-top:0;font-size:1.1em}
+.toc ol{margin:0;padding-left:1.3em}
+.toc li{margin:.3em 0}
+${umbruch ? 'section.umbruch{page-break-before:always;break-before:page}\nsection.umbruch:first-of-type{page-break-before:auto;break-before:auto}' : ''}
+</style>
+</head>
+<body>
+${inhalt}
+</body>
+</html>
+`;
+}
+
+AK.$('#zurueck').onclick = () => zeigen(aktuell - 1);
+AK.$('#vor').onclick = () => zeigen(aktuell + 1);
+addEventListener('keydown', e => {
+  if(!buch || e.target.matches('input, textarea, select')) return;
+  if(e.key === 'ArrowLeft')  zeigen(aktuell - 1);
+  if(e.key === 'ArrowRight') zeigen(aktuell + 1);
+});
+
+AK.dropzone('#drop', '#picker', addFiles);
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

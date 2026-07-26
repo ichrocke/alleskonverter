@@ -5,6 +5,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 ## Werkzeuge
 
 **PDF**
+
 | Werkzeug | Kann |
 |---|---|
 | [PDF zusammenfügen](tools/pdf-zusammenfuegen/index.html) | Mehrere PDFs stapeln, auch schreibgeschützte/passwortgeschützte; Seitenbereiche je Datei |
@@ -13,53 +14,75 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [PDF → Bild](tools/pdf-zu-bild/index.html) | Seiten als PNG/JPEG, 96–300 dpi, einzeln oder ZIP |
 | [Bilder → PDF](tools/bild-zu-pdf/index.html) | JPG/PNG/WebP/HEIC/GIF → ein PDF, A4 oder randlos |
 | [PDF komprimieren](tools/pdf-komprimieren/index.html) | Neuaufbau mit dpi/Qualität, Vorher-/Nachher-Größe |
-| [PDF stempeln](tools/pdf-stempeln/index.html) | Wasserzeichen und Seitenzahlen einfügen, mit Live-Vorschau |
-| [PDF-Übersichtsblatt](tools/pdf-kontaktabzug/index.html) | Kontaktabzug: alle Seiten als Miniaturen, Raster und Format wählbar |
 | [Text auslesen](tools/pdf-text/index.html) | Textextraktion, Zwischenablage oder .txt |
-
+| [PDF stempeln](tools/pdf-stempeln/index.html) | Wasserzeichen und Seitenzahlen einfügen, mit Live-Vorschau |
 | [PDF-Passwort](tools/pdf-passwort/index.html) | PDF mit AES-128 verschlüsseln oder bekannten Schutz entfernen, Rechte einstellen |
 | [PDF-Formular ausfüllen](tools/pdf-formular/index.html) | Formularfelder auslesen, ausfüllen und speichern, optional festschreiben |
+| [PDF-Übersichtsblatt](tools/pdf-kontaktabzug/index.html) | Kontaktabzug: alle Seiten als Miniaturen, Raster und Format wählbar |
 | [PDF durchsuchbar machen](tools/pdf-durchsuchbar/index.html) | OCR legt eine unsichtbare Textebene über den Scan |
+
 **Bilder**
+
 | Werkzeug | Kann |
 |---|---|
+| [Bilder konvertieren](tools/bild-konvertieren/index.html) | Batch: JPEG/PNG/WebP/AVIF, HEIC-Eingabe, Größe begrenzen, Qualität, EXIF/GPS wird entfernt |
 | [Bild zuschneiden](tools/bild-zuschneiden/index.html) | Ausschnitt frei oder mit festem Seitenverhältnis, drehen, spiegeln |
 | [Bilder zusammenfügen](tools/bilder-zusammenfuegen/index.html) | Collage: nebeneinander, untereinander oder Raster, mit Abstand und Hintergrund |
 | [Hintergrund entfernen](tools/hintergrund-entfernen/index.html) | Motiv freistellen (U²-Net im Browser), transparent oder mit neuer Farbe |
 | [Bild-Metadaten anzeigen](tools/bild-metadaten/index.html) | EXIF lesen: Kamera, Zeit, Einstellungen, GPS-Standort mit Kartenlink |
-| [Bild als Daten-URI](tools/bild-base64/index.html) | Base64-Schnipsel für CSS/HTML/Markdown, mit Größenwarnung |
-| [Bilder konvertieren](tools/bild-konvertieren/index.html) | Batch: JPEG/PNG/WebP/AVIF, HEIC-Eingabe, Größe begrenzen, Qualität, EXIF/GPS wird entfernt |
+| [Dateien umbenennen](tools/bilder-umbenennen/index.html) | Stapelweise umbenennen mit Muster, Zähler und Datum, Ausgabe als ZIP |
 
-**Dokumente & Daten**
+**Dokumente & Text**
+
 | Werkzeug | Kann |
 |---|---|
+| [Word-Datei erstellen](tools/word-erstellen/index.html) | Markdown/Text/HTML → DOCX mit Formatvorlagen, Titelseite, Inhaltsverzeichnis, Seitenzahlen |
 | [Word → HTML](tools/word-zu-html/index.html) | DOCX → HTML (komplett/Fragment) oder Text, mit Vorschau |
 | [Markdown ↔ HTML](tools/markdown-html/index.html) | Beide Richtungen, Live-Vorschau |
-| [Tabellen-Konverter](tools/tabellen/index.html) | CSV/TSV/JSON/XLSX/XLS ↔ CSV/JSON/XLSX, Vorschau |
-
+| [EPUB lesen & umwandeln](tools/epub/index.html) | E-Book im Browser lesen (EPUB 2 + 3), Export als HTML, Text, Markdown oder ZIP je Kapitel |
 | [Texterkennung (OCR)](tools/texterkennung/index.html) | Text aus Bildern und gescannten PDFs erkennen (Tesseract, deutsch/englisch) |
-| [JSON &amp; YAML](tools/json-yaml/index.html) | JSON formatieren/prüfen/minimieren, YAML ↔ JSON, Fehler mit Zeilenangabe |
-**Extras**
+| [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
+| [Texte & Tabellen vergleichen](tools/vergleichen/index.html) | Diff nach Myers, wortgenaue Hervorhebung, Tabellen zellenweise, Export als .diff oder CSV |
+
+**Tabellen & Daten**
+
 | Werkzeug | Kann |
 |---|---|
-| [QR-Code erstellen](tools/qr-code/index.html) | 12 QR-Typen (Link, WLAN, vCard, GiroCode …), Farben/Logos/Rahmen, Bild-im-Code, PNG/SVG-Export |
-| [ZIP entpacken & packen](tools/zip/index.html) | Archive öffnen, Dateien einzeln oder gebündelt herausholen; Dateien zu ZIP packen |
+| [Tabellen-Konverter](tools/tabellen/index.html) | CSV/TSV/JSON/XLSX/XLS ↔ CSV/JSON/XLSX, Vorschau |
+| [CSV bereinigen](tools/csv-bereinigen/index.html) | Spalten wählen und per Ziehen sortieren, Duplikate entfernen, Zeilen filtern, Export CSV/XLSX/JSON |
+| [JSON &amp; YAML](tools/json-yaml/index.html) | JSON formatieren/prüfen/minimieren, YAML ↔ JSON, Fehler mit Zeilenangabe |
 
-| [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
-| [Untertitel SRT ↔ VTT](tools/untertitel/index.html) | Untertitel umwandeln, reinen Text extrahieren, Zeiten verschieben |
-| [Favicon-Generator](tools/favicon/index.html) | Alle Symbolgrößen, favicon.ico, Apple-Touch-Icon, Manifest und HTML-Schnipsel als ZIP |
-| [Farbwerte umrechnen](tools/farben/index.html) | HEX/RGB/HSL/CMYK, Pipette für Bilder, Abstufungen, WCAG-Kontrastprüfung |
-| [Passwort-Generator](tools/passwort/index.html) | Zeichenfolgen, Passphrasen und PINs mit echtem Zufall, Stärke- und Zeitschätzung |
-| [Einheiten &amp; Zeitzonen](tools/einheiten/index.html) | Neun Größenarten umrechnen, Uhrzeit in 20 Zeitzonen |
-| [Dateien umbenennen](tools/bilder-umbenennen/index.html) | Stapelweise umbenennen mit Muster, Zähler und Datum, Ausgabe als ZIP |
-**Medien**
+**Audio & Video**
+
 | Werkzeug | Kann |
 |---|---|
 | [Audio & Video](tools/medien/index.html) | MP3/WAV/OGG/M4A/FLAC/MP4/WebM/GIF via ffmpeg.wasm, Tonspur extrahieren |
-
 | [Medien schneiden](tools/medien-schneiden/index.html) | Video/Audio auf einen Ausschnitt kürzen, wahlweise ohne Neuberechnung |
-| [GIF erstellen](tools/gif-erstellen/index.html) | Animiertes GIF aus Bildern, mit eigener Farbtabelle für bessere Farben |
 | [Ton verbessern](tools/ton-verbessern/index.html) | Normalisieren nach EBU R128, Stille abschneiden, Rauschdämpfung |
+| [GIF erstellen](tools/gif-erstellen/index.html) | Animiertes GIF aus Bildern, mit eigener Farbtabelle für bessere Farben |
+| [Untertitel SRT ↔ VTT](tools/untertitel/index.html) | Untertitel umwandeln, reinen Text extrahieren, Zeiten verschieben |
+
+**Web & Entwicklung**
+
+| Werkzeug | Kann |
+|---|---|
+| [Bildergalerie als HTML](tools/bildergalerie/index.html) | Raster/Mauerwerk/Reihe, Bildunterschriften, Großansicht; Bilder eingebettet oder als ZIP |
+| [Bild als Daten-URI](tools/bild-base64/index.html) | Base64-Schnipsel für CSS/HTML/Markdown, mit Größenwarnung |
+| [Favicon-Generator](tools/favicon/index.html) | Alle Symbolgrößen, favicon.ico, Apple-Touch-Icon, Manifest und HTML-Schnipsel als ZIP |
+| [Farbwerte umrechnen](tools/farben/index.html) | HEX/RGB/HSL/CMYK, Pipette für Bilder, Abstufungen, WCAG-Kontrastprüfung |
+| [Regex ausprobieren](tools/regex/index.html) | Treffer live hervorgehoben, Gruppen aufgelistet, Erklärung auf Deutsch, Ersetzen |
+| [Testdaten & Blindtext](tools/testdaten/index.html) | Lorem Ipsum in drei Sorten; Namen, Adressen, IBAN mit Prüfziffer als CSV/JSON/SQL |
+
+**Alltag**
+
+| Werkzeug | Kann |
+|---|---|
+| [QR-Code erstellen](tools/qr-code/index.html) | 12 QR-Typen (Link, WLAN, vCard, GiroCode …), Farben/Logos/Rahmen, Bild-im-Code, PNG/SVG-Export |
+| [Passwort-Generator](tools/passwort/index.html) | Zeichenfolgen, Passphrasen und PINs mit echtem Zufall, Stärke- und Zeitschätzung |
+| [Einheiten &amp; Zeitzonen](tools/einheiten/index.html) | Neun Größenarten umrechnen, Uhrzeit in 20 Zeitzonen |
+| [Termin als ICS](tools/termin/index.html) | Kalender-Einladung nach RFC 5545 mit Zeitzone, Wiederholung, Erinnerung und Teilnehmern |
+| [ZIP entpacken & packen](tools/zip/index.html) | Archive öffnen, Dateien einzeln oder gebündelt herausholen; Dateien zu ZIP packen |
+
 ## Nutzung
 
 Live unter <https://alleskonverter.de>. Die Seite lässt sich über den Browser als App
@@ -130,6 +153,12 @@ Fehler gefunden oder ein Werkzeug vermisst? Gern als
 Der Quellcode ist bewusst offen: Bei Werkzeugen, die mit vertraulichen Dateien umgehen,
 soll niemand einem Versprechen glauben müssen. Dass nichts hochgeladen wird, lässt sich
 hier nachlesen — und im Browser unter „Netzwerk“ selbst nachmessen.
+
+## Lizenz
+
+Der Quellcode steht unter der [MIT-Lizenz](LICENSE) — verwendbar, veränderbar und
+weitergebbar, auch gewerblich. Die mitgelieferten Fremdbibliotheken unter `vendor/`
+haben eigene Lizenzen; welche das sind, steht in [vendor/VERSIONEN.md](vendor/VERSIONEN.md).
 
 ## Changelog
 

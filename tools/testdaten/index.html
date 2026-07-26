@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testdaten und Lorem Ipsum erzeugen (Namen, Adressen, IBAN) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Blindtext und Testdatensätze erzeugen: deutsche Namen, Adressen, E-Mails, Telefonnummern und IBAN mit korrekter Prüfziffer. Als CSV, JSON oder SQL. Kostenlos, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/testdaten/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Testdaten und Lorem Ipsum erzeugen — kostenlos | Alleskonverter">
+<meta property="og:description" content="Blindtext und Testdatensätze: Namen, Adressen, E-Mails, IBAN mit korrekter Prüfziffer. Als CSV, JSON oder SQL.">
+<meta property="og:url" content="https://alleskonverter.de/tools/testdaten/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Testdaten und Lorem Ipsum erzeugen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Testdaten erzeugen — Alleskonverter","url":"https://alleskonverter.de/tools/testdaten/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Blindtext und deutsche Testdatensätze erzeugen — Namen, Adressen, IBAN mit Prüfziffer, als CSV, JSON oder SQL."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Sind die IBANs echt?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Prüfziffer ist mathematisch korrekt, damit Eingabemasken die Nummer annehmen — die Bankleitzahl gehört aber zu keinem echten Institut. Es lässt sich damit kein Geld bewegen."}},{"@type":"Question","name":"Sind die Namen und Adressen echte Personen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Vor- und Nachnamen werden aus Listen häufiger deutscher Namen zufällig zusammengesetzt, Hausnummern frei gewürfelt. Zufällige Übereinstimmungen mit echten Personen sind möglich, aber unbeabsichtigt."}},{"@type":"Question","name":"Kann ich dieselben Daten später noch einmal erzeugen?","acceptedAnswer":{"@type":"Answer","text":"Ja. Mit einem festen Startwert (Seed) kommt immer derselbe Datensatz heraus — praktisch für nachvollziehbare Tests."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{padding:8px 13px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tabs button:hover{border-color:var(--ink)}
+.tabs button.active{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+.felder{border:1px solid var(--rule);background:var(--card);max-height:280px;overflow:auto}
+.felder label{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--rule);
+  font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink);margin:0;cursor:pointer}
+.felder label:last-child{border-bottom:0}
+.felder input{width:auto;margin:0}
+.felder small{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft)}
+.blindtext{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:16px 18px;
+  max-height:420px;overflow:auto;line-height:1.7;font-size:14.5px}
+.blindtext p{margin:0 0 1em}
+.blindtext p:last-child{margin:0}
+.warnung{border-left:3px solid var(--stamp);background:var(--card);padding:9px 12px;margin-top:12px;
+  font-size:12.5px;color:var(--ink-soft);line-height:1.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Testdaten <span>&amp; Blindtext</span></h1>
+  <p class="sub">Füllmaterial für Entwürfe und Tests: Lorem Ipsum in mehreren Geschmacksrichtungen und komplette Datensätze mit deutschen Namen, Adressen, E-Mails und IBANs mit korrekter Prüfziffer.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="tabs" role="tablist">
+      <button class="active" id="tab-text" role="tab" aria-selected="true">Blindtext</button>
+      <button id="tab-daten" role="tab" aria-selected="false">Datensätze</button>
+    </div>
+
+    <div id="bereich-text">
+      <h2>Vorschau</h2>
+      <div class="blindtext" id="textvorschau"></div>
+    </div>
+
+    <div id="bereich-daten" hidden>
+      <h2>Vorschau <small style="font-family:var(--mono);font-size:11px;color:var(--ink-soft);font-weight:400">— erste 50 Zeilen</small></h2>
+      <div class="tablewrap" id="tabellenvorschau"></div>
+      <p class="warnung">Alle Angaben sind erfunden. Die IBAN-Prüfziffer ist zwar korrekt gerechnet, die Bankleitzahl gehört aber zu keinem echten Institut — es lässt sich damit kein Geld bewegen.</p>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Erzeugen</h2>
+    <div class="count" id="anzahl">0<small>Zeichen</small></div>
+
+    <!-- Blindtext -->
+    <div id="opt-text" style="margin-top:16px">
+      <div class="field">
+        <label for="sorte">Art des Blindtexts</label>
+        <select id="sorte">
+          <option value="lorem">Lorem Ipsum (klassisch)</option>
+          <option value="deutsch">Deutscher Blindtext</option>
+          <option value="fach">Fülltext im Behördenton</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="einheit">Menge</label>
+        <select id="einheit">
+          <option value="absaetze">Absätze</option>
+          <option value="saetze">Sätze</option>
+          <option value="woerter">Wörter</option>
+          <option value="zeichen">Zeichen</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="menge">Wie viele</label>
+        <input type="number" id="menge" value="3" min="1" max="2000">
+      </div>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:8px;color:var(--ink)">
+        <input type="checkbox" id="startklassisch" checked style="width:auto"> Mit dem klassischen Anfang beginnen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:16px;color:var(--ink)">
+        <input type="checkbox" id="alshtml" style="width:auto"> Als HTML mit &lt;p&gt;-Absätzen</label>
+    </div>
+
+    <!-- Datensätze -->
+    <div id="opt-daten" style="margin-top:16px" hidden>
+      <div class="field">
+        <label for="zeilen">Anzahl der Datensätze</label>
+        <input type="number" id="zeilen" value="25" min="1" max="10000">
+      </div>
+      <div class="field">
+        <label>Spalten</label>
+        <div class="felder" id="felder"></div>
+      </div>
+      <div class="field">
+        <label for="format">Speichern als</label>
+        <select id="format">
+          <option value="csv">CSV (Semikolon, für Excel)</option>
+          <option value="json">JSON</option>
+          <option value="sql">SQL (INSERT-Anweisungen)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="seed">Startwert <small style="text-transform:none;letter-spacing:0;color:var(--ink-soft)">— gleicher Wert, gleiche Daten</small></label>
+      <input type="text" id="seed" placeholder="leer = jedes Mal neu">
+    </div>
+
+    <button class="primary" id="neu">Neu würfeln</button>
+    <button id="go" style="margin-top:8px">Herunterladen</button>
+    <button id="kopieren" style="margin-top:8px">Kopieren</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Layout ohne Text sieht immer gut aus, und eine Datenbank ohne Zeilen auch. Hier bekommst du beides: Blindtext in der Menge, die du brauchst, und komplette Testdatensätze mit plausiblen deutschen Namen, Adressen, E-Mail-Adressen, Telefonnummern und IBANs — als CSV für Excel, als JSON fürs Frontend oder gleich als SQL-INSERTs für die Testdatenbank.</p>
+  <h3>Sind die IBANs echt?</h3>
+  <p>Nein — und das ist Absicht. Die Prüfziffer wird nach ISO 13616 korrekt berechnet, damit Formulare und Validierungsbibliotheken die Nummer annehmen. Die verwendeten Bankleitzahlen gehören aber zu keinem echten Kreditinstitut, es gibt kein zugehöriges Konto und es lässt sich damit kein Geld bewegen.</p>
+  <h3>Sind die Namen und Adressen echte Personen?</h3>
+  <p>Nein. Vornamen, Nachnamen, Straßen und Städte stammen aus Listen gebräuchlicher deutscher Namen und werden zufällig neu kombiniert; Hausnummern werden gewürfelt. Dass dabei zufällig eine reale Kombination entsteht, lässt sich nicht ausschließen — gemeint ist sie nicht.</p>
+  <h3>Warum sollte ich echte Daten nicht zum Testen nehmen?</h3>
+  <p>Weil Testsysteme selten so gut geschützt sind wie Produktivsysteme und Kopien echter Kundendaten dort schnell vergessen werden. Die DSGVO verlangt Datenminimierung; synthetische Testdaten sind der einfachste Weg, dieses Problem gar nicht erst zu bekommen.</p>
+  <h3>Kann ich dieselben Daten später noch einmal erzeugen?</h3>
+  <p>Ja. Trägst du einen Startwert ein — irgendein Wort oder eine Zahl —, kommt bei gleicher Einstellung immer derselbe Datensatz heraus. Das ist praktisch, wenn ein Test reproduzierbar fehlschlagen soll. Bleibt das Feld leer, wird jedes Mal neu gewürfelt.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Die Postleitzahlen passen jeweils zur genannten Stadt, damit die Daten auch Plausibilitätsprüfungen überstehen. Die Zufallszahlen kommen aus einem einfachen, wiederholbaren Generator — nicht für kryptografische Zwecke geeignet.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/xlsx.full.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+/* ---------- Wiederholbarer Zufall (mulberry32) ---------- */
+let wuerfel = Math.random;
+function seedSetzen(text){
+  if(!text){ wuerfel = Math.random; return; }
+  let h = 1779033703 ^ text.length;
+  for(let i = 0; i < text.length; i++){
+    h = Math.imul(h ^ text.charCodeAt(i), 3432918353);
+    h = h << 13 | h >>> 19;
+  }
+  let a = h >>> 0;
+  wuerfel = function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const w = arr => arr[Math.floor(wuerfel() * arr.length)];
+const z = (min, max) => min + Math.floor(wuerfel() * (max - min + 1));
+
+/* ---------- Wortlisten ---------- */
+const VORNAMEN_W = ['Anna','Marie','Sophie','Emma','Lena','Laura','Julia','Sarah','Lisa','Hannah','Mia','Leonie','Charlotte','Johanna','Katharina','Nina','Elisabeth','Franziska','Clara','Amelie','Ida','Greta','Mathilda','Paula','Helena','Nele','Jana','Melanie','Sabine','Petra','Andrea','Claudia','Susanne','Birgit','Monika'];
+const VORNAMEN_M = ['Lukas','Jonas','Leon','Felix','Maximilian','Paul','Elias','Noah','Ben','Finn','Luis','Julian','Moritz','Jakob','David','Simon','Tobias','Sebastian','Christian','Michael','Thomas','Andreas','Stefan','Martin','Peter','Wolfgang','Matthias','Alexander','Philipp','Daniel','Florian','Markus','Oliver','Jan','Timo'];
+const NACHNAMEN = ['Müller','Schmidt','Schneider','Fischer','Weber','Meyer','Wagner','Becker','Schulz','Hoffmann','Schäfer','Koch','Bauer','Richter','Klein','Wolf','Schröder','Neumann','Schwarz','Zimmermann','Braun','Krüger','Hofmann','Hartmann','Lange','Schmitt','Werner','Krause','Meier','Lehmann','Schmid','Schulze','Maier','Köhler','Herrmann','König','Walter','Mayer','Huber','Kaiser','Fuchs','Peters','Lang','Scholz','Möller','Weiß','Jung','Hahn','Schubert','Vogel','Friedrich','Keller','Günther','Frank','Berger','Winkler','Roth','Beck','Lorenz','Baumann','Franke','Albrecht','Ludwig','Winter','Kraus','Martin','Schumacher','Krämer','Vogt','Stein','Jäger','Otto','Sommer','Groß','Seidel','Heinrich','Brandt','Haas','Schreiber','Graf','Schulte','Dietrich','Ziegler','Kuhn','Kühn','Pohl','Engel','Horn','Busch','Bergmann','Thomas','Voigt','Sauer','Arnold','Wolff','Pfeiffer'];
+const STRASSEN = ['Hauptstraße','Schulstraße','Gartenstraße','Bahnhofstraße','Dorfstraße','Bergstraße','Birkenweg','Lindenstraße','Kirchstraße','Waldstraße','Ringstraße','Mühlenweg','Amselweg','Feldstraße','Poststraße','Rosenweg','Schillerstraße','Goethestraße','Wiesenweg','Talstraße','Ahornweg','Buchenweg','Eichenweg','Fasanenweg','Blumenstraße','Marktplatz','Am Sportplatz','Zum Alten Bahnhof','Industriestraße','Parkstraße','Sonnenweg','Erlenweg','Danziger Straße','Beethovenstraße','Mozartstraße','Uhlandstraße','Fichtenweg','Hochstraße','Neue Straße','Weststraße'];
+const ORTE = [['Berlin','101'],['Hamburg','203'],['München','803'],['Köln','507'],['Frankfurt am Main','604'],['Stuttgart','701'],['Düsseldorf','402'],['Leipzig','041'],['Dortmund','442'],['Essen','451'],['Bremen','281'],['Dresden','011'],['Hannover','301'],['Nürnberg','904'],['Duisburg','470'],['Bochum','448'],['Wuppertal','422'],['Bielefeld','336'],['Bonn','531'],['Münster','481'],['Karlsruhe','761'],['Mannheim','681'],['Augsburg','861'],['Wiesbaden','651'],['Mönchengladbach','410'],['Gelsenkirchen','458'],['Braunschweig','381'],['Kiel','241'],['Chemnitz','091'],['Aachen','520'],['Halle (Saale)','061'],['Magdeburg','391'],['Freiburg im Breisgau','791'],['Krefeld','477'],['Lübeck','235'],['Mainz','550'],['Erfurt','990'],['Rostock','180'],['Kassel','341'],['Potsdam','144'],['Paderborn','331'],['Osnabrück','490'],['Ingolstadt','850'],['Würzburg','970'],['Regensburg','930'],['Heidelberg','691'],['Göttingen','370'],['Ulm','890'],['Oldenburg','261'],['Trier','545']];
+const FIRMEN_A = ['Nord','Süd','Elbe','Rhein','Alpha','Delta','Vita','Terra','Novum','Pro','Inter','Uni','Global','Fein','Blitz','Sonnen','Stern','Wald','Berg','Kron'];
+const FIRMEN_B = ['technik','handel','bau','logistik','service','systeme','consult','werk','partner','media','data','plan','druck','transport','pflege'];
+const FIRMEN_C = ['GmbH','GmbH & Co. KG','AG','e. K.','UG (haftungsbeschränkt)','GbR'];
+const BERUFE = ['Kauffrau/-mann für Büromanagement','Softwareentwicklung','Pflegefachkraft','Elektroniker/in','Lehrkraft','Verkäufer/in','Buchhaltung','Projektleitung','Mechatroniker/in','Grafikdesign','Krankenpflege','Logistik','Kundenbetreuung','Personalwesen','Vertrieb','Erzieher/in','Steuerfachangestellte/r','Bauleitung','Marketing','Qualitätssicherung'];
+const DOMAINS = ['beispiel.de','muster-mail.de','testpost.de','example.org','probe.net','mailbox-test.de'];
+
+const LOREM = 'lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat voluptua at vero eos accusam justo duo dolores rebum stet clita kasd gubergren no sea takimata sanctus est nam liber tempore cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum typi non habent claritatem insitam consuetudium lectorum mirum notare quam littera gothica quarto decima eodem modo qui sequitur mutationem'.split(' ');
+const DEUTSCH = 'ein sehr schöner tag im norden der stadt bringt viele menschen auf die straße wo sie sich über das wetter und die neuen pläne der verwaltung unterhalten während kinder auf dem platz spielen und ältere leute auf den bänken sitzen die bäume werfen lange schatten über den weg der zum fluss führt dort liegen boote am ufer und warten auf den sommer der noch weit entfernt scheint doch die vorfreude ist bereits deutlich zu spüren in jedem gespräch'.split(' ');
+const BEHOERDE = 'die zuständige stelle prüft den vorgang nach maßgabe der einschlägigen vorschriften und teilt das ergebnis unverzüglich mit soweit weitere unterlagen erforderlich sind werden diese gesondert angefordert eine frist von vier wochen ab zugang dieses schreibens gilt als angemessen im übrigen wird auf die beigefügten hinweise verwiesen die entscheidung ergeht gebührenfrei rechtsbehelfe sind gesondert aufgeführt'.split(' ');
+const KLASSIKER = {
+  lorem: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.',
+  deutsch: 'Dies ist ein Blindtext, der lediglich dazu dient, den Eindruck einer gesetzten Seite zu vermitteln, ohne durch seinen Inhalt abzulenken.',
+  fach: 'Hiermit wird der Eingang Ihres Antrags bestätigt; über den weiteren Fortgang des Verfahrens werden Sie zu gegebener Zeit unterrichtet.',
+};
+
+/* ---------- IBAN mit korrekter Prüfziffer (ISO 13616) ---------- */
+function mod97(text){
+  let rest = 0;
+  for(const zeichen of text) rest = (rest * 10 + parseInt(zeichen, 10)) % 97;
+  return rest;
+}
+function iban(){
+  // Bankleitzahl aus einem Bereich, der keinem echten Institut zugeordnet ist
+  const blz = String(z(99000000, 99999999));
+  const konto = String(z(0, 9999999999)).padStart(10, '0');
+  const bban = blz + konto;
+  // "DE" → 1314, dann Prüfziffer 00 anhängen und Rest zu 98 ergänzen
+  const pruef = String(98 - mod97(bban + '131400')).padStart(2, '0');
+  const voll = 'DE' + pruef + bban;
+  return voll.replace(/(.{4})/g, '$1 ').trim();
+}
+
+/* ---------- Felder ---------- */
+const FELDER = [
+  ['vorname',   'Vorname',        () => wuerfel() < .5 ? w(VORNAMEN_W) : w(VORNAMEN_M)],
+  ['nachname',  'Nachname',       () => w(NACHNAMEN)],
+  ['anrede',    'Anrede',         () => wuerfel() < .5 ? 'Frau' : 'Herr'],
+  ['strasse',   'Straße + Nr.',   () => w(STRASSEN) + ' ' + z(1, 148) + (wuerfel() < .12 ? w(['a','b','c']) : '')],
+  ['plz',       'PLZ',            null],
+  ['ort',       'Ort',            null],
+  ['email',     'E-Mail',         null],
+  ['telefon',   'Telefon',        () => '0' + z(20, 99) + z(1, 9) + ' ' + z(100000, 9999999)],
+  ['mobil',     'Mobil',          () => '01' + w(['5','6','7']) + z(0, 9) + ' ' + z(1000000, 9999999)],
+  ['geburtstag','Geburtsdatum',   () => datum(z(1945, 2007))],
+  ['iban',      'IBAN',           iban],
+  ['firma',     'Firma',          () => w(FIRMEN_A) + w(FIRMEN_B) + ' ' + w(FIRMEN_C)],
+  ['beruf',     'Beruf',          () => w(BERUFE)],
+  ['kundennr',  'Kundennummer',   () => 'K-' + String(z(10000, 999999)).padStart(6, '0')],
+  ['betrag',    'Betrag (EUR)',   () => (z(150, 250000) / 100).toFixed(2).replace('.', ',')],
+  ['datum',     'Datum',          () => datum(z(2024, 2027))],
+  ['uuid',      'UUID',           () => Array.from({length:36}, (_, i) =>
+                                        [8,13,18,23].includes(i) ? '-' :
+                                        i === 14 ? '4' :
+                                        i === 19 ? '89ab'[z(0,3)] :
+                                        '0123456789abcdef'[z(0,15)]).join('')],
+  ['satz',      'Blindtext-Satz', () => satz(LOREM)],
+];
+const VORAUSGEWAEHLT = ['vorname','nachname','strasse','plz','ort','email'];
+
+function datum(jahr){
+  const monat = z(1, 12);
+  const tage = new Date(jahr, monat, 0).getDate();
+  return String(z(1, tage)).padStart(2, '0') + '.' + String(monat).padStart(2, '0') + '.' + jahr;
+}
+
+const OHNE_UMLAUT = t => t.toLowerCase()
+  .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+  .replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'');
+
+/* ---------- Blindtext ---------- */
+function satz(quelle){
+  const laenge = z(6, 18);
+  const woerter = Array.from({length: laenge}, () => w(quelle));
+  const text = woerter.join(' ');
+  return text.charAt(0).toUpperCase() + text.slice(1) + w(['.', '.', '.', '.', '?', '!']);
+}
+
+function blindtext(){
+  const sorte = AK.$('#sorte').value;
+  const quelle = sorte === 'lorem' ? LOREM : sorte === 'deutsch' ? DEUTSCH : BEHOERDE;
+  const einheit = AK.$('#einheit').value;
+  const menge = Math.max(1, Math.min(2000, parseInt(AK.$('#menge').value, 10) || 1));
+  const klassisch = AK.$('#startklassisch').checked;
+
+  if(einheit === 'woerter'){
+    const woerter = [];
+    if(klassisch) woerter.push(...KLASSIKER[sorte].replace(/[.,;]/g, '').split(' '));
+    while(woerter.length < menge) woerter.push(w(quelle));
+    const text = woerter.slice(0, menge).join(' ');
+    return [text.charAt(0).toUpperCase() + text.slice(1) + '.'];
+  }
+  if(einheit === 'zeichen'){
+    let text = klassisch ? KLASSIKER[sorte] : '';
+    while(text.length < menge) text += (text ? ' ' : '') + satz(quelle);
+    return [text.slice(0, menge).trim()];
+  }
+  if(einheit === 'saetze'){
+    const saetze = [];
+    if(klassisch) saetze.push(KLASSIKER[sorte]);
+    while(saetze.length < menge) saetze.push(satz(quelle));
+    return [saetze.slice(0, menge).join(' ')];
+  }
+  const absaetze = [];
+  for(let i = 0; i < menge; i++){
+    const saetze = [];
+    if(i === 0 && klassisch) saetze.push(KLASSIKER[sorte]);
+    const wieViele = z(3, 7);
+    while(saetze.length < wieViele) saetze.push(satz(quelle));
+    absaetze.push(saetze.join(' '));
+  }
+  return absaetze;
+}
+
+/* ---------- Datensätze ---------- */
+function datensaetze(){
+  const gewaehlt = FELDER.filter(f => {
+    const box = document.getElementById('f-' + f[0]);
+    return box && box.checked;
+  });
+  const anzahl = Math.max(1, Math.min(10000, parseInt(AK.$('#zeilen').value, 10) || 1));
+  const kopf = gewaehlt.map(f => f[1]);
+  const zeilen = [];
+  for(let i = 0; i < anzahl; i++){
+    // Zusammenhängende Werte einmal je Zeile bestimmen, damit E-Mail zum Namen
+    // und die PLZ zum Ort passt
+    const weiblich = wuerfel() < .5;
+    const vorname = weiblich ? w(VORNAMEN_W) : w(VORNAMEN_M);
+    const nachname = w(NACHNAMEN);
+    const [ort, plzVorne] = w(ORTE);
+    const plz = plzVorne + String(z(0, 99)).padStart(2, '0');
+    const email = OHNE_UMLAUT(vorname) + '.' + OHNE_UMLAUT(nachname) + '@' + w(DOMAINS);
+    const fest = {vorname, nachname, plz, ort, email, anrede: weiblich ? 'Frau' : 'Herr'};
+    zeilen.push(gewaehlt.map(f => fest[f[0]] !== undefined ? fest[f[0]] : f[2]()));
+  }
+  return {kopf, zeilen, schluessel: gewaehlt.map(f => f[0])};
+}
+
+/* ---------- Darstellung ---------- */
+let aktuellText = [], aktuellDaten = null;
+
+function istText(){ return !AK.$('#bereich-text').hidden; }
+
+function erzeugen(){
+  seedSetzen(AK.$('#seed').value.trim());
+  AK.clearDownloads(); AK.stamp(false); AK.logClear();
+  if(istText()){
+    aktuellText = blindtext();
+    const html = AK.$('#alshtml').checked;
+    AK.$('#textvorschau').innerHTML = aktuellText.map(a => `<p>${AK.esc(a)}</p>`).join('');
+    const zeichen = aktuellText.join('\n\n').length;
+    AK.$('#anzahl').innerHTML = zeichen.toLocaleString('de-DE') + '<small>Zeichen</small>';
+    if(html) AK.log('Beim Herunterladen und Kopieren werden die Absätze als <p>…</p> ausgegeben.');
+  }else{
+    aktuellDaten = datensaetze();
+    const teil = aktuellDaten.zeilen.slice(0, 50);
+    AK.$('#tabellenvorschau').innerHTML = aktuellDaten.kopf.length
+      ? '<table><thead><tr>' + aktuellDaten.kopf.map(k => `<th>${AK.esc(k)}</th>`).join('') +
+        '</tr></thead><tbody>' +
+        teil.map(r => '<tr>' + r.map(c => `<td>${AK.esc(c)}</td>`).join('') + '</tr>').join('') +
+        '</tbody></table>'
+      : '<p class="empty">Keine Spalte ausgewählt.</p>';
+    AK.$('#anzahl').innerHTML = aktuellDaten.zeilen.length.toLocaleString('de-DE') + '<small>Datensätze</small>';
+  }
+}
+
+function ausgabe(){
+  if(istText()){
+    return AK.$('#alshtml').checked
+      ? {text: aktuellText.map(a => '<p>' + AK.esc(a) + '</p>').join('\n'), name:'blindtext.html', typ:'text/html'}
+      : {text: aktuellText.join('\n\n'), name:'blindtext.txt', typ:'text/plain'};
+  }
+  const format = AK.$('#format').value;
+  const {kopf, zeilen, schluessel} = aktuellDaten;
+  if(format === 'json'){
+    const objekte = zeilen.map(r => Object.fromEntries(schluessel.map((k, i) => [k, r[i]])));
+    return {text: JSON.stringify(objekte, null, 2), name:'testdaten.json', typ:'application/json'};
+  }
+  if(format === 'sql'){
+    const spalten = schluessel.join(', ');
+    const zeilenSql = zeilen.map(r =>
+      `INSERT INTO testdaten (${spalten}) VALUES (${r.map(v => "'" + String(v).replace(/'/g, "''") + "'").join(', ')});`);
+    return {text: zeilenSql.join('\n'), name:'testdaten.sql', typ:'text/plain'};
+  }
+  const blatt = XLSX.utils.aoa_to_sheet([kopf, ...zeilen]);
+  return {text: '﻿' + XLSX.utils.sheet_to_csv(blatt, {FS:';'}), name:'testdaten.csv', typ:'text/csv'};
+}
+
+/* ---------- Steuerung ---------- */
+const felderWrap = AK.$('#felder');
+FELDER.forEach(([id, name]) => {
+  const l = document.createElement('label');
+  l.innerHTML = `<input type="checkbox" id="f-${id}" ${VORAUSGEWAEHLT.includes(id) ? 'checked' : ''}> ${AK.esc(name)}<small>${id}</small>`;
+  l.querySelector('input').onchange = erzeugen;
+  felderWrap.appendChild(l);
+});
+
+function umschalten(aufText){
+  AK.$('#tab-text').classList.toggle('active', aufText);
+  AK.$('#tab-daten').classList.toggle('active', !aufText);
+  AK.$('#tab-text').setAttribute('aria-selected', String(aufText));
+  AK.$('#tab-daten').setAttribute('aria-selected', String(!aufText));
+  AK.$('#bereich-text').hidden = !aufText;
+  AK.$('#bereich-daten').hidden = aufText;
+  AK.$('#opt-text').hidden = !aufText;
+  AK.$('#opt-daten').hidden = aufText;
+  erzeugen();
+}
+AK.$('#tab-text').onclick  = () => umschalten(true);
+AK.$('#tab-daten').onclick = () => umschalten(false);
+
+AK.$('#neu').onclick = erzeugen;
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const a = ausgabe();
+  AK.offerDownload(new Blob([a.text], {type: a.typ + ';charset=utf-8'}), a.name);
+  AK.stamp(true);
+};
+AK.$('#kopieren').onclick = async () => {
+  try{
+    await navigator.clipboard.writeText(ausgabe().text);
+    AK.log('In die Zwischenablage kopiert.');
+  }catch(_){
+    AK.log('Kopieren wurde vom Browser abgelehnt.', true);
+  }
+};
+
+['#sorte','#einheit','#menge','#startklassisch','#alshtml','#zeilen','#format','#seed']
+  .forEach(s => AK.$(s).addEventListener('input', erzeugen));
+
+erzeugen();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

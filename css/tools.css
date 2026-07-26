@@ -57,7 +57,7 @@ aside{position:sticky;top:20px;background:var(--card);border:1px solid var(--rul
 @media(max-width:860px){aside{position:static}}
 .field{margin-bottom:14px}
 .field label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px}
-.field input,.field select{width:100%}
+.field input,.field select,.field textarea{width:100%}
 .field .hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:4px}
 .count{font-family:var(--display);font-size:44px;line-height:1;letter-spacing:.02em}
 .count small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-top:4px}
@@ -92,6 +92,7 @@ textarea.pane{width:100%;min-height:320px;resize:vertical;line-height:1.55;backg
 .seotext h3{font-size:15px;margin:20px 0 4px}
 .seotext p{margin:6px 0 0;color:var(--ink-soft)}
 .seotext > p:first-of-type{color:var(--ink)}
+.seotext a{color:var(--stamp)}
 
 /* Datentabellen-Vorschau */
 .tablewrap{overflow-x:auto;background:#fff;color:var(--ink);border:1px solid var(--rule);box-shadow:var(--shadow);max-height:420px;overflow-y:auto}

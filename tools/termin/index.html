@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Termin als ICS-Datei erstellen (Kalender-Einladung) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Kalender-Einladung als .ics-Datei erzeugen: Titel, Ort, Zeit, Wiederholung und Erinnerung. Funktioniert mit Outlook, Google Kalender und Apple. Ohne Konto, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/termin/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Termin als ICS-Datei erstellen (Kalender-Einladung) | Alleskonverter">
+<meta property="og:description" content="Kalender-Einladung als .ics-Datei erzeugen — für Outlook, Google Kalender und Apple. Ohne Konto.">
+<meta property="og:url" content="https://alleskonverter.de/tools/termin/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Termin als ICS-Datei erstellen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"ICS-Termin erzeugen — Alleskonverter","url":"https://alleskonverter.de/tools/termin/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Kalender-Einladungen als .ics-Datei erzeugen — mit Wiederholung, Erinnerung und Teilnehmern, ohne Kalenderdienst."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist eine ICS-Datei?","acceptedAnswer":{"@type":"Answer","text":"Das ist das Standardformat für Kalendereinträge (RFC 5545). Outlook, Google Kalender, Apple Kalender, Thunderbird und praktisch jede Kalender-App können sie öffnen — ein Doppelklick genügt."}},{"@type":"Question","name":"Brauche ich einen Kalenderdienst?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Datei entsteht in deinem Browser und wird bei dir gespeichert. Du kannst sie anschließend selbst per E-Mail verschicken oder in deinen eigenen Kalender ziehen."}},{"@type":"Question","name":"Wie verschicke ich die Einladung?","acceptedAnswer":{"@type":"Answer","text":"Die .ics-Datei einfach als Anhang an eine normale E-Mail hängen. Outlook und Gmail erkennen den Anhang und bieten den Empfängern direkt Zusagen an."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.zwei{grid-template-columns:1fr}}
+.quelle{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px 14px;
+  font-family:var(--mono);font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-all;
+  max-height:300px;overflow:auto;margin-top:8px;color:#40474B}
+.karte{border:1.5px solid var(--ink);background:var(--card);padding:16px 18px;box-shadow:var(--shadow)}
+.karte h3{font-family:var(--display);font-size:22px;margin:0 0 4px;line-height:1.15}
+.karte .wann{font-family:var(--mono);font-size:12.5px;color:var(--stamp);margin:0 0 10px}
+.karte dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13.5px}
+.karte dt{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--ink-soft);padding-top:3px}
+.karte dd{margin:0;word-break:break-word}
+.hinweis{font-size:12.5px;color:var(--ink-soft);margin:6px 0 0;line-height:1.55}
+.fehler{color:var(--alert);font-size:12.5px;margin:6px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Termin <span>als ICS</span></h1>
+  <p class="sub">Eine Kalender-Einladung erzeugen, die sich in Outlook, Google Kalender, Apple Kalender und Thunderbird per Doppelklick öffnet — ohne dafür bei einem Kalenderdienst angemeldet zu sein.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Termin</h2>
+    <div class="field">
+      <label for="titel">Titel</label>
+      <input type="text" id="titel" value="Besprechung" maxlength="200">
+    </div>
+
+    <div class="zwei">
+      <div class="field">
+        <label for="start">Beginn</label>
+        <input type="datetime-local" id="start">
+      </div>
+      <div class="field">
+        <label for="ende">Ende</label>
+        <input type="datetime-local" id="ende">
+      </div>
+    </div>
+
+    <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin:-6px 0 16px;color:var(--ink)">
+      <input type="checkbox" id="ganztag" style="width:auto"> Ganztägiger Termin</label>
+
+    <div class="field">
+      <label for="ort">Ort <small style="text-transform:none;letter-spacing:0;color:var(--ink-soft)">— Adresse oder Videolink</small></label>
+      <input type="text" id="ort" placeholder="Flurstr. 31, 33609 Bielefeld">
+    </div>
+
+    <div class="field">
+      <label for="beschreibung">Beschreibung</label>
+      <textarea id="beschreibung" rows="4" placeholder="Tagesordnung, Zugangsdaten, Hinweise …"></textarea>
+    </div>
+
+    <div class="zwei">
+      <div class="field">
+        <label for="organisator">Organisator (E-Mail)</label>
+        <input type="email" id="organisator" placeholder="optional">
+      </div>
+      <div class="field">
+        <label for="teilnehmer">Teilnehmer (E-Mail)</label>
+        <input type="text" id="teilnehmer" placeholder="optional, mit Komma getrennt">
+      </div>
+    </div>
+
+    <h2 style="margin-top:22px">Vorschau</h2>
+    <div class="karte" id="karte"></div>
+    <p class="fehler" id="fehler" hidden></p>
+
+    <h2 style="margin-top:22px">Dateiinhalt</h2>
+    <div class="quelle" id="quelle"></div>
+  </section>
+
+  <aside>
+    <h2>Einstellungen</h2>
+    <div class="count" id="anzahl">1<small>Termin</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="zeitzone">Zeitzone</label>
+      <select id="zeitzone">
+        <option value="Europe/Berlin">Europe/Berlin (MEZ/MESZ)</option>
+        <option value="Europe/Vienna">Europe/Vienna</option>
+        <option value="Europe/Zurich">Europe/Zurich</option>
+        <option value="UTC">UTC</option>
+        <option value="">ohne — Ortszeit des Empfängers</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="wdh">Wiederholung</label>
+      <select id="wdh">
+        <option value="">einmalig</option>
+        <option value="DAILY">täglich</option>
+        <option value="WEEKLY">wöchentlich</option>
+        <option value="WEEKLY;INTERVAL=2">alle zwei Wochen</option>
+        <option value="MONTHLY">monatlich</option>
+        <option value="YEARLY">jährlich</option>
+        <option value="WEEKLY;BYDAY=MO,TU,WE,TH,FR">an jedem Werktag</option>
+      </select>
+    </div>
+
+    <div class="field" id="wdhendefeld" hidden>
+      <label for="wdhende">Wiederholung endet</label>
+      <select id="wdhende">
+        <option value="">nie</option>
+        <option value="anzahl">nach Anzahl</option>
+        <option value="datum">an einem Datum</option>
+      </select>
+    </div>
+    <div class="field" id="wdhanzahlfeld" hidden>
+      <label for="wdhanzahl">Anzahl der Termine</label>
+      <input type="number" id="wdhanzahl" value="10" min="2" max="999">
+    </div>
+    <div class="field" id="wdhdatumfeld" hidden>
+      <label for="wdhdatum">Letzter Tag</label>
+      <input type="date" id="wdhdatum">
+    </div>
+
+    <div class="field">
+      <label for="erinnerung">Erinnerung</label>
+      <select id="erinnerung">
+        <option value="">keine</option>
+        <option value="5">5 Minuten vorher</option>
+        <option value="15" selected>15 Minuten vorher</option>
+        <option value="30">30 Minuten vorher</option>
+        <option value="60">1 Stunde vorher</option>
+        <option value="1440">1 Tag vorher</option>
+        <option value="10080">1 Woche vorher</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="status">Zeigt mich als</label>
+      <select id="status">
+        <option value="BUSY">gebucht</option>
+        <option value="FREE">frei</option>
+      </select>
+    </div>
+
+    <button class="primary" id="go">.ics herunterladen</button>
+    <button id="kopieren" style="margin-top:8px">Inhalt kopieren</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Eine Einladung verschicken, ohne dafür Google, Microsoft oder Apple einen Termin anzuvertrauen: Hier trägst du Titel, Zeit, Ort und Teilnehmer ein und bekommst eine fertige <code>.ics</code>-Datei. Die hängst du an eine normale E-Mail — der Empfänger klickt sie an und hat den Termin im Kalender, samt Erinnerung und Zusage-Schaltfläche.</p>
+  <h3>Was ist eine ICS-Datei?</h3>
+  <p>Das ist das seit Jahrzehnten gültige Standardformat für Kalendereinträge, festgelegt in RFC 5545 (früher iCalendar). Outlook, Google Kalender, Apple Kalender, Thunderbird, Nextcloud und praktisch jede Kalender-App auf Handy und Rechner können es lesen.</p>
+  <h3>Brauche ich einen Kalenderdienst oder ein Konto?</h3>
+  <p>Nein. Die Datei entsteht in deinem Browser und landet in deinem Download-Ordner. Es gibt keinen Server, der den Termin sieht — für Bewerbungsgespräche, Arzttermine oder interne Besprechungen ist das ein spürbarer Unterschied zu einem Einladungslink von einem fremden Anbieter.</p>
+  <h3>Wie verschicke ich die Einladung?</h3>
+  <p>Die Datei als Anhang an eine ganz normale E-Mail hängen. Outlook und Gmail erkennen den Anhang und bieten den Empfängern direkt „Zusagen / Absagen“ an. Trägst du Organisator und Teilnehmer ein, wird die Datei als echte Einladung markiert (<code>METHOD:REQUEST</code>) statt nur als Kalendereintrag.</p>
+  <h3>Warum sollte ich eine Zeitzone wählen?</h3>
+  <p>Weil ein Termin um 14 Uhr für jemanden in London etwas anderes bedeutet. Mit gewählter Zeitzone wird die Umrechnung samt Sommerzeit in die Datei geschrieben, und jeder sieht die für ihn richtige Uhrzeit. „Ortszeit des Empfängers“ ist nur sinnvoll, wenn der Termin überall lokal um dieselbe Uhrzeit stattfinden soll — etwa bei einer täglichen Erinnerung.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Erzeugt wird iCalendar 2.0 nach RFC 5545: Zeilen werden nach 75 Zeichen korrekt umgebrochen, Sonderzeichen maskiert, und für Berlin, Wien und Zürich wird die Sommerzeitregel mitgeliefert.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+/* Sommerzeitregel für die mitteleuropäischen Zeitzonen — seit 1996 unverändert */
+const MEZ = ['Europe/Berlin','Europe/Vienna','Europe/Zurich'];
+
+function vtimezone(tzid){
+  return [
+    'BEGIN:VTIMEZONE',
+    'TZID:' + tzid,
+    'X-LIC-LOCATION:' + tzid,
+    'BEGIN:DAYLIGHT',
+    'TZOFFSETFROM:+0100',
+    'TZOFFSETTO:+0200',
+    'TZNAME:CEST',
+    'DTSTART:19700329T020000',
+    'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU',
+    'END:DAYLIGHT',
+    'BEGIN:STANDARD',
+    'TZOFFSETFROM:+0200',
+    'TZOFFSETTO:+0100',
+    'TZNAME:CET',
+    'DTSTART:19701025T030000',
+    'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+    'END:STANDARD',
+    'END:VTIMEZONE',
+  ];
+}
+
+/* Backslash, Semikolon, Komma und Zeilenumbrüche müssen maskiert werden */
+function ics(text){
+  return String(text)
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r?\n/g, '\\n');
+}
+
+/* Zeilen dürfen höchstens 75 Oktette lang sein; Fortsetzung beginnt mit Leerzeichen.
+   Gezählt wird in UTF-8-Bytes, sonst zerreißt es Umlaute an der Grenze. */
+function falten(zeile){
+  const bytes = new TextEncoder().encode(zeile);
+  if(bytes.length <= 75) return zeile;
+  const teile = [];
+  let aktuell = '', laenge = 0, grenze = 75;
+  for(const zeichen of zeile){
+    const n = new TextEncoder().encode(zeichen).length;
+    if(laenge + n > grenze){
+      teile.push(aktuell);
+      aktuell = zeichen;
+      laenge = n + 1;   // führendes Leerzeichen der Folgezeile zählt mit
+      grenze = 75;
+    }else{
+      aktuell += zeichen;
+      laenge += n;
+    }
+  }
+  teile.push(aktuell);
+  return teile[0] + '\r\n ' + teile.slice(1).join('\r\n ');
+}
+
+function zweistellig(n){ return String(n).padStart(2, '0'); }
+
+/* "2026-08-15T14:30" → "20260815T143000" (ohne Umrechnung, gilt in der TZID) */
+function ortszeit(wert){
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(wert || '');
+  if(!m) return null;
+  return m[1] + m[2] + m[3] + 'T' + m[4] + m[5] + '00';
+}
+function nurDatum(wert){
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(wert || '');
+  return m ? m[1] + m[2] + m[3] : null;
+}
+function utcJetzt(){
+  const d = new Date();
+  return d.getUTCFullYear() + zweistellig(d.getUTCMonth()+1) + zweistellig(d.getUTCDate()) + 'T' +
+         zweistellig(d.getUTCHours()) + zweistellig(d.getUTCMinutes()) + zweistellig(d.getUTCSeconds()) + 'Z';
+}
+/* Für UTC-Ausgabe: die eingegebene Zeit als Ortszeit des Browsers deuten und umrechnen */
+function nachUtc(wert){
+  const d = new Date(wert);
+  if(isNaN(d)) return null;
+  return d.getUTCFullYear() + zweistellig(d.getUTCMonth()+1) + zweistellig(d.getUTCDate()) + 'T' +
+         zweistellig(d.getUTCHours()) + zweistellig(d.getUTCMinutes()) + '00Z';
+}
+/* Ganztägige Termine enden im ICS am Folgetag (DTEND ist exklusiv) */
+function tagPlus(datum, tage){
+  const d = new Date(datum + 'T12:00:00');
+  d.setDate(d.getDate() + tage);
+  return d.getFullYear() + zweistellig(d.getMonth()+1) + zweistellig(d.getDate());
+}
+
+function uid(){
+  const zufall = (crypto.randomUUID ? crypto.randomUUID()
+    : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2,'0')).join(''));
+  return zufall + '@alleskonverter.de';
+}
+
+let letzteUid = uid();
+
+function bauen(){
+  const ganztag = AK.$('#ganztag').checked;
+  const tz = AK.$('#zeitzone').value;
+  const titel = AK.$('#titel').value.trim() || 'Termin';
+  const startWert = AK.$('#start').value;
+  const endeWert = AK.$('#ende').value;
+
+  if(!startWert) return {fehler:'Bitte einen Beginn angeben.'};
+
+  const zeilen = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//alleskonverter.de//ICS//DE','CALSCALE:GREGORIAN'];
+
+  const organisator = AK.$('#organisator').value.trim();
+  const teilnehmer = AK.$('#teilnehmer').value.split(',').map(t => t.trim()).filter(Boolean);
+  const einladung = organisator && teilnehmer.length;
+  if(einladung) zeilen.push('METHOD:REQUEST');
+
+  if(!ganztag && MEZ.includes(tz)) zeilen.push(...vtimezone(tz));
+
+  zeilen.push('BEGIN:VEVENT');
+  zeilen.push('UID:' + letzteUid);
+  zeilen.push('DTSTAMP:' + utcJetzt());
+  zeilen.push('SEQUENCE:0');
+
+  if(ganztag){
+    const s = nurDatum(startWert);
+    if(!s) return {fehler:'Der Beginn ist unvollständig.'};
+    const e = endeWert ? nurDatum(endeWert) : s;
+    if(e < s) return {fehler:'Das Ende liegt vor dem Beginn.'};
+    zeilen.push('DTSTART;VALUE=DATE:' + s);
+    zeilen.push('DTEND;VALUE=DATE:' + tagPlus(e.slice(0,4)+'-'+e.slice(4,6)+'-'+e.slice(6,8), 1));
+  }else{
+    if(!endeWert) return {fehler:'Bitte auch ein Ende angeben.'};
+    if(new Date(endeWert) <= new Date(startWert)) return {fehler:'Das Ende muss nach dem Beginn liegen.'};
+    if(tz === 'UTC'){
+      zeilen.push('DTSTART:' + nachUtc(startWert));
+      zeilen.push('DTEND:'   + nachUtc(endeWert));
+    }else if(tz === ''){
+      zeilen.push('DTSTART:' + ortszeit(startWert));
+      zeilen.push('DTEND:'   + ortszeit(endeWert));
+    }else{
+      zeilen.push(`DTSTART;TZID=${tz}:` + ortszeit(startWert));
+      zeilen.push(`DTEND;TZID=${tz}:`   + ortszeit(endeWert));
+    }
+  }
+
+  zeilen.push('SUMMARY:' + ics(titel));
+  const ort = AK.$('#ort').value.trim();
+  if(ort) zeilen.push('LOCATION:' + ics(ort));
+  const beschreibung = AK.$('#beschreibung').value.trim();
+  if(beschreibung) zeilen.push('DESCRIPTION:' + ics(beschreibung));
+  if(/^https?:\/\//i.test(ort)) zeilen.push('URL:' + ort);
+
+  const wdh = AK.$('#wdh').value;
+  if(wdh){
+    let regel = 'RRULE:FREQ=' + wdh;
+    const ende = AK.$('#wdhende').value;
+    if(ende === 'anzahl'){
+      regel += ';COUNT=' + Math.max(2, parseInt(AK.$('#wdhanzahl').value, 10) || 2);
+    }else if(ende === 'datum' && AK.$('#wdhdatum').value){
+      regel += ';UNTIL=' + nurDatum(AK.$('#wdhdatum').value) + (ganztag ? '' : 'T235959Z');
+    }
+    zeilen.push(regel);
+  }
+
+  if(organisator) zeilen.push(`ORGANIZER;CN=${ics(organisator)}:mailto:${organisator}`);
+  teilnehmer.forEach(t => zeilen.push(
+    `ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:${t}`));
+
+  zeilen.push('TRANSP:' + (AK.$('#status').value === 'FREE' ? 'TRANSPARENT' : 'OPAQUE'));
+  zeilen.push('STATUS:CONFIRMED');
+
+  const erinnerung = AK.$('#erinnerung').value;
+  if(erinnerung){
+    const min = parseInt(erinnerung, 10);
+    const dauer = min % 1440 === 0 ? `-P${min/1440}D` : min % 60 === 0 ? `-PT${min/60}H` : `-PT${min}M`;
+    zeilen.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:' + ics(titel),'TRIGGER:' + dauer,'END:VALARM');
+  }
+
+  zeilen.push('END:VEVENT','END:VCALENDAR');
+  return {text: zeilen.map(falten).join('\r\n') + '\r\n', einladung, teilnehmer: teilnehmer.length};
+}
+
+const WOCHENTAG = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function lesbar(wert, ganztag){
+  const d = new Date(wert);
+  if(isNaN(d)) return '—';
+  const datum = `${WOCHENTAG[d.getDay()]}, ${zweistellig(d.getDate())}.${zweistellig(d.getMonth()+1)}.${d.getFullYear()}`;
+  return ganztag ? datum : datum + `, ${zweistellig(d.getHours())}:${zweistellig(d.getMinutes())} Uhr`;
+}
+
+function aktualisieren(){
+  const ganztag = AK.$('#ganztag').checked;
+  const wdh = AK.$('#wdh').value;
+  AK.$('#wdhendefeld').hidden = !wdh;
+  AK.$('#wdhanzahlfeld').hidden = !wdh || AK.$('#wdhende').value !== 'anzahl';
+  AK.$('#wdhdatumfeld').hidden  = !wdh || AK.$('#wdhende').value !== 'datum';
+  AK.$('#zeitzone').closest('.field').hidden = ganztag;
+
+  const ergebnis = bauen();
+  const fehler = AK.$('#fehler');
+  fehler.hidden = !ergebnis.fehler;
+  fehler.textContent = ergebnis.fehler || '';
+  AK.$('#go').disabled = !!ergebnis.fehler;
+  AK.$('#kopieren').disabled = !!ergebnis.fehler;
+  AK.$('#quelle').textContent = ergebnis.text || '';
+
+  // Vorschaukarte
+  const ort = AK.$('#ort').value.trim();
+  const besch = AK.$('#beschreibung').value.trim();
+  const teiln = AK.$('#teilnehmer').value.split(',').map(t => t.trim()).filter(Boolean);
+  const wdhText = wdh ? AK.$('#wdh').selectedOptions[0].textContent : '';
+  const beginn = lesbar(AK.$('#start').value, ganztag);
+  const schluss = AK.$('#ende').value ? lesbar(AK.$('#ende').value, ganztag) : '';
+  const gleicherTag = AK.$('#start').value.slice(0,10) === AK.$('#ende').value.slice(0,10);
+  const wann = !schluss ? beginn
+    : ganztag ? (gleicherTag ? beginn : beginn + ' – ' + schluss)
+    : gleicherTag ? beginn + ' – ' + schluss.split(', ').pop() : beginn + ' – ' + schluss;
+
+  AK.$('#karte').innerHTML =
+    `<h3>${AK.esc(AK.$('#titel').value.trim() || 'Termin')}</h3>` +
+    `<p class="wann">${AK.esc(wann)}${wdhText ? ' · ' + AK.esc(wdhText) : ''}</p>` +
+    '<dl>' +
+    (ort   ? `<dt>Ort</dt><dd>${AK.esc(ort)}</dd>` : '') +
+    (besch ? `<dt>Info</dt><dd>${AK.esc(besch).replace(/\n/g,'<br>')}</dd>` : '') +
+    (teiln.length ? `<dt>Gäste</dt><dd>${AK.esc(teiln.join(', '))}</dd>` : '') +
+    '</dl>';
+
+  AK.$('#anzahl').innerHTML = (wdh
+    ? (AK.$('#wdhende').value === 'anzahl' ? parseInt(AK.$('#wdhanzahl').value, 10) || 1 : '∞')
+    : 1) + '<small>' + (wdh ? 'Termine' : 'Termin') + '</small>';
+
+  if(ergebnis.einladung && !AK.$('#log').textContent.includes('Einladung')){
+    AK.logClear();
+    AK.log(`Wird als echte Einladung erzeugt (METHOD:REQUEST) — ${ergebnis.teilnehmer} Teilnehmer können zu- oder absagen.`);
+  }else if(!ergebnis.einladung){
+    AK.logClear();
+  }
+}
+
+/* Voreinstellung: nächste volle Stunde, eine Stunde lang */
+(function vorbelegen(){
+  const d = new Date();
+  d.setMinutes(0, 0, 0);
+  d.setHours(d.getHours() + 1);
+  const f = x => x.getFullYear() + '-' + zweistellig(x.getMonth()+1) + '-' + zweistellig(x.getDate()) +
+                 'T' + zweistellig(x.getHours()) + ':' + zweistellig(x.getMinutes());
+  AK.$('#start').value = f(d);
+  d.setHours(d.getHours() + 1);
+  AK.$('#ende').value = f(d);
+})();
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  const ergebnis = bauen();
+  if(ergebnis.fehler){ AK.log(ergebnis.fehler, true); return; }
+  const name = (AK.$('#titel').value.trim() || 'termin')
+    .toLowerCase().replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'termin';
+  AK.offerDownload(new Blob([ergebnis.text], {type:'text/calendar;charset=utf-8'}), name + '.ics');
+  AK.log('ICS-Datei erstellt. Als Anhang verschicken oder in den eigenen Kalender ziehen.');
+  AK.stamp(true);
+  letzteUid = uid();   // nächster Download wird ein eigener Termin, kein Update
+};
+
+AK.$('#kopieren').onclick = async () => {
+  const ergebnis = bauen();
+  if(ergebnis.fehler) return;
+  try{
+    await navigator.clipboard.writeText(ergebnis.text);
+    AK.log('Inhalt in die Zwischenablage kopiert.');
+  }catch(_){
+    AK.log('Kopieren wurde vom Browser abgelehnt — Text unten von Hand markieren.', true);
+  }
+};
+
+AK.$$('input, select, textarea').forEach(el => {
+  el.addEventListener('input', aktualisieren);
+  el.addEventListener('change', aktualisieren);
+});
+aktualisieren();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

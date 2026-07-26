@@ -57,6 +57,7 @@ const SHELL = [
   '/tools/qr-code/js/artqr.js',
   '/vendor/js-yaml.min.js',
   '/vendor/pdf-lib-crypt.min.js',
+  '/vendor/docx.min.js',
 ];
 
 /* Werkzeugseiten aus der sitemap.xml lesen — so wächst der Cache automatisch mit. */

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bildergalerie als HTML erzeugen — kostenlos | Alleskonverter</title>
+<meta name="description" content="Aus mehreren Bildern einen fertigen HTML-Schnipsel machen: Raster, Bildunterschriften, Lightbox. Bilder einbetten oder daneben ablegen. Kostenlos, ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bildergalerie/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Bildergalerie als HTML erzeugen — kostenlos | Alleskonverter">
+<meta property="og:description" content="Aus mehreren Bildern einen fertigen HTML-Schnipsel machen: Raster, Bildunterschriften, Lightbox. Ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bildergalerie/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bildergalerie als HTML erzeugen — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bildergalerie als HTML — Alleskonverter","url":"https://alleskonverter.de/tools/bildergalerie/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Aus mehreren Bildern einen fertigen HTML-Schnipsel für eine Galerie erzeugen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Bilder hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Bilder werden im Browser gelesen und verkleinert; es gibt keinen Server, der sie annehmen könnte."}},{"@type":"Question","name":"Soll ich die Bilder einbetten oder daneben ablegen?","acceptedAnswer":{"@type":"Answer","text":"Einbetten ergibt eine einzige Datei, die man verschicken kann, wird aber schnell mehrere Megabyte groß. Daneben ablegen ist die bessere Wahl für echte Webseiten, weil der Browser die Bilder dann zwischenspeichern kann."}},{"@type":"Question","name":"Braucht die Galerie JavaScript?","acceptedAnswer":{"@type":"Answer","text":"Nur die Großansicht beim Anklicken. Ohne sie ist die Galerie reines HTML und CSS und läuft überall, auch in Newslettern und CMS-Systemen mit eingeschränktem Editor."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{padding:8px 13px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tabs button:hover{border-color:var(--ink)}
+.tabs button.active{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+.miniaturen{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:14px}
+.mini{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:8px;cursor:grab}
+.mini.zieht{opacity:.4}
+.mini.ziel{border-color:var(--stamp);border-style:dashed}
+.mini img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#DDD;display:block}
+.mini input{margin:7px 0 0;font-size:12px;padding:5px 6px}
+.mini .zeile{display:flex;justify-content:space-between;align-items:center;margin-top:5px;
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-soft)}
+.mini button{background:none;border:0;color:var(--alert);cursor:pointer;font-family:var(--mono);
+  font-size:10.5px;text-decoration:underline;padding:0}
+.quelle{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px 14px;
+  font-family:var(--mono);font-size:11.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;
+  max-height:400px;overflow:auto;color:#40474B}
+.rahmen{width:100%;height:460px;border:1px solid var(--rule);box-shadow:var(--shadow);background:#fff}
+.groesse{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:8px}
+.groesse b{color:var(--stamp);font-weight:500}
+.groesse.warn b{color:var(--alert)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bildergalerie <span>als HTML</span></h1>
+  <p class="sub">Mehrere Bilder hineinziehen, sortieren, beschriften — und einen fertigen HTML-Schnipsel herausbekommen, den du in jede Seite einsetzen kannst. Wahlweise mit eingebetteten Bildern als eine einzige Datei.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Bilder auswählen">
+      <strong>Bilder hineinziehen</strong>
+      <small>JPG, PNG, WebP, GIF, AVIF · mehrere auf einmal · zum Sortieren später ziehen</small>
+    </div>
+    <input type="file" id="picker" hidden accept="image/*" multiple>
+
+    <div class="miniaturen" id="miniaturen"></div>
+
+    <div id="ergebnis" hidden>
+    <h2 style="margin-top:24px">Ergebnis</h2>
+    <div class="tabs" role="tablist">
+      <button class="active" id="tab-vorschau" role="tab" aria-selected="true">Vorschau</button>
+      <button id="tab-quelle" role="tab" aria-selected="false">HTML-Quelltext</button>
+    </div>
+    <iframe class="rahmen" id="rahmen" title="Vorschau der Galerie" sandbox="allow-scripts"></iframe>
+    <div class="quelle" id="quelle" hidden></div>
+    <p class="groesse" id="groesse"></p>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Galerie</h2>
+    <div class="count" id="anzahl">0<small>Bilder</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="layout">Anordnung</label>
+      <select id="layout">
+        <option value="raster">Raster, gleich hohe Kacheln</option>
+        <option value="mauer">Mauerwerk, Bilder in Originalhöhe</option>
+        <option value="reihe">Eine Reihe zum Seitwärtsscrollen</option>
+        <option value="einzeln">Untereinander, volle Breite</option>
+      </select>
+    </div>
+
+    <div class="field" id="spaltenfeld">
+      <label for="spalten">Spalten am Rechner</label>
+      <select id="spalten">
+        <option value="2">2</option>
+        <option value="3" selected>3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="auto">automatisch nach Platz</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="abstand">Abstand</label>
+      <select id="abstand">
+        <option value="0">ohne — Bilder stoßen aneinander</option>
+        <option value="8">schmal (8 px)</option>
+        <option value="16" selected>normal (16 px)</option>
+        <option value="28">weit (28 px)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Extras</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="untertitel" checked style="width:auto"> Bildunterschriften anzeigen</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="lightbox" checked style="width:auto"> Großansicht beim Anklicken</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="rund" style="width:auto"> Abgerundete Ecken</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="lazy" checked style="width:auto"> Bilder erst beim Scrollen laden</label>
+    </div>
+
+    <div class="field">
+      <label for="einbetten">Bilder</label>
+      <select id="einbetten">
+        <option value="ordner">neben die HTML-Datei legen (bilder/)</option>
+        <option value="data">in die HTML einbetten (eine Datei)</option>
+      </select>
+    </div>
+
+    <div class="field" id="breitefeld">
+      <label for="breite">Bilder verkleinern auf höchstens</label>
+      <select id="breite">
+        <option value="0">Originalgröße behalten</option>
+        <option value="800">800 px Breite</option>
+        <option value="1200" selected>1200 px Breite</option>
+        <option value="1600">1600 px Breite</option>
+        <option value="2000">2000 px Breite</option>
+      </select>
+    </div>
+
+    <div class="field" id="qualifeld">
+      <label for="quali">Qualität <span id="qualiwert" style="font-family:var(--mono);color:var(--stamp)">80</span></label>
+      <input type="range" id="quali" min="40" max="95" value="80" step="5">
+    </div>
+
+    <button class="primary" id="go" disabled>Als ZIP herunterladen</button>
+    <button id="kopieren" style="margin-top:8px" disabled>HTML kopieren</button>
+    <div class="bar" hidden><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Eine Bildergalerie in eine Seite einzubauen ist erstaunlich fummelig: Man braucht die richtigen CSS-Regeln, muss an die Bildunterschriften denken, an die alt-Texte für Screenreader und daran, dass die Bilder nicht in Originalgröße ausgeliefert werden. Hier ziehst du deine Bilder hinein, sortierst sie und bekommst einen fertigen Schnipsel — sauberes HTML mit CSS, das ohne Framework und ohne Bibliothek auskommt.</p>
+  <h3>Werden meine Bilder hochgeladen?</h3>
+  <p>Nein. Die Bilder werden von deinem Browser gelesen, verkleinert und wieder in eine Datei geschrieben. Es gibt keinen Server, der sie annehmen könnte.</p>
+  <h3>Soll ich die Bilder einbetten oder daneben ablegen?</h3>
+  <p>Eingebettete Bilder (als <code>data:</code>-Adresse) ergeben eine einzige HTML-Datei, die man per E-Mail verschicken oder auf einen Stick legen kann — dafür wird sie schnell mehrere Megabyte groß, und der Browser kann nichts zwischenspeichern. Für eine echte Webseite ist die zweite Variante besser: Du bekommst ein ZIP mit der HTML-Datei und einem Ordner <code>bilder/</code> und lädst beides zusammen hoch.</p>
+  <h3>Braucht die Galerie JavaScript?</h3>
+  <p>Nur die Großansicht beim Anklicken, und die sind rund fünfzehn Zeilen. Schaltest du sie ab, ist das Ergebnis reines HTML und CSS — das lässt sich auch in CMS-Systeme, Wikis und Newsletter einsetzen, die kein JavaScript durchlassen.</p>
+  <h3>Was ist mit den alt-Texten?</h3>
+  <p>Jede Bildunterschrift, die du einträgst, wird gleichzeitig als <code>alt</code>-Text gesetzt. Lässt du sie leer, bekommt das Bild ein leeres <code>alt=""</code> — das ist die richtige Kennzeichnung für rein dekorative Bilder, damit Screenreader sie überspringen statt Dateinamen vorzulesen.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Das erzeugte CSS ist auf eine Klasse (<code>.ak-galerie</code>) beschränkt und stört den Rest deiner Seite nicht. Breite und Höhe werden ins <code>img</code>-Element geschrieben, damit beim Laden nichts springt.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/jszip.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+let bilder = [];   // {datei, url, breite, hoehe, titel, name}
+let vorschauUrl = null;
+
+async function addFiles(dateien){
+  AK.logClear();
+  for(const datei of dateien){
+    if(!datei.type.startsWith('image/')) continue;
+    try{
+      const url = URL.createObjectURL(datei);
+      const masse = await abmessungen(url);
+      bilder.push({
+        datei, url,
+        breite: masse.breite, hoehe: masse.hoehe,
+        titel: datei.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '),
+        name: sauber(datei.name),
+      });
+    }catch(err){
+      AK.log(`„${datei.name}“ konnte nicht gelesen werden.`, true);
+    }
+  }
+  miniaturenZeigen();
+  await bauen();
+}
+window.addFiles = addFiles;
+
+function abmessungen(url){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res({breite: img.naturalWidth, hoehe: img.naturalHeight});
+    img.onerror = () => rej(new Error('kein Bild'));
+    img.src = url;
+  });
+}
+
+function sauber(name){
+  return name.toLowerCase()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9.]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function miniaturenZeigen(){
+  const wrap = AK.$('#miniaturen');
+  wrap.innerHTML = '';
+  bilder.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'mini';
+    d.draggable = true;
+    d.dataset.i = i;
+    d.innerHTML = `<img src="${b.url}" alt="">
+      <input type="text" value="${AK.esc(b.titel)}" placeholder="Bildunterschrift / alt-Text" aria-label="Bildunterschrift">
+      <div class="zeile"><span>${b.breite}×${b.hoehe} · ${AK.fmtBytes(b.datei.size)}</span><button type="button">entfernen</button></div>`;
+    d.querySelector('input').oninput = e => { bilder[i].titel = e.target.value; bauen(); };
+    d.querySelector('button').onclick = () => {
+      URL.revokeObjectURL(bilder[i].url);
+      bilder.splice(i, 1);
+      miniaturenZeigen(); bauen();
+    };
+    d.addEventListener('dragstart', e => {
+      d.classList.add('zieht');
+      e.dataTransfer.setData('text/plain', String(i));
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    d.addEventListener('dragend', () => {
+      d.classList.remove('zieht');
+      AK.$$('.mini').forEach(x => x.classList.remove('ziel'));
+    });
+    d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('ziel'); });
+    d.addEventListener('dragleave', () => d.classList.remove('ziel'));
+    d.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const von = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      if(isNaN(von) || von === i) return;
+      const [x] = bilder.splice(von, 1);
+      bilder.splice(i, 0, x);
+      miniaturenZeigen(); bauen();
+    });
+    wrap.appendChild(d);
+  });
+  AK.$('#anzahl').innerHTML = bilder.length + `<small>${bilder.length === 1 ? 'Bild' : 'Bilder'}</small>`;
+  AK.$('#ergebnis').hidden = !bilder.length;
+  AK.$('#go').disabled = !bilder.length;
+  AK.$('#kopieren').disabled = !bilder.length;
+}
+
+/* Bild verkleinern und neu kodieren — liefert Blob samt neuen Abmessungen */
+async function aufbereiten(b){
+  const maxBreite = parseInt(AK.$('#breite').value, 10);
+  const quali = parseInt(AK.$('#quali').value, 10) / 100;
+  const istPng = /png$/i.test(b.datei.type);
+  if(!maxBreite || b.breite <= maxBreite){
+    return {blob: b.datei, breite: b.breite, hoehe: b.hoehe, endung: (b.name.match(/\.([^.]+)$/) || [,'jpg'])[1]};
+  }
+  const faktor = maxBreite / b.breite;
+  const breite = Math.round(b.breite * faktor), hoehe = Math.round(b.hoehe * faktor);
+  const bitmap = await createImageBitmap(b.datei);
+  const c = document.createElement('canvas');
+  c.width = breite; c.height = hoehe;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bitmap, 0, 0, breite, hoehe);
+  bitmap.close && bitmap.close();
+  const typ = istPng ? 'image/png' : 'image/jpeg';
+  const blob = await new Promise(r => c.toBlob(r, typ, quali));
+  return {blob, breite, hoehe, endung: istPng ? 'png' : 'jpg'};
+}
+
+function alsDataUrl(blob){
+  return new Promise(res => {
+    const leser = new FileReader();
+    leser.onload = () => res(leser.result);
+    leser.readAsDataURL(blob);
+  });
+}
+
+/* ---------- HTML bauen ---------- */
+function css(){
+  const abstand = parseInt(AK.$('#abstand').value, 10);
+  const layout = AK.$('#layout').value;
+  const spalten = AK.$('#spalten').value;
+  const rund = AK.$('#rund').checked ? '6px' : '0';
+  const spaltenRegel = spalten === 'auto'
+    ? 'repeat(auto-fill, minmax(220px, 1fr))'
+    : `repeat(${spalten}, 1fr)`;
+
+  const teile = [
+`.ak-galerie{margin:0;padding:0;list-style:none}`,
+`.ak-galerie figure{margin:0}`,
+`.ak-galerie img{display:block;width:100%;height:auto;border-radius:${rund}}`,
+`.ak-galerie figcaption{font:14px/1.4 system-ui,sans-serif;color:#555;margin-top:6px}`,
+  ];
+
+  if(layout === 'raster'){
+    teile.push(`.ak-galerie{display:grid;grid-template-columns:${spaltenRegel};gap:${abstand}px}`);
+    teile.push(`.ak-galerie img{aspect-ratio:4/3;object-fit:cover}`);
+    teile.push(`@media(max-width:640px){.ak-galerie{grid-template-columns:repeat(2,1fr)}}`);
+  }else if(layout === 'mauer'){
+    const n = spalten === 'auto' ? 3 : spalten;
+    teile.push(`.ak-galerie{column-count:${n};column-gap:${abstand}px}`);
+    teile.push(`.ak-galerie figure{break-inside:avoid;margin-bottom:${abstand}px}`);
+    teile.push(`@media(max-width:640px){.ak-galerie{column-count:1}}`);
+  }else if(layout === 'reihe'){
+    teile.push(`.ak-galerie{display:flex;gap:${abstand}px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}`);
+    teile.push(`.ak-galerie figure{flex:0 0 auto;width:280px;scroll-snap-align:start}`);
+    teile.push(`.ak-galerie img{aspect-ratio:4/3;object-fit:cover}`);
+  }else{
+    teile.push(`.ak-galerie{display:flex;flex-direction:column;gap:${abstand}px}`);
+  }
+
+  if(AK.$('#lightbox').checked){
+    teile.push(`.ak-galerie a{display:block;cursor:zoom-in}`);
+    teile.push(`.ak-gross{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999;cursor:zoom-out}`);
+    teile.push(`.ak-gross img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:0}`);
+  }
+  return teile.join('\n');
+}
+
+const SKRIPT = `document.querySelectorAll('.ak-galerie a').forEach(function(a){
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    var box = document.createElement('div');
+    box.className = 'ak-gross';
+    box.innerHTML = '<img src="' + a.getAttribute('href') + '" alt="">';
+    box.addEventListener('click', function(){ box.remove(); });
+    document.addEventListener('keydown', function schliessen(ev){
+      if(ev.key === 'Escape'){ box.remove(); document.removeEventListener('keydown', schliessen); }
+    });
+    document.body.appendChild(box);
+  });
+});`;
+
+/* Alle Bilder einmal umrechnen. Das ist der teure Teil, deshalb wird das
+   Ergebnis zwischengespeichert und nur neu gerechnet, wenn sich Größe oder
+   Qualität geändert haben. */
+let zwischenlager = null, zwischenSchluessel = '';
+
+async function aufbereitenAlle(){
+  const schluessel = [AK.$('#breite').value, AK.$('#quali').value,
+    bilder.map(b => b.datei.name + b.datei.size).join('|')].join('#');
+  if(zwischenlager && zwischenSchluessel === schluessel) return zwischenlager;
+
+  const fertig = [];
+  for(let i = 0; i < bilder.length; i++){
+    const b = bilder[i];
+    const auf = await aufbereiten(b);
+    fertig.push({
+      blob: auf.blob,
+      breite: auf.breite,
+      hoehe: auf.hoehe,
+      name: String(i + 1).padStart(2, '0') + '-' + b.name.replace(/\.[^.]+$/, '') + '.' + auf.endung,
+      datenUrl: null,
+    });
+    AK.bar((i + 1) / bilder.length);
+  }
+  zwischenlager = fertig;
+  zwischenSchluessel = schluessel;
+  return fertig;
+}
+
+async function schnipsel(fuerVorschau){
+  const einbetten = AK.$('#einbetten').value === 'data';
+  const untertitel = AK.$('#untertitel').checked;
+  const lightbox = AK.$('#lightbox').checked;
+  const lazy = AK.$('#lazy').checked;
+  const fertig = await aufbereitenAlle();
+  const figuren = [];
+
+  for(let i = 0; i < fertig.length; i++){
+    const f = fertig[i], b = bilder[i];
+    // In der Vorschau immer eingebettet: der abgeschottete Rahmen darf keine
+    // blob:-Adressen der Elternseite laden.
+    let quelle;
+    if(einbetten || fuerVorschau){
+      if(!f.datenUrl) f.datenUrl = await alsDataUrl(f.blob);
+      quelle = f.datenUrl;
+    }else{
+      quelle = 'bilder/' + f.name;
+    }
+    const alt = AK.esc(b.titel);
+    const img = `<img src="${quelle}" width="${f.breite}" height="${f.hoehe}" alt="${alt}"` +
+      (lazy ? ' loading="lazy" decoding="async"' : '') + '>';
+    const inhalt = lightbox ? `<a href="${quelle}">${img}</a>` : img;
+    figuren.push('  <figure>\n    ' + inhalt +
+      (untertitel && b.titel ? `\n    <figcaption>${alt}</figcaption>` : '') + '\n  </figure>');
+  }
+
+  const html = `<style>\n${css()}\n</style>\n\n<div class="ak-galerie">\n${figuren.join('\n')}\n</div>` +
+    (lightbox ? `\n\n<script>\n${SKRIPT}\n<\/script>` : '');
+  return {html, dateien: fertig.map(f => ({name: f.name, data: f.blob}))};
+}
+
+function seite(inhalt){
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bildergalerie</title>
+<style>body{max-width:1100px;margin:0 auto;padding:24px 16px;font-family:system-ui,sans-serif;background:#fff;color:#16191B}</style>
+</head>
+<body>
+${inhalt}
+</body>
+</html>
+`;
+}
+
+let laeuft = false, nochmal = false;
+async function bauen(){
+  if(!bilder.length){
+    AK.$('#rahmen').removeAttribute('srcdoc');
+    AK.$('#quelle').textContent = '';
+    AK.$('#groesse').textContent = '';
+    return;
+  }
+  if(laeuft){ nochmal = true; return; }
+  laeuft = true;
+  AK.$('.bar').hidden = false;
+  try{
+    const {html, dateien} = await schnipsel(true);
+    AK.$('#rahmen').srcdoc = seite(html);
+    // Quelltext zeigt die endgültigen Pfade, nicht die Vorschau-Adressen
+    const fest = await schnipsel(false);
+    AK.$('#quelle').textContent = fest.html;
+    const bytes = new Blob([fest.html]).size +
+      fest.dateien.reduce((s, d) => s + d.data.size, 0);
+    const gross = bytes > 5 * 1024 * 1024;
+    AK.$('#groesse').className = 'groesse' + (gross ? ' warn' : '');
+    AK.$('#groesse').innerHTML = AK.$('#einbetten').value === 'data'
+      ? `HTML-Datei: <b>${AK.fmtBytes(new Blob([fest.html]).size)}</b> — alle Bilder sind darin enthalten.` +
+        (gross ? ' Das ist für eine Webseite reichlich; erwäge die Variante mit Ordner.' : '')
+      : `HTML-Schnipsel: <b>${AK.fmtBytes(new Blob([fest.html]).size)}</b> · Bilder: <b>${AK.fmtBytes(bytes - new Blob([fest.html]).size)}</b> in ${fest.dateien.length} ${fest.dateien.length === 1 ? 'Datei' : 'Dateien'}.`;
+  }catch(err){
+    AK.log('Galerie konnte nicht gebaut werden: ' + err.message, true);
+    console.error(err);
+  }finally{
+    laeuft = false;
+    AK.$('.bar').hidden = true;
+    AK.bar(0);
+    if(nochmal){ nochmal = false; bauen(); }
+  }
+}
+
+/* ---------- Bedienung ---------- */
+AK.$('#tab-vorschau').onclick = () => {
+  AK.$('#tab-vorschau').classList.add('active');
+  AK.$('#tab-quelle').classList.remove('active');
+  AK.$('#tab-vorschau').setAttribute('aria-selected','true');
+  AK.$('#tab-quelle').setAttribute('aria-selected','false');
+  AK.$('#rahmen').hidden = false;
+  AK.$('#quelle').hidden = true;
+};
+AK.$('#tab-quelle').onclick = () => {
+  AK.$('#tab-quelle').classList.add('active');
+  AK.$('#tab-vorschau').classList.remove('active');
+  AK.$('#tab-quelle').setAttribute('aria-selected','true');
+  AK.$('#tab-vorschau').setAttribute('aria-selected','false');
+  AK.$('#rahmen').hidden = true;
+  AK.$('#quelle').hidden = false;
+};
+
+AK.$('#go').onclick = async () => {
+  AK.clearDownloads(); AK.stamp(false); AK.logClear();
+  AK.$('#go').disabled = true;
+  try{
+    const {html, dateien} = await schnipsel(false);
+    if(AK.$('#einbetten').value === 'data'){
+      AK.offerDownload(new Blob([seite(html)], {type:'text/html;charset=utf-8'}),
+        'galerie.html', 'galerie.html herunterladen');
+      AK.log('Eine einzige HTML-Datei mit allen Bildern darin.');
+    }else{
+      const zip = new JSZip();
+      zip.file('galerie.html', seite(html));
+      zip.file('schnipsel.html', html);
+      const ordner = zip.folder('bilder');
+      dateien.forEach(d => ordner.file(d.name, d.data));
+      const blob = await zip.generateAsync({type:'blob'});
+      AK.offerDownload(blob, 'galerie.zip', 'galerie.zip herunterladen');
+      AK.log(`ZIP mit galerie.html, schnipsel.html und ${dateien.length} Bildern im Ordner bilder/.`);
+    }
+    AK.stamp(true);
+  }catch(err){
+    AK.log('Fehlgeschlagen: ' + err.message, true);
+  }finally{
+    AK.$('#go').disabled = !bilder.length;
+  }
+};
+
+AK.$('#kopieren').onclick = async () => {
+  try{
+    const {html} = await schnipsel(false);
+    await navigator.clipboard.writeText(html);
+    AK.log('HTML-Schnipsel in die Zwischenablage kopiert.');
+  }catch(err){
+    AK.log('Kopieren wurde vom Browser abgelehnt.', true);
+  }
+};
+
+AK.$('#quali').addEventListener('input', () => {
+  AK.$('#qualiwert').textContent = AK.$('#quali').value;
+});
+['#layout','#spalten','#abstand','#untertitel','#lightbox','#rund','#lazy','#einbetten','#breite','#quali']
+  .forEach(s => AK.$(s).addEventListener('change', () => {
+    AK.$('#spaltenfeld').hidden = AK.$('#layout').value === 'reihe' || AK.$('#layout').value === 'einzeln';
+    AK.$('#qualifeld').hidden = AK.$('#breite').value === '0';
+    bauen();
+  }));
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#qualifeld').hidden = false;
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Texte und Tabellen vergleichen (Diff) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Zwei Texte oder zwei Tabellen vergleichen: Unterschiede werden zeilen- und wortgenau hervorgehoben. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/vergleichen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Texte und Tabellen vergleichen (Diff) — kostenlos | Alleskonverter">
+<meta property="og:description" content="Zwei Texte oder zwei Tabellen vergleichen: Unterschiede zeilen- und wortgenau hervorgehoben. Ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/vergleichen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Texte und Tabellen vergleichen (Diff) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Vergleichen (Diff) — Alleskonverter","url":"https://alleskonverter.de/tools/vergleichen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Zwei Texte oder zwei Tabellen vergleichen — Unterschiede zeilen- und wortgenau hervorgehoben, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Dateien hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Vergleich läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Welche Dateien kann ich vergleichen?","acceptedAnswer":{"@type":"Answer","text":"Für den Textvergleich alles Textbasierte: TXT, Markdown, Quelltext, JSON, Protokolle. Für den Tabellenvergleich CSV, TSV und Excel-Dateien (XLSX)."}},{"@type":"Question","name":"Kann ich das Ergebnis speichern?","acceptedAnswer":{"@type":"Answer","text":"Ja. Der Textvergleich lässt sich als Unified-Diff (.diff) speichern, wie ihn Git und Patch-Werkzeuge verstehen. Der Tabellenvergleich wird als CSV mit einer Spalte je Änderung gespeichert."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.seiten{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.seiten{grid-template-columns:1fr}}
+.seiten .drop{padding:14px;min-height:0}
+.seiten textarea.pane{min-height:130px}
+.seitenkopf{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-soft);margin:0 0 6px}
+.diff{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);margin-top:10px;
+  overflow:auto;max-height:520px;font-family:var(--mono);font-size:12.5px;line-height:1.6}
+.diff table{border-collapse:collapse;width:100%}
+.diff td{padding:1px 8px;vertical-align:top;white-space:pre-wrap;word-break:break-word}
+.diff td.nr{width:1%;text-align:right;color:#9A9A93;background:#FAFAF7;user-select:none;
+  border-right:1px solid var(--rule);white-space:nowrap;padding:1px 6px}
+.diff tr.plus  td{background:#E4F5E8}
+.diff tr.minus td{background:#FBE4E4}
+.diff tr.luecke td{background:#F5F4F0;color:#9A9A93;text-align:center;font-size:11px;padding:3px}
+.diff ins{background:#A8E5BB;text-decoration:none}
+.diff del{background:#F5AFAF;text-decoration:none}
+.diff.nebenein td.b{border-left:1px solid var(--rule)}
+.diff td.weg{background:#FBE4E4}
+.diff td.neu{background:#E4F5E8}
+.zelle-anders{background:#FFEEBA}
+.legende{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12px;color:var(--ink-soft)}
+.legende span::before{content:'';display:inline-block;width:11px;height:11px;margin-right:5px;
+  border:1px solid var(--rule);vertical-align:-1px}
+.legende .l1::before{background:#E4F5E8}
+.legende .l2::before{background:#FBE4E4}
+.legende .l3::before{background:#FFEEBA}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Vergleichen <span>Text &amp; Tabelle</span></h1>
+  <p class="sub">Zwei Fassungen nebeneinanderlegen und sehen, was sich geändert hat — zeilen- und wortgenau bei Texten, zellengenau bei Tabellen. Dateien hineinziehen oder direkt einfügen.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="seiten">
+      <div>
+        <p class="seitenkopf" id="kopfa">Vorher (A)</p>
+        <div class="drop" id="dropa" tabindex="0" role="button" aria-label="Datei A auswählen">
+          <strong>Datei A</strong><small>hineinziehen oder klicken</small>
+        </div>
+        <input type="file" id="pickera" hidden accept=".txt,.md,.markdown,.csv,.tsv,.json,.xml,.html,.htm,.log,.srt,.vtt,.yml,.yaml,.xlsx,.xls,text/*">
+        <textarea class="pane" id="a" spellcheck="false" aria-label="Text A" placeholder="… oder hier einfügen"></textarea>
+      </div>
+      <div>
+        <p class="seitenkopf" id="kopfb">Nachher (B)</p>
+        <div class="drop" id="dropb" tabindex="0" role="button" aria-label="Datei B auswählen">
+          <strong>Datei B</strong><small>hineinziehen oder klicken</small>
+        </div>
+        <input type="file" id="pickerb" hidden accept=".txt,.md,.markdown,.csv,.tsv,.json,.xml,.html,.htm,.log,.srt,.vtt,.yml,.yaml,.xlsx,.xls,text/*">
+        <textarea class="pane" id="b" spellcheck="false" aria-label="Text B" placeholder="… oder hier einfügen"></textarea>
+      </div>
+    </div>
+
+    <h2 style="margin-top:24px">Unterschiede</h2>
+    <div class="diff" id="ausgabe"><table><tr><td style="color:#9A9A93;padding:14px">Noch nichts zu vergleichen.</td></tr></table></div>
+    <div class="legende">
+      <span class="l1">hinzugekommen</span><span class="l2">entfernt</span><span class="l3">geändert</span>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Vergleich</h2>
+    <div class="count" id="anzahl">0<small>Änderungen</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="modus">Was vergleichen</label>
+      <select id="modus">
+        <option value="text">Text (zeilenweise)</option>
+        <option value="tabelle">Tabelle (zellenweise)</option>
+      </select>
+    </div>
+
+    <div class="field" id="ansichtfeld">
+      <label for="ansicht">Darstellung</label>
+      <select id="ansicht">
+        <option value="neben">Nebeneinander</option>
+        <option value="unter">Untereinander (klassisch)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Ignorieren</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="ign_ws" style="width:auto"> Leerraum am Zeilenrand</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="ign_case" style="width:auto"> Groß-/Kleinschreibung</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="ign_leer" style="width:auto"> Leere Zeilen</label>
+    </div>
+
+    <div class="field" id="kontextfeld">
+      <label for="kontext">Unveränderte Zeilen zeigen</label>
+      <select id="kontext">
+        <option value="3">3 Zeilen um jede Änderung</option>
+        <option value="8">8 Zeilen um jede Änderung</option>
+        <option value="99999" selected>alle</option>
+      </select>
+    </div>
+
+    <div class="field" id="schluesselfeld" hidden>
+      <label for="schluessel">Zeilen zuordnen über</label>
+      <select id="schluessel"><option value="">Reihenfolge</option></select>
+    </div>
+
+    <button class="primary" id="go" disabled>Ergebnis speichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Zwei Fassungen eines Vertrags, zwei Exporte aus dem Warenwirtschaftssystem, zwei Stände einer Konfigurationsdatei: Von Hand vergleichen kostet Nerven und man übersieht genau die eine Zahl, auf die es ankam. Dieses Werkzeug legt beide Fassungen nebeneinander und markiert, was hinzugekommen, entfernt oder geändert wurde — bei Texten bis auf einzelne Wörter genau, bei Tabellen bis auf die einzelne Zelle.</p>
+  <h3>Werden meine Dateien hochgeladen?</h3>
+  <p>Nein. Der Vergleich läuft vollständig in deinem Browser. Gerade beim Vergleichen geht es oft um Verträge, Preislisten oder Personaldaten — nichts davon verlässt dein Gerät, weil es keinen Server gibt, der etwas annehmen könnte.</p>
+  <h3>Welche Dateien kann ich vergleichen?</h3>
+  <p>Im Textmodus alles Textbasierte: TXT, Markdown, Quelltext, JSON, XML, Protokolldateien, Untertitel. Im Tabellenmodus CSV, TSV und Excel-Dateien. Du kannst auch einfach in beide Felder etwas einfügen, ganz ohne Datei.</p>
+  <h3>Was bedeutet „Zeilen zuordnen über“?</h3>
+  <p>Beim Tabellenvergleich hilft es, wenn beide Tabellen dieselbe Reihenfolge haben. Haben sie das nicht — etwa weil einmal nach Name und einmal nach Datum sortiert wurde — kannst du eine Spalte als Schlüssel wählen (Artikelnummer, Kundennummer, E-Mail). Die Zeilen werden dann über diesen Wert einander zugeordnet, unabhängig von der Position.</p>
+  <h3>Kann ich das Ergebnis speichern?</h3>
+  <p>Ja. Der Textvergleich wird als Unified-Diff (.diff) gespeichert — das Format, das Git, <code>patch</code> und die meisten Editoren verstehen. Der Tabellenvergleich wird als CSV gespeichert, mit einer Spalte, die je Zeile sagt, was passiert ist.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Der Vergleich nutzt den Myers-Algorithmus — dasselbe Verfahren, mit dem auch Git seine Unterschiede berechnet. Sehr große Dateien werden zum Schutz vor Einfrieren nach 40.000 Zeilen abgeschnitten.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/xlsx.full.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+const MAX_ZEILEN = 40000;
+let nameA = 'A', nameB = 'B', tabelleA = null, tabelleB = null, letztes = null;
+
+/* ---------- Myers-Diff (dasselbe Verfahren wie in Git) ----------
+   Vorwärts die kürzeste Bearbeitungsfolge suchen, dabei jeden Zwischenstand
+   merken, anschließend rückwärts durch diese Spur laufen und daraus die
+   einzelnen Schritte ableiten: '=' unverändert, '-' entfernt, '+' neu. */
+function diffScript(a, b){
+  const N = a.length, M = b.length;
+  if(!N && !M) return [];
+  if(!N) return b.map((_, i) => ({t:'+', b:i}));
+  if(!M) return a.map((_, i) => ({t:'-', a:i}));
+
+  const v = new Map([[1, 0]]);
+  const spur = [];
+  let gefunden = -1;
+  for(let d = 0; d <= N + M; d++){
+    spur.push(new Map(v));
+    for(let k = -d; k <= d; k += 2){
+      let x;
+      if(k === -d || (k !== d && (v.get(k-1) ?? 0) < (v.get(k+1) ?? 0))) x = v.get(k+1) ?? 0;
+      else x = (v.get(k-1) ?? 0) + 1;
+      let y = x - k;
+      while(x < N && y < M && a[x] === b[y]){ x++; y++; }
+      v.set(k, x);
+      if(x >= N && y >= M){ gefunden = d; break; }
+    }
+    if(gefunden >= 0) break;
+  }
+  if(gefunden < 0) return [];
+
+  const schritte = [];
+  let x = N, y = M;
+  for(let d = gefunden; d >= 0; d--){
+    const v2 = spur[d];
+    const k = x - y;
+    let vorK;
+    if(k === -d || (k !== d && (v2.get(k-1) ?? 0) < (v2.get(k+1) ?? 0))) vorK = k + 1;
+    else vorK = k - 1;
+    const vorX = d === 0 ? 0 : (v2.get(vorK) ?? 0);
+    const vorY = d === 0 ? 0 : vorX - vorK;
+    while(x > vorX && y > vorY){ schritte.push({t:'=', a:x-1, b:y-1}); x--; y--; }
+    if(d > 0){
+      if(x === vorX) schritte.push({t:'+', b:y-1});
+      else           schritte.push({t:'-', a:x-1});
+      x = vorX; y = vorY;
+    }
+  }
+  return schritte.reverse();
+}
+
+/* ---------- Vorbereiten ---------- */
+function normalisiere(zeile){
+  let z = zeile;
+  if(AK.$('#ign_ws').checked)   z = z.replace(/\s+$/,'').replace(/^\s+/,'');
+  if(AK.$('#ign_case').checked) z = z.toLowerCase();
+  return z;
+}
+
+function zeilen(text){
+  let z = text.replace(/\r\n?/g, '\n').split('\n');
+  if(z.length && z[z.length-1] === '') z.pop();
+  if(AK.$('#ign_leer').checked) z = z.filter(l => l.trim() !== '');
+  if(z.length > MAX_ZEILEN){
+    AK.log(`Nur die ersten ${MAX_ZEILEN.toLocaleString('de-DE')} Zeilen werden verglichen.`);
+    z = z.slice(0, MAX_ZEILEN);
+  }
+  return z;
+}
+
+/* ---------- Wortgenaue Hervorhebung in geänderten Zeilen ---------- */
+function teile(zeile){
+  return zeile.match(/\s+|[^\s]+/g) || [];
+}
+
+function wortDiff(alt, neu){
+  const ta = teile(alt), tb = teile(neu);
+  if(ta.length + tb.length > 600) return [AK.esc(alt), AK.esc(neu)];
+  const s = diffScript(ta.map(t => AK.$('#ign_case').checked ? t.toLowerCase() : t),
+                       tb.map(t => AK.$('#ign_case').checked ? t.toLowerCase() : t));
+  let ha = '', hb = '';
+  for(const sch of s){
+    if(sch.t === '=')      { ha += AK.esc(ta[sch.a]); hb += AK.esc(tb[sch.b]); }
+    else if(sch.t === '-') { ha += '<del>' + AK.esc(ta[sch.a]) + '</del>'; }
+    else                   { hb += '<ins>' + AK.esc(tb[sch.b]) + '</ins>'; }
+  }
+  return [ha, hb];
+}
+
+/* ---------- Textvergleich darstellen ---------- */
+function bloecke(schritte){
+  // gleichartige Schritte zu Blöcken zusammenfassen
+  const b = [];
+  for(const s of schritte){
+    const letzter = b[b.length-1];
+    if(letzter && letzter.t === s.t) letzter.items.push(s);
+    else b.push({t:s.t, items:[s]});
+  }
+  return b;
+}
+
+function textVergleich(){
+  const za = zeilen(AK.$('#a').value), zb = zeilen(AK.$('#b').value);
+  const schritte = diffScript(za.map(normalisiere), zb.map(normalisiere));
+  const geaendert = schritte.filter(s => s.t !== '=').length;
+  const nebenein = AK.$('#ansicht').value === 'neben';
+  const kontext = parseInt(AK.$('#kontext').value, 10);
+
+  // Blöcke bilden und Minus/Plus-Paare zusammenführen (= geänderte Zeilen)
+  const bl = bloecke(schritte);
+  const reihen = [];
+  for(let i = 0; i < bl.length; i++){
+    const blk = bl[i];
+    if(blk.t === '='){
+      reihen.push({t:'=', items:blk.items});
+    }else if(blk.t === '-' && bl[i+1] && bl[i+1].t === '+'){
+      reihen.push({t:'~', weg:blk.items, neu:bl[i+1].items});
+      i++;
+    }else{
+      reihen.push({t:blk.t, items:blk.items});
+    }
+  }
+
+  const zeilenAus = [];
+  reihen.forEach(r => {
+    if(r.t === '='){
+      const n = r.items.length;
+      if(n > kontext * 2 + 1){
+        r.items.slice(0, kontext).forEach(s => zeilenAus.push({t:'=', a:s.a, b:s.b}));
+        zeilenAus.push({t:'luecke', n: n - kontext * 2});
+        r.items.slice(n - kontext).forEach(s => zeilenAus.push({t:'=', a:s.a, b:s.b}));
+      }else{
+        r.items.forEach(s => zeilenAus.push({t:'=', a:s.a, b:s.b}));
+      }
+    }else if(r.t === '~'){
+      const max = Math.max(r.weg.length, r.neu.length);
+      for(let j = 0; j < max; j++){
+        zeilenAus.push({t:'~', a:r.weg[j] ? r.weg[j].a : null, b:r.neu[j] ? r.neu[j].b : null});
+      }
+    }else if(r.t === '-'){
+      r.items.forEach(s => zeilenAus.push({t:'-', a:s.a, b:null}));
+    }else{
+      r.items.forEach(s => zeilenAus.push({t:'+', a:null, b:s.b}));
+    }
+  });
+
+  const tr = [];
+  for(const z of zeilenAus){
+    if(z.t === 'luecke'){
+      tr.push(`<tr class="luecke"><td colspan="${nebenein ? 4 : 2}">… ${z.n} unveränderte Zeilen …</td></tr>`);
+      continue;
+    }
+    const alt = z.a !== null ? za[z.a] : null;
+    const neu = z.b !== null ? zb[z.b] : null;
+    let ha = alt === null ? '' : AK.esc(alt);
+    let hb = neu === null ? '' : AK.esc(neu);
+    if(z.t === '~' && alt !== null && neu !== null) [ha, hb] = wortDiff(alt, neu);
+
+    if(nebenein){
+      const klA = z.t !== '=' && alt !== null ? ' class="weg"' : '';
+      const klB = z.t !== '=' && neu !== null ? ' class="neu"' : '';
+      tr.push('<tr>' +
+        `<td class="nr">${z.a !== null ? z.a+1 : ''}</td>` +
+        `<td${klA}>${ha}</td>` +
+        `<td class="nr b">${z.b !== null ? z.b+1 : ''}</td>` +
+        `<td${klB}>${hb}</td></tr>`);
+    }else{
+      if(z.t === '=' ){
+        tr.push(`<tr><td class="nr">${z.a+1}</td><td> ${ha}</td></tr>`);
+      }else{
+        if(alt !== null) tr.push(`<tr class="minus"><td class="nr">${z.a+1}</td><td>− ${ha}</td></tr>`);
+        if(neu !== null) tr.push(`<tr class="plus"><td class="nr">${z.b+1}</td><td>+ ${hb}</td></tr>`);
+      }
+    }
+  }
+
+  const aus = AK.$('#ausgabe');
+  aus.className = 'diff' + (nebenein ? ' nebenein' : '');
+  aus.innerHTML = tr.length
+    ? '<table>' + tr.join('') + '</table>'
+    : '<table><tr><td style="color:#9A9A93;padding:14px">Beide Seiten sind identisch.</td></tr></table>';
+
+  AK.$('#anzahl').innerHTML = geaendert.toLocaleString('de-DE') +
+    `<small>${geaendert === 1 ? 'geänderte Zeile' : 'geänderte Zeilen'}</small>`;
+  AK.$('#go').disabled = !geaendert;
+  letztes = {art:'text', za, zb, schritte};
+}
+
+/* ---------- Tabellenvergleich ---------- */
+function alsZellen(text){
+  const trenner = text.includes('\t') && !text.includes(';') ? '\t' : undefined;
+  const wb = XLSX.read(text, {type:'string', raw:true, FS:trenner});
+  const bl = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(bl, {header:1, defval:'', blankrows:false}).map(r => r.map(c => String(c)));
+}
+
+function tabellenVergleich(){
+  let ga, gb;
+  try{
+    ga = tabelleA || alsZellen(AK.$('#a').value);
+    gb = tabelleB || alsZellen(AK.$('#b').value);
+  }catch(err){
+    AK.log('Tabelle konnte nicht gelesen werden: ' + err.message, true);
+    return;
+  }
+  if(!ga.length && !gb.length){
+    AK.$('#ausgabe').innerHTML = '<table><tr><td style="color:#9A9A93;padding:14px">Noch nichts zu vergleichen.</td></tr></table>';
+    return;
+  }
+
+  const kopf = (ga[0] || gb[0] || []).map((c, i) => c || ('Spalte ' + (i+1)));
+  spaltenAuswahlFuellen(kopf);
+
+  const schluesselIdx = AK.$('#schluessel').value === '' ? -1 : parseInt(AK.$('#schluessel').value, 10);
+  const rumpfA = ga.slice(1), rumpfB = gb.slice(1);
+
+  let paare;  // [zeileA|null, zeileB|null]
+  if(schluesselIdx >= 0){
+    const karteB = new Map();
+    rumpfB.forEach(r => {
+      const k = normalisiere(r[schluesselIdx] ?? '');
+      if(!karteB.has(k)) karteB.set(k, []);
+      karteB.get(k).push(r);
+    });
+    paare = [];
+    rumpfA.forEach(r => {
+      const k = normalisiere(r[schluesselIdx] ?? '');
+      const treffer = karteB.get(k);
+      if(treffer && treffer.length) paare.push([r, treffer.shift()]);
+      else paare.push([r, null]);
+    });
+    karteB.forEach(rest => rest.forEach(r => paare.push([null, r])));
+  }else{
+    const sig = r => r.map(normalisiere).join('');
+    const s = diffScript(rumpfA.map(sig), rumpfB.map(sig));
+    // Minus/Plus-Paare als geänderte Zeilen zusammenführen
+    paare = [];
+    const bl = bloecke(s);
+    for(let i = 0; i < bl.length; i++){
+      const blk = bl[i];
+      if(blk.t === '='){ blk.items.forEach(x => paare.push([rumpfA[x.a], rumpfB[x.b]])); }
+      else if(blk.t === '-' && bl[i+1] && bl[i+1].t === '+'){
+        const max = Math.max(blk.items.length, bl[i+1].items.length);
+        for(let j = 0; j < max; j++){
+          paare.push([blk.items[j] ? rumpfA[blk.items[j].a] : null,
+                      bl[i+1].items[j] ? rumpfB[bl[i+1].items[j].b] : null]);
+        }
+        i++;
+      }
+      else if(blk.t === '-') blk.items.forEach(x => paare.push([rumpfA[x.a], null]));
+      else                   blk.items.forEach(x => paare.push([null, rumpfB[x.b]]));
+    }
+  }
+
+  const spalten = Math.max(kopf.length, ...paare.map(([x,y]) => Math.max(x?x.length:0, y?y.length:0)), 1);
+  let aenderungen = 0;
+  const tr = ['<tr><td class="nr">#</td>' +
+    Array.from({length:spalten}, (_,i) => `<td style="font-weight:600;background:#FAFAF7">${AK.esc(kopf[i] || '')}</td>`).join('') +
+    '</tr>'];
+
+  paare.forEach(([ra, rb], i) => {
+    if(!rb){
+      aenderungen++;
+      tr.push(`<tr class="minus"><td class="nr">${i+1}</td>` +
+        Array.from({length:spalten}, (_,c) => `<td>${AK.esc(ra[c] ?? '')}</td>`).join('') + '</tr>');
+    }else if(!ra){
+      aenderungen++;
+      tr.push(`<tr class="plus"><td class="nr">${i+1}</td>` +
+        Array.from({length:spalten}, (_,c) => `<td>${AK.esc(rb[c] ?? '')}</td>`).join('') + '</tr>');
+    }else{
+      const zellen = [];
+      let anders = false;
+      for(let c = 0; c < spalten; c++){
+        const va = ra[c] ?? '', vb = rb[c] ?? '';
+        if(normalisiere(va) === normalisiere(vb)){
+          zellen.push(`<td>${AK.esc(vb)}</td>`);
+        }else{
+          anders = true;
+          zellen.push(`<td class="zelle-anders">${va ? '<del>' + AK.esc(va) + '</del> ' : ''}<ins>${AK.esc(vb)}</ins></td>`);
+        }
+      }
+      if(anders) aenderungen++;
+      else if(parseInt(AK.$('#kontext').value, 10) < 99999) return;
+      tr.push(`<tr><td class="nr">${i+1}</td>${zellen.join('')}</tr>`);
+    }
+  });
+
+  AK.$('#ausgabe').className = 'diff';
+  AK.$('#ausgabe').innerHTML = '<table>' + tr.join('') + '</table>';
+  AK.$('#anzahl').innerHTML = aenderungen.toLocaleString('de-DE') +
+    `<small>${aenderungen === 1 ? 'geänderte Zeile' : 'geänderte Zeilen'}</small>`;
+  AK.$('#go').disabled = !aenderungen;
+  letztes = {art:'tabelle', kopf, paare, spalten};
+}
+
+function spaltenAuswahlFuellen(kopf){
+  const sel = AK.$('#schluessel');
+  const vorher = sel.value;
+  if(sel.dataset.kopf === kopf.join('')) return;
+  sel.dataset.kopf = kopf.join('');
+  sel.innerHTML = '<option value="">Reihenfolge</option>';
+  kopf.forEach((k, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = k;
+    sel.appendChild(o);
+  });
+  if(vorher !== '' && kopf[vorher] !== undefined) sel.value = vorher;
+}
+
+/* ---------- Steuerung ---------- */
+function aktualisieren(){
+  AK.logClear();
+  const tabelle = AK.$('#modus').value === 'tabelle';
+  AK.$('#schluesselfeld').hidden = !tabelle;
+  AK.$('#ansichtfeld').hidden = tabelle;
+  AK.$('#kontextfeld').querySelector('label').textContent =
+    tabelle ? 'Unveränderte Zeilen' : 'Unveränderte Zeilen zeigen';
+  try{
+    if(tabelle) tabellenVergleich(); else textVergleich();
+  }catch(err){
+    AK.log('Vergleich fehlgeschlagen: ' + err.message, true);
+    console.error(err);
+  }
+}
+
+async function einlesen(datei, seite){
+  const endung = (datei.name.match(/\.([^.]+)$/) || [,''])[1].toLowerCase();
+  if(endung === 'xlsx' || endung === 'xls'){
+    const buf = await datei.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    const bl = wb.Sheets[wb.SheetNames[0]];
+    const grid = XLSX.utils.sheet_to_json(bl, {header:1, defval:'', blankrows:false}).map(r => r.map(c => String(c)));
+    if(seite === 'a') tabelleA = grid; else tabelleB = grid;
+    AK.$('#' + seite).value = grid.map(r => r.join(';')).join('\n');
+    AK.$('#modus').value = 'tabelle';
+  }else{
+    const text = await leseText(datei);
+    if(seite === 'a') tabelleA = null; else tabelleB = null;
+    AK.$('#' + seite).value = text;
+    if(/^(csv|tsv)$/.test(endung)) AK.$('#modus').value = 'tabelle';
+  }
+  if(seite === 'a'){ nameA = datei.name; AK.$('#kopfa').textContent = 'Vorher (A) · ' + datei.name; }
+  else            { nameB = datei.name; AK.$('#kopfb').textContent = 'Nachher (B) · ' + datei.name; }
+  aktualisieren();
+}
+
+/* UTF-8 mit Rückfall auf Windows-1252 — sonst werden Umlaute zerlegt */
+async function leseText(datei){
+  const buf = await datei.arrayBuffer();
+  try{
+    return new TextDecoder('utf-8', {fatal:true}).decode(buf);
+  }catch(_){
+    return new TextDecoder('windows-1252').decode(buf);
+  }
+}
+
+/* Von der Startseite übergebene Dateien landen in A, dann B */
+window.addFiles = async function(dateien){
+  if(dateien[0]) await einlesen(dateien[0], 'a');
+  if(dateien[1]) await einlesen(dateien[1], 'b');
+};
+
+AK.dropzone('#dropa', '#pickera', d => einlesen(d[0], 'a'));
+AK.dropzone('#dropb', '#pickerb', d => einlesen(d[0], 'b'));
+
+['#a','#b'].forEach(s => AK.$(s).addEventListener('input', () => {
+  if(s === '#a') tabelleA = null; else tabelleB = null;
+  aktualisieren();
+}));
+['#modus','#ansicht','#kontext','#schluessel','#ign_ws','#ign_case','#ign_leer']
+  .forEach(s => AK.$(s).addEventListener('change', aktualisieren));
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  if(!letztes) return;
+  if(letztes.art === 'text'){
+    const zeilen = [`--- ${nameA}`, `+++ ${nameB}`];
+    // Ein einziger Bereich über die ganze Datei — für Patch-Werkzeuge ausreichend
+    zeilen.push(`@@ -1,${letztes.za.length} +1,${letztes.zb.length} @@`);
+    for(const s of letztes.schritte){
+      if(s.t === '=')      zeilen.push(' ' + letztes.za[s.a]);
+      else if(s.t === '-') zeilen.push('-' + letztes.za[s.a]);
+      else                 zeilen.push('+' + letztes.zb[s.b]);
+    }
+    AK.offerDownload(new Blob([zeilen.join('\n') + '\n'], {type:'text/plain;charset=utf-8'}),
+      'vergleich.diff', '.diff herunterladen');
+    AK.log('Unified-Diff erstellt.');
+  }else{
+    const reihen = [['Änderung', ...Array.from({length:letztes.spalten}, (_,i) => letztes.kopf[i] || '')]];
+    letztes.paare.forEach(([ra, rb]) => {
+      if(!rb)      reihen.push(['entfernt', ...Array.from({length:letztes.spalten}, (_,c) => ra[c] ?? '')]);
+      else if(!ra) reihen.push(['neu',      ...Array.from({length:letztes.spalten}, (_,c) => rb[c] ?? '')]);
+      else{
+        const anders = Array.from({length:letztes.spalten}, (_,c) =>
+          normalisiere(ra[c] ?? '') !== normalisiere(rb[c] ?? ''));
+        if(!anders.some(Boolean)) return;
+        reihen.push(['geändert', ...Array.from({length:letztes.spalten}, (_,c) =>
+          anders[c] ? `${ra[c] ?? ''} → ${rb[c] ?? ''}` : (rb[c] ?? ''))]);
+      }
+    });
+    const bl = XLSX.utils.aoa_to_sheet(reihen);
+    const csv = '﻿' + XLSX.utils.sheet_to_csv(bl, {FS:';'});
+    AK.offerDownload(new Blob([csv], {type:'text/csv;charset=utf-8'}), 'vergleich.csv', 'CSV herunterladen');
+    AK.log('Änderungsliste erstellt.');
+  }
+  AK.stamp(true);
+};
+
+aktualisieren();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

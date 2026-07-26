@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word-Datei erstellen (DOCX aus Text oder Markdown) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Aus Markdown, Text oder HTML eine echte Word-Datei (DOCX) machen: mit Überschriften, Listen, Tabellen, Titelseite, Inhaltsverzeichnis und Seitenzahlen. Ohne Word, ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/word-erstellen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Word-Datei erstellen (DOCX aus Text oder Markdown) | Alleskonverter">
+<meta property="og:description" content="Aus Markdown, Text oder HTML eine echte Word-Datei machen — mit Titelseite, Inhaltsverzeichnis und Seitenzahlen. Ohne Word, ohne Upload.">
+<meta property="og:url" content="https://alleskonverter.de/tools/word-erstellen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Word-Datei erstellen (DOCX) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Word-Datei erstellen — Alleskonverter","url":"https://alleskonverter.de/tools/word-erstellen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Aus Markdown, Text oder HTML eine echte DOCX-Datei erzeugen — mit Titelseite, Inhaltsverzeichnis und Seitenzahlen, ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Ist das eine echte Word-Datei?","acceptedAnswer":{"@type":"Answer","text":"Ja. Erzeugt wird eine gültige DOCX-Datei nach dem Office-Open-XML-Standard, die sich in Word, LibreOffice, Google Docs und Pages öffnen und ganz normal weiterbearbeiten lässt."}},{"@type":"Question","name":"Brauche ich Word dafür?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Datei entsteht komplett im Browser — es ist weder Word noch ein Office-Abonnement nötig."}},{"@type":"Question","name":"Warum ist mein Inhaltsverzeichnis leer?","acceptedAnswer":{"@type":"Answer","text":"Word berechnet Inhaltsverzeichnisse erst beim Öffnen. Ein Rechtsklick auf das Verzeichnis und „Felder aktualisieren“ füllt es; in LibreOffice heißt der Punkt „Verzeichnis aktualisieren“."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{padding:8px 13px;border:1px solid var(--rule);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tabs button:hover{border-color:var(--ink)}
+.tabs button.active{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+.blatt{background:#fff;border:1px solid var(--rule);box-shadow:var(--shadow);padding:34px 40px;
+  max-height:560px;overflow:auto;color:#16191B;line-height:1.6}
+@media(max-width:520px){.blatt{padding:20px}}
+.blatt h1,.blatt h2,.blatt h3,.blatt h4{color:#1B4D3E;line-height:1.25;margin:1.3em 0 .45em;
+  font-family:var(--sans);font-weight:700}
+.blatt h1{font-size:23px}.blatt h2{font-size:19px}.blatt h3{font-size:16.5px}.blatt h4{font-size:15px;font-style:italic;color:#16191B}
+.blatt h1:first-child{margin-top:0}
+.blatt p{margin:0 0 .7em}
+.blatt ul,.blatt ol{margin:0 0 .7em;padding-left:1.6em}
+.blatt li{margin:.15em 0}
+.blatt blockquote{border-left:3px solid #CFCDC6;margin:.8em 0;padding-left:1em;color:#555}
+.blatt pre{background:#F2F2F2;padding:10px 12px;overflow:auto;font-family:var(--mono);font-size:12.5px;margin:0 0 .8em}
+.blatt code{font-family:var(--mono);font-size:.9em}
+.blatt table{border-collapse:collapse;width:100%;margin:0 0 .8em;font-size:14px}
+.blatt th,.blatt td{border:1px solid #CFCDC6;padding:5px 9px;text-align:left}
+.blatt th{background:#EFEFEF}
+.blatt hr{border:0;border-top:1px solid #999;margin:1.2em 0}
+.blatt a{color:#1B4D3E}
+.blatt .deckblatt{text-align:center;padding:60px 0 40px;border-bottom:1px dashed var(--rule);margin-bottom:24px}
+.blatt .deckblatt b{display:block;font-size:26px;font-weight:700;margin-bottom:12px}
+.blatt .deckblatt span{display:block;font-size:15px}
+.blatt .deckblatt em{display:block;font-size:13px;color:#666;margin-top:6px}
+.blatt .tocbox{border:1px solid #CFCDC6;background:#FAFAF7;padding:12px 16px;margin:0 0 24px}
+.blatt .tocbox b{display:block;color:#1B4D3E;font-size:17px;margin-bottom:6px}
+.blatt .tocbox div{font-size:14px;padding:2px 0}
+.blatt .tocbox div.s2{padding-left:16px;color:#555}
+.blatt .tocbox div.s3{padding-left:32px;color:#777;font-size:13px}
+.spick{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);line-height:1.9;margin-top:10px}
+.spick code{background:var(--card);border:1px solid var(--rule);padding:1px 5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Word-Datei <span>erstellen</span></h1>
+  <p class="sub">Aus Markdown, reinem Text oder HTML eine echte DOCX-Datei machen — mit Überschriften, Listen, Tabellen, Titelseite, Inhaltsverzeichnis und Seitenzahlen. Ohne Word, ohne Konto, ohne Upload.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Textdatei auswählen">
+      <strong>Markdown, Text oder HTML hineinziehen</strong>
+      <small>oder unten direkt lostippen</small>
+    </div>
+    <input type="file" id="picker" hidden accept=".md,.markdown,.txt,.html,.htm,text/plain,text/markdown,text/html">
+
+    <div class="tabs" role="tablist" style="margin-top:18px">
+      <button class="active" id="tab-schreiben" role="tab" aria-selected="true">Schreiben</button>
+      <button id="tab-vorschau" role="tab" aria-selected="false">Seitenvorschau</button>
+    </div>
+
+    <div id="bereich-schreiben">
+      <textarea class="pane" id="quelle" spellcheck="false" aria-label="Inhalt in Markdown"
+        style="min-height:340px"></textarea>
+      <p class="spick"><code># Überschrift</code> · <code>## kleiner</code> · <code>**fett**</code> ·
+        <code>*kursiv*</code> · <code>- Liste</code> · <code>1. Nummern</code> · <code>&gt; Zitat</code> ·
+        <code>[Text](Adresse)</code> · <code>| Tabelle | … |</code> · <code>---</code> für eine Trennlinie</p>
+    </div>
+
+    <div id="bereich-vorschau" hidden>
+      <div class="blatt" id="blatt"></div>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Dokument</h2>
+    <div class="count" id="anzahl">0<small>Wörter</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="titel">Titel</label>
+      <input type="text" id="titel" placeholder="wird auch als Dateiname benutzt">
+    </div>
+
+    <div class="field">
+      <label>Aufbau</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="titelseite" style="width:auto"> Eigene Titelseite</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:6px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="verzeichnis" style="width:auto"> Inhaltsverzeichnis</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;text-transform:none;letter-spacing:0;color:var(--ink)">
+        <input type="checkbox" id="seitenzahlen" checked style="width:auto"> Seitenzahlen in der Fußzeile</label>
+    </div>
+
+    <div class="field" id="autorfeld" hidden>
+      <label for="autor">Verfasser</label>
+      <input type="text" id="autor" placeholder="optional">
+    </div>
+
+    <div class="field">
+      <label for="kopfzeile">Kopfzeile</label>
+      <input type="text" id="kopfzeile" placeholder="optional, z. B. der Projektname">
+    </div>
+
+    <div class="field">
+      <label for="schrift">Schriftart</label>
+      <select id="schrift">
+        <option>Calibri</option>
+        <option>Arial</option>
+        <option>Times New Roman</option>
+        <option>Cambria</option>
+        <option>Georgia</option>
+        <option>Verdana</option>
+        <option>Garamond</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="groesse">Schriftgröße</label>
+      <select id="groesse">
+        <option value="10">10 pt</option>
+        <option value="11" selected>11 pt</option>
+        <option value="12">12 pt</option>
+        <option value="13">13 pt</option>
+        <option value="14">14 pt</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="zeilenabstand">Zeilenabstand</label>
+      <select id="zeilenabstand">
+        <option value="1">einfach</option>
+        <option value="1.15" selected>1,15</option>
+        <option value="1.5">1,5</option>
+        <option value="2">doppelt</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="rand">Seitenrand</label>
+      <select id="rand">
+        <option value="15">schmal (1,5 cm)</option>
+        <option value="25" selected>normal (2,5 cm)</option>
+        <option value="32">weit (3,2 cm)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="format">Seitenformat</label>
+      <select id="format">
+        <option value="a4">A4 hoch</option>
+        <option value="a4-quer">A4 quer</option>
+        <option value="letter">Letter hoch</option>
+      </select>
+    </div>
+
+    <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;margin-bottom:16px;color:var(--ink)">
+      <input type="checkbox" id="blocksatz" style="width:auto"> Blocksatz</label>
+
+    <button class="primary" id="go" disabled>.docx herunterladen</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Text ist fertig, aber die Gegenseite will ihn als Word-Datei — und Word ist gerade nicht zur Hand. Hier schreibst oder fügst du den Inhalt ein und bekommst eine echte <code>.docx</code>-Datei mit sauberen Überschriften-Formatvorlagen, Listen, Tabellen, wahlweise Titelseite, Inhaltsverzeichnis und Seitenzahlen. Der Gegenpart dazu ist das Werkzeug <a href="../word-zu-html/">Word zu HTML</a>, das den Weg zurück geht.</p>
+  <h3>Ist das eine echte Word-Datei?</h3>
+  <p>Ja. Erzeugt wird eine gültige DOCX-Datei nach dem Office-Open-XML-Standard — dieselbe Struktur, die Word selbst schreibt. Sie lässt sich in Word, LibreOffice, Google Docs, Pages und OnlyOffice öffnen und ganz normal weiterbearbeiten. Die Überschriften nutzen die Standard-Formatvorlagen, du kannst das Aussehen im Dokument also nachträglich mit einem Klick umstellen.</p>
+  <h3>Brauche ich Word oder ein Office-Abo?</h3>
+  <p>Nein. Die Datei entsteht komplett in deinem Browser, es ist keinerlei Software nötig. Und weil nichts hochgeladen wird, eignet sich das auch für Bewerbungen, Verträge und interne Berichte.</p>
+  <h3>Warum ist mein Inhaltsverzeichnis leer?</h3>
+  <p>Weil Word Verzeichnisse erst beim Öffnen berechnet — in der Datei steht nur der Auftrag dazu. Ein Rechtsklick auf das Verzeichnis und „Felder aktualisieren“ füllt es. In LibreOffice heißt der Punkt „Verzeichnis aktualisieren“, Google Docs aktualisiert von selbst.</p>
+  <h3>Muss ich Markdown können?</h3>
+  <p>Nein. Du kannst auch einfach normalen Text einfügen — Absätze bleiben Absätze. Markdown ist nur die Abkürzung, wenn du Überschriften, Listen oder Tabellen willst: eine Raute für eine Überschrift, ein Bindestrich für einen Aufzählungspunkt. Die wichtigsten Zeichen stehen unter dem Eingabefeld.</p>
+  <h3>Kommen auch Bilder mit?</h3>
+  <p>Bilder aus dem Markdown werden derzeit als Platzhalter mit ihrem Beschreibungstext eingesetzt statt eingebettet — sie liegen ja außerhalb dieser Seite. Für ein Dokument mit Bildern ist der Weg über <a href="../bild-zu-pdf/">Bild zu PDF</a> meist der bessere.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Ziehst du eine HTML-Datei hinein, wird sie zunächst in Markdown umgewandelt und dann gesetzt — Skripte, Formulare und Layout-Klassen fallen dabei weg.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/docx.min.js"></script>
+<script src="../../vendor/marked.min.js"></script>
+<script src="../../vendor/turndown.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+const {Document, Paragraph, TextRun, Packer, HeadingLevel, Table, TableRow, TableCell,
+       AlignmentType, LevelFormat, WidthType, BorderStyle, ExternalHyperlink, PageNumber,
+       PageBreak, Footer, Header, TableOfContents, convertMillimetersToTwip} = docx;
+
+const BEISPIEL = `# Projektbericht
+
+Ein kurzer Absatz zur Einordnung. Text lässt sich **fett** oder *kursiv* auszeichnen,
+und Verweise sehen so aus: [alleskonverter.de](https://alleskonverter.de).
+
+## Was gemacht wurde
+
+- Erster Punkt
+- Zweiter Punkt mit **Betonung**
+  - ein Unterpunkt
+- Dritter Punkt
+
+## Zahlen
+
+| Posten      | Menge | Preis |
+|:------------|------:|------:|
+| Papier      |    12 | 24,90 |
+| Druckfarbe  |     3 | 58,00 |
+
+> Ein Zitat oder eine Anmerkung am Rand.
+
+## Nächste Schritte
+
+1. Angebot einholen
+2. Termin abstimmen
+3. Abnahme
+`;
+
+function einstellungen(){
+  const format = AK.$('#format').value;
+  return {
+    schrift: AK.$('#schrift').value,
+    groesse: parseInt(AK.$('#groesse').value, 10),
+    zeilenabstand: parseFloat(AK.$('#zeilenabstand').value),
+    blocksatz: AK.$('#blocksatz').checked,
+    rand: parseInt(AK.$('#rand').value, 10),
+    format: format.startsWith('letter') ? 'letter' : 'a4',
+    quer: format.endsWith('-quer'),
+    titelseite: AK.$('#titelseite').checked,
+    verzeichnis: AK.$('#verzeichnis').checked,
+    seitenzahlen: AK.$('#seitenzahlen').checked,
+    kopfzeile: AK.$('#kopfzeile').value.trim(),
+    titel: AK.$('#titel').value.trim(),
+    autor: AK.$('#autor').value.trim(),
+  };
+}
+
+/* HTML-Entitäten zurückwandeln — marked liefert sie kodiert, DOCX will Klartext */
+function entHtml(s){
+  return String(s).replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g,' ');
+}
+
+function baueDokument(md, opt){
+  const PT = pt => pt * 2;                       // DOCX rechnet in halben Punkten
+  const groesse = PT(opt.groesse), schrift = opt.schrift;
+  const ausrichtung = opt.blocksatz ? AlignmentType.JUSTIFIED : AlignmentType.LEFT;
+  const zeilen = Math.round(240 * opt.zeilenabstand);
+
+  /* ---- Inline-Auszeichnungen ---- */
+  function laeufe(tokens, erbe){
+    erbe = erbe || {};
+    const raus = [];
+    for(const t of tokens || []){
+      if(t.type === 'strong')        raus.push(...laeufe(t.tokens, {...erbe, bold:true}));
+      else if(t.type === 'em')       raus.push(...laeufe(t.tokens, {...erbe, italics:true}));
+      else if(t.type === 'del')      raus.push(...laeufe(t.tokens, {...erbe, strike:true}));
+      else if(t.type === 'codespan') raus.push(new TextRun({text:entHtml(t.text), font:'Consolas', size:groesse-2, ...erbe}));
+      else if(t.type === 'br')       raus.push(new TextRun({break:1}));
+      else if(t.type === 'link'){
+        const innen = laeufe(t.tokens, {...erbe, style:'Hyperlink'});
+        raus.push(new ExternalHyperlink({
+          children: innen.length ? innen : [new TextRun({text:entHtml(t.text || t.href), style:'Hyperlink'})],
+          link: t.href,
+        }));
+      }
+      else if(t.type === 'image')    raus.push(new TextRun({text:'[Bild: ' + entHtml(t.text || t.href) + ']', italics:true, font:schrift, size:groesse}));
+      else if(t.tokens && t.tokens.length) raus.push(...laeufe(t.tokens, erbe));
+      else if(t.text !== undefined)  raus.push(new TextRun({text:entHtml(t.text), font:schrift, size:groesse, ...erbe}));
+    }
+    return raus;
+  }
+
+  const UEBER = [HeadingLevel.HEADING_1, HeadingLevel.HEADING_2, HeadingLevel.HEADING_3,
+                 HeadingLevel.HEADING_4, HeadingLevel.HEADING_5, HeadingLevel.HEADING_6];
+
+  /* Listeneinträge packen ihren Text in ein weiteres Token — hier ausgepackt */
+  function flach(tokens){
+    const raus = [];
+    for(const t of tokens){
+      if((t.type === 'text' || t.type === 'paragraph') && t.tokens) raus.push(...t.tokens);
+      else raus.push(t);
+    }
+    return raus;
+  }
+
+  function spaltenLage(a){
+    return a === 'center' ? AlignmentType.CENTER : a === 'right' ? AlignmentType.RIGHT : AlignmentType.LEFT;
+  }
+
+  function bloecke(tokens, ebene){
+    ebene = ebene || 0;
+    const raus = [];
+    for(const t of tokens){
+      switch(t.type){
+        case 'heading':
+          raus.push(new Paragraph({heading: UEBER[Math.min(t.depth, 6) - 1], children: laeufe(t.tokens)}));
+          break;
+        case 'paragraph':
+        case 'text':
+          raus.push(new Paragraph({
+            children: t.tokens ? laeufe(t.tokens) : [new TextRun({text:entHtml(t.text), font:schrift, size:groesse})],
+            alignment: ausrichtung,
+            spacing: {after: 140, line: zeilen},
+          }));
+          break;
+        case 'blockquote':
+          // Eingerückt mit Strich am linken Rand, damit es auch in Word als Zitat lesbar bleibt
+          for(const innen of t.tokens){
+            if(innen.type === 'paragraph' || innen.type === 'text'){
+              raus.push(new Paragraph({
+                children: innen.tokens ? laeufe(innen.tokens)
+                  : [new TextRun({text: entHtml(innen.text), font: schrift, size: groesse, italics: true})],
+                alignment: ausrichtung,
+                spacing: {after: 140, line: zeilen},
+                indent: {left: convertMillimetersToTwip(8)},
+                border: {left: {style: BorderStyle.SINGLE, size: 12, color: 'BBBBBB', space: 8}},
+              }));
+            }else{
+              raus.push(...bloecke([innen], ebene));
+            }
+          }
+          break;
+        case 'code':
+          String(t.text).split('\n').forEach(z => raus.push(new Paragraph({
+            children: [new TextRun({text: z || ' ', font: 'Consolas', size: groesse - 2})],
+            spacing: {after: 0, line: 240},
+            shading: {fill: 'F2F2F2'},
+            indent: {left: convertMillimetersToTwip(4)},
+          })));
+          raus.push(new Paragraph({children: [], spacing: {after: 140}}));
+          break;
+        case 'list':
+          t.items.forEach(eintrag => {
+            const eigene = (eintrag.tokens || []).filter(x => x.type !== 'list');
+            const unter  = (eintrag.tokens || []).filter(x => x.type === 'list');
+            const haken = eintrag.task
+              ? [new TextRun({text: eintrag.checked ? '☒ ' : '☐ ', font: schrift, size: groesse})]
+              : [];
+            raus.push(new Paragraph({
+              children: [...haken, ...laeufe(flach(eigene))],
+              spacing: {after: 60, line: zeilen},
+              ...(t.ordered
+                ? {numbering: {reference: 'ak-nummern', level: Math.min(ebene, 4)}}
+                : {bullet: {level: Math.min(ebene, 4)}}),
+            }));
+            unter.forEach(u => raus.push(...bloecke([u], ebene + 1)));
+          });
+          break;
+        case 'table': {
+          const zelle = (z, i, kopf) => new TableCell({
+            shading: kopf ? {fill: 'EFEFEF'} : undefined,
+            children: [new Paragraph({
+              children: laeufe(z.tokens).map(r => r),
+              alignment: spaltenLage(t.align[i]),
+              spacing: {after: 0, line: 240},
+            })],
+          });
+          raus.push(new Table({
+            width: {size: 100, type: WidthType.PERCENTAGE},
+            rows: [
+              new TableRow({tableHeader: true, children: t.header.map((z, i) => zelle(z, i, true))}),
+              ...t.rows.map(r => new TableRow({children: r.map((z, i) => zelle(z, i, false))})),
+            ],
+          }));
+          raus.push(new Paragraph({children: [], spacing: {after: 140}}));
+          break;
+        }
+        case 'hr':
+          raus.push(new Paragraph({
+            children: [],
+            border: {bottom: {style: BorderStyle.SINGLE, size: 6, color: '999999', space: 6}},
+            spacing: {before: 140, after: 260},
+          }));
+          break;
+        case 'html': {
+          const nur = String(t.text).replace(/<[^>]*>/g, '').trim();
+          if(nur) raus.push(new Paragraph({
+            children: [new TextRun({text: entHtml(nur), font: schrift, size: groesse})],
+            spacing: {after: 140, line: zeilen},
+          }));
+          break;
+        }
+        case 'space':
+          break;
+        default:
+          if(t.tokens) raus.push(...bloecke(t.tokens, ebene));
+      }
+    }
+    return raus;
+  }
+
+  const inhalt = [];
+
+  if(opt.titelseite && (opt.titel || opt.autor)){
+    inhalt.push(new Paragraph({
+      children: [new TextRun({text: opt.titel || '', font: schrift, size: PT(28), bold: true})],
+      alignment: AlignmentType.CENTER,
+      spacing: {before: convertMillimetersToTwip(55), after: 300},
+    }));
+    if(opt.autor) inhalt.push(new Paragraph({
+      children: [new TextRun({text: opt.autor, font: schrift, size: PT(14)})],
+      alignment: AlignmentType.CENTER, spacing: {after: 140},
+    }));
+    inhalt.push(new Paragraph({
+      children: [new TextRun({text: heute(), font: schrift, size: PT(11), color: '666666'})],
+      alignment: AlignmentType.CENTER,
+    }));
+    inhalt.push(new Paragraph({children: [new PageBreak()]}));
+  }
+
+  if(opt.verzeichnis){
+    inhalt.push(new Paragraph({heading: HeadingLevel.HEADING_1, children: [new TextRun({text: 'Inhalt'})]}));
+    inhalt.push(new TableOfContents('Inhalt', {hyperlink: true, headingStyleRange: '1-3'}));
+    inhalt.push(new Paragraph({children: [new PageBreak()]}));
+  }
+
+  inhalt.push(...bloecke(marked.lexer(md)));
+
+  const rand = convertMillimetersToTwip(opt.rand);
+  const [b, h] = opt.format === 'letter' ? [215.9, 279.4] : [210, 297];
+
+  return new Document({
+    creator: opt.autor || 'alleskonverter.de',
+    title: opt.titel || '',
+    styles: {
+      default: {
+        document: {run: {font: schrift, size: groesse}, paragraph: {spacing: {line: zeilen}}},
+        heading1: {run: {font: schrift, size: PT(opt.groesse + 8), bold: true, color: '1B4D3E'},
+                   paragraph: {spacing: {before: 320, after: 140}}},
+        heading2: {run: {font: schrift, size: PT(opt.groesse + 4), bold: true, color: '1B4D3E'},
+                   paragraph: {spacing: {before: 280, after: 120}}},
+        heading3: {run: {font: schrift, size: PT(opt.groesse + 2), bold: true},
+                   paragraph: {spacing: {before: 240, after: 100}}},
+        heading4: {run: {font: schrift, size: PT(opt.groesse), bold: true, italics: true},
+                   paragraph: {spacing: {before: 200, after: 80}}},
+      },
+    },
+    numbering: {
+      config: [{
+        reference: 'ak-nummern',
+        levels: [0, 1, 2, 3, 4].map(l => ({
+          level: l,
+          format: [LevelFormat.DECIMAL, LevelFormat.LOWER_LETTER, LevelFormat.LOWER_ROMAN,
+                   LevelFormat.DECIMAL, LevelFormat.LOWER_LETTER][l],
+          text: `%${l + 1}.`,
+          alignment: AlignmentType.START,
+          style: {paragraph: {indent: {left: 720 * (l + 1), hanging: 360}}},
+        })),
+      }],
+    },
+    sections: [{
+      properties: {
+        page: {
+          size: {
+            width:  convertMillimetersToTwip(opt.quer ? h : b),
+            height: convertMillimetersToTwip(opt.quer ? b : h),
+            orientation: opt.quer ? 'landscape' : 'portrait',
+          },
+          margin: {top: rand, right: rand, bottom: rand, left: rand},
+        },
+      },
+      headers: opt.kopfzeile ? {default: new Header({children: [new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [new TextRun({text: opt.kopfzeile, font: schrift, size: PT(9), color: '666666'})],
+      })]})} : undefined,
+      footers: opt.seitenzahlen ? {default: new Footer({children: [new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({children: ['Seite ', PageNumber.CURRENT, ' von ', PageNumber.TOTAL_PAGES],
+          font: schrift, size: PT(9), color: '666666'})],
+      })]})} : undefined,
+      children: inhalt,
+    }],
+  });
+}
+
+function heute(){
+  return new Date().toLocaleDateString('de-DE', {day:'numeric', month:'long', year:'numeric'});
+}
+
+/* ---------- Vorschau ---------- */
+function vorschau(){
+  const opt = einstellungen();
+  const md = AK.$('#quelle').value;
+  const blatt = AK.$('#blatt');
+  let html = '';
+
+  if(opt.titelseite && (opt.titel || opt.autor)){
+    html += `<div class="deckblatt"><b>${AK.esc(opt.titel)}</b>` +
+      (opt.autor ? `<span>${AK.esc(opt.autor)}</span>` : '') +
+      `<em>${heute()}</em></div>`;
+  }
+  if(opt.verzeichnis){
+    const ueber = marked.lexer(md).filter(t => t.type === 'heading' && t.depth <= 3);
+    html += '<div class="tocbox"><b>Inhalt</b>' +
+      (ueber.length ? ueber.map(u => `<div class="s${u.depth}">${AK.esc(u.text)}</div>`).join('')
+                    : '<div style="color:#888">— noch keine Überschriften —</div>') +
+      '</div>';
+  }
+  html += marked.parse(md, {breaks:false, gfm:true});
+  blatt.innerHTML = html;
+  blatt.style.fontFamily = opt.schrift + ', serif';
+  blatt.style.fontSize = opt.groesse + 'pt';
+  blatt.style.lineHeight = opt.zeilenabstand * 1.45;
+  blatt.style.textAlign = opt.blocksatz ? 'justify' : 'left';
+
+  const woerter = md.replace(/[#*_`>|\-\[\]()]/g, ' ').split(/\s+/).filter(Boolean).length;
+  AK.$('#anzahl').innerHTML = woerter.toLocaleString('de-DE') +
+    `<small>${woerter === 1 ? 'Wort' : 'Wörter'}</small>`;
+  AK.$('#go').disabled = !md.trim();
+  AK.$('#autorfeld').hidden = !opt.titelseite;
+}
+
+/* ---------- Datei hineinziehen ---------- */
+async function addFiles(dateien){
+  const datei = dateien[0];
+  if(!datei) return;
+  AK.logClear();
+  const text = await leseText(datei);
+  if(/\.html?$/i.test(datei.name)){
+    const dienst = new TurndownService({headingStyle:'atx', codeBlockStyle:'fenced', bulletListMarker:'-'});
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    doc.querySelectorAll('script, style, nav, footer, form, iframe').forEach(el => el.remove());
+    AK.$('#quelle').value = dienst.turndown(doc.body ? doc.body.innerHTML : text);
+    AK.log(`„${datei.name}“ von HTML nach Markdown umgewandelt.`);
+  }else{
+    AK.$('#quelle').value = text;
+    AK.log(`„${datei.name}“ geladen.`);
+  }
+  if(!AK.$('#titel').value.trim()) AK.$('#titel').value = datei.name.replace(/\.[^.]+$/, '');
+  vorschau();
+}
+window.addFiles = addFiles;
+
+async function leseText(datei){
+  const buf = await datei.arrayBuffer();
+  try{ return new TextDecoder('utf-8', {fatal:true}).decode(buf); }
+  catch(_){ return new TextDecoder('windows-1252').decode(buf); }
+}
+
+/* ---------- Speichern ---------- */
+AK.$('#go').onclick = async () => {
+  AK.clearDownloads(); AK.stamp(false); AK.logClear();
+  AK.$('#go').disabled = true;
+  try{
+    const opt = einstellungen();
+    const doc = baueDokument(AK.$('#quelle').value, opt);
+    const blob = await Packer.toBlob(doc);
+    const name = (opt.titel || 'dokument')
+      .replace(/[^\wäöüßÄÖÜ \-]+/g, '').trim().replace(/\s+/g, '-').slice(0, 60) || 'dokument';
+    AK.offerDownload(blob, name + '.docx', '.docx herunterladen');
+    AK.log(`Word-Datei erstellt (${AK.fmtBytes(blob.size)}).`);
+    if(opt.verzeichnis) AK.log('Im Inhaltsverzeichnis in Word einmal „Felder aktualisieren“ auslösen — Word rechnet Verzeichnisse erst beim Öffnen.');
+    AK.stamp(true);
+  }catch(err){
+    AK.log('Erstellen fehlgeschlagen: ' + err.message, true);
+    console.error(err);
+  }finally{
+    AK.$('#go').disabled = !AK.$('#quelle').value.trim();
+  }
+};
+
+/* ---------- Bedienung ---------- */
+function reiter(aufSchreiben){
+  AK.$('#tab-schreiben').classList.toggle('active', aufSchreiben);
+  AK.$('#tab-vorschau').classList.toggle('active', !aufSchreiben);
+  AK.$('#tab-schreiben').setAttribute('aria-selected', String(aufSchreiben));
+  AK.$('#tab-vorschau').setAttribute('aria-selected', String(!aufSchreiben));
+  AK.$('#bereich-schreiben').hidden = !aufSchreiben;
+  AK.$('#bereich-vorschau').hidden = aufSchreiben;
+}
+AK.$('#tab-schreiben').onclick = () => reiter(true);
+AK.$('#tab-vorschau').onclick  = () => { reiter(false); vorschau(); };
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#quelle').addEventListener('input', vorschau);
+['#titel','#autor','#kopfzeile','#schrift','#groesse','#zeilenabstand','#rand','#format',
+ '#blocksatz','#titelseite','#verzeichnis','#seitenzahlen']
+  .forEach(s => AK.$(s).addEventListener('input', vorschau));
+
+AK.$('#quelle').value = BEISPIEL;
+AK.$('#titel').value = 'Projektbericht';
+vorschau();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
