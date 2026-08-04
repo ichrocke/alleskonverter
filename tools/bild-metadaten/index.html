@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EXIF-Daten anzeigen — was verrät mein Foto? | Alleskonverter</title>
-<meta name="description" content="EXIF-Daten eines Fotos anzeigen: Kamera, Aufnahmezeit, Einstellungen und GPS-Standort. Sehen, was ein Bild über dich verrät — kostenlos, ohne Upload.">
+<title>EXIF-Daten anzeigen &amp; entfernen — was verrät mein Foto? | Alleskonverter</title>
+<meta name="description" content="EXIF-Daten eines Fotos anzeigen und entfernen: Kamera, Aufnahmezeit und GPS-Standort sehen — und verlustfrei löschen, bevor das Bild rausgeht. Ohne Upload.">
 <link rel="canonical" href="https://alleskonverter.de/tools/bild-metadaten/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Alleskonverter">
-<meta property="og:title" content="EXIF-Daten anzeigen — was verrät mein Foto? | Alleskonverter">
-<meta property="og:description" content="Kamera, Aufnahmezeit und GPS-Standort eines Fotos anzeigen — kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:title" content="EXIF-Daten anzeigen &amp; entfernen — was verrät mein Foto? | Alleskonverter">
+<meta property="og:description" content="Kamera, Aufnahmezeit und GPS-Standort eines Fotos anzeigen und verlustfrei entfernen — kostenlos, ohne Upload, lokal im Browser.">
 <meta property="og:url" content="https://alleskonverter.de/tools/bild-metadaten/">
 <meta property="og:image" content="https://alleskonverter.de/assets/og.png">
 <meta property="og:locale" content="de_DE">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="EXIF-Daten anzeigen — was verrät mein Foto? | Alleskonverter">
+<meta name="twitter:title" content="EXIF-Daten anzeigen &amp; entfernen — was verrät mein Foto? | Alleskonverter">
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild-Metadaten anzeigen — Alleskonverter","url":"https://alleskonverter.de/tools/bild-metadaten/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"EXIF-Daten eines Fotos anzeigen: Kamera, Zeit, Einstellungen, GPS — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was sind EXIF-Daten?","acceptedAnswer":{"@type":"Answer","text":"Zusatzangaben, die die Kamera unsichtbar in die Bilddatei schreibt: Kameramodell, Objektiv, Belichtung, Aufnahmezeitpunkt und bei Handys oft auch der GPS-Standort."}},{"@type":"Question","name":"Wird mein Foto hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Datei wird nur in deinem Browser gelesen — gerade bei Fotos mit Standortangabe wäre ein Upload das Gegenteil von dem, was man will."}},{"@type":"Question","name":"Wie entferne ich die Daten?","acceptedAnswer":{"@type":"Answer","text":"Mit dem Werkzeug „Bilder konvertieren“: Beim Neukodieren gehen sämtliche Metadaten verloren."}}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild-Metadaten anzeigen & entfernen — Alleskonverter","url":"https://alleskonverter.de/tools/bild-metadaten/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"EXIF-Daten eines Fotos anzeigen und verlustfrei entfernen: Kamera, Zeit, Einstellungen, GPS — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was sind EXIF-Daten?","acceptedAnswer":{"@type":"Answer","text":"Zusatzangaben, die die Kamera unsichtbar in die Bilddatei schreibt: Kameramodell, Objektiv, Belichtung, Aufnahmezeitpunkt und bei Handys oft auch der GPS-Standort."}},{"@type":"Question","name":"Wird mein Foto hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Datei wird nur in deinem Browser gelesen — gerade bei Fotos mit Standortangabe wäre ein Upload das Gegenteil von dem, was man will."}},{"@type":"Question","name":"Wie entferne ich die Daten?","acceptedAnswer":{"@type":"Answer","text":"Direkt hier: „Ohne Metadaten speichern“ entfernt EXIF, XMP und IPTC verlustfrei aus JPG, PNG und WebP — das Bild selbst wird dabei nicht neu berechnet, die Qualität bleibt exakt gleich."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
@@ -43,7 +43,7 @@ table.daten td:first-child{width:38%;color:var(--ink-soft);font-family:var(--mon
 <header>
   <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
   <h1>Bild-<span>Metadaten</span></h1>
-  <p class="sub">Sehen, was ein Foto über dich verrät: Kameramodell, Aufnahmezeitpunkt, Belichtungseinstellungen — und bei Handyfotos oft der genaue Ort der Aufnahme.</p>
+  <p class="sub">Sehen, was ein Foto über dich verrät: Kameramodell, Aufnahmezeitpunkt, Belichtungseinstellungen — und bei Handyfotos oft der genaue Ort der Aufnahme. Auf Wunsch alles verlustfrei entfernen, bevor das Bild rausgeht.</p>
 </header>
 
 <main>
@@ -69,7 +69,8 @@ table.daten td:first-child{width:38%;color:var(--ink-soft);font-family:var(--mon
       <label><input type="checkbox" id="alles" style="width:auto;margin-right:6px">Auch technische Rohwerte zeigen</label>
     </div>
 
-    <button class="primary" id="go" disabled>Als Textdatei sichern</button>
+    <button class="primary" id="clean" disabled>Ohne Metadaten speichern</button>
+    <button class="ghost" id="go" disabled style="margin-top:8px;width:100%">Als Textdatei sichern</button>
     <div id="log" aria-live="polite"></div>
     <div class="stamp" id="stamp">Fertig</div>
   </aside>
@@ -82,7 +83,8 @@ table.daten td:first-child{width:38%;color:var(--ink-soft);font-family:var(--mon
   <h3>Wird mein Foto hochgeladen?</h3>
   <p>Nein — und das ist hier besonders wichtig. Ausgerechnet ein Werkzeug, das Standortdaten sichtbar macht, dürfte sie am wenigsten irgendwohin schicken. Die Datei wird ausschließlich in deinem Browser gelesen.</p>
   <h3>Wie werde ich die Daten wieder los?</h3>
-  <p>Mit <a href="../bild-konvertieren/index.html">Bilder konvertieren</a>: Beim Neukodieren gehen sämtliche Metadaten verloren, auch der Standort. Das funktioniert stapelweise für ganze Ordner.</p>
+  <p>Direkt hier: <strong>„Ohne Metadaten speichern“</strong> entfernt EXIF, XMP und IPTC aus JPG, PNG und WebP — und zwar <strong>verlustfrei</strong>. Das Bild wird dabei nicht neu berechnet, es werden nur die Metadaten-Blöcke aus der Datei herausgeschnitten; jeder Bildpunkt bleibt exakt wie er war. Auch versteckt an die Datei angehängte Daten (etwa das Kurzvideo von „bewegten Fotos“ mancher Handys) fliegen mit raus. Die Ausrichtung des Bildes bleibt erhalten, damit gedreht aufgenommene Fotos nicht plötzlich auf der Seite liegen. Zur Sicherheit liest das Werkzeug die bereinigte Datei anschließend noch einmal ein und speichert nur, wenn wirklich nichts mehr auffindbar ist.</p>
+  <p>Für ganze Ordner voller Bilder oder andere Formate (etwa HEIC) eignet sich <a href="../bild-konvertieren/index.html">Bilder konvertieren</a>: Beim Neukodieren gehen sämtliche Metadaten ebenfalls verloren — dabei wird das Bild allerdings neu komprimiert.</p>
   <h3>Warum finde ich bei manchen Bildern nichts?</h3>
   <p>Weil viele Plattformen die Daten beim Hochladen entfernen — ein Foto, das du von WhatsApp oder Instagram gespeichert hast, ist meist schon bereinigt. Auch Screenshots und PNG-Dateien enthalten selten EXIF-Angaben.</p>
   <h3>Was kostet das? Brauche ich ein Konto?</h3>
@@ -147,10 +149,12 @@ async function addFiles(list){
     daten = await exifr.parse(file, { tiff:true, exif:true, gps:true, ifd0:true, xmp:true, iptc:true, translateValues:true, reviveValues:true }) || {};
     daten.__datei = { Dateiname: file.name, Dateigröße: AK.fmtBytes(file.size), Typ: file.type || '—' };
     letzteDatei = file;
+    AK.$('#clean').disabled = false;
     zeige(file);
   }catch(err){
     console.error(err);
-    daten = null;
+    daten = null; letzteDatei = null;
+    AK.$('#clean').disabled = true;
     AK.log('Datei kann nicht gelesen werden.', true);
   }
 }
@@ -178,8 +182,9 @@ function zeige(file){
         typeof daten.GPSAltitude === 'number' ? ` (Höhe ${Math.round(daten.GPSAltitude)} m)` : ''}.
       Wer die Datei bekommt, kann den Ort auf wenige Meter genau bestimmen.</p>
       <p><a href="https://www.openstreetmap.org/?mlat=${la}&mlon=${lo}#map=16/${la}/${lo}" target="_blank" rel="noopener">Auf der Karte ansehen (OpenStreetMap)</a>
-      &nbsp;·&nbsp; <a href="../bild-konvertieren/index.html">Metadaten entfernen</a></p>`;
+      &nbsp;·&nbsp; <a href="#" id="warnclean">Metadaten jetzt entfernen</a></p>`;
     wrap.appendChild(box);
+    box.querySelector('#warnclean').onclick = ev => { ev.preventDefault(); bereinigen(); };
     zeilen.push(['Standort', `${la}, ${lo}`]);
   }
 
@@ -227,6 +232,175 @@ function zeige(file){
   }
 }
 
+/* ---------- Metadaten entfernen ----------
+   Verlustfrei: Es werden nur die Metadaten-Blöcke aus der Datei geschnitten,
+   die Bilddaten selbst bleiben Byte für Byte unangetastet. */
+
+/* Winziges Ersatz-EXIF, das nur die Ausrichtung trägt — sonst lägen gedreht
+   aufgenommene Fotos nach dem Entfernen plötzlich auf der Seite. */
+function ausrichtungsSegment(o){
+  return new Uint8Array([
+    0xFF, 0xE1, 0, 34,                             // APP1, Länge 34
+    0x45, 0x78, 0x69, 0x66, 0, 0,                  // "Exif\0\0"
+    0x49, 0x49, 0x2A, 0, 8, 0, 0, 0,               // TIFF, little-endian, IFD ab Byte 8
+    1, 0,                                          // ein Eintrag:
+    0x12, 0x01, 3, 0, 1, 0, 0, 0, o, 0, 0, 0,      // Orientation (SHORT)
+    0, 0, 0, 0,                                    // kein weiteres IFD
+  ]);
+}
+
+/* Welche JPEG-Segmente fliegen raus? Bewusst als Positivliste: Behalten wird
+   nur, was zum Bild gehört (JFIF, ICC-Farbprofil, Adobe-Farbkennung) —
+   alles andere an Zusatzsegmenten wird entfernt. */
+function segmentRaus(m, seg){
+  if(m === 0xFE) return 'Kommentar';
+  if(m < 0xE0 || m > 0xEF) return null;            // kein Zusatzsegment → gehört zum Bild
+  if(m === 0xE0 || m === 0xEE) return null;        // JFIF bzw. Adobe-Farbkennung
+  const kopf = String.fromCharCode.apply(null, seg.subarray(4, Math.min(seg.length, 24)));
+  if(m === 0xE2 && kopf.startsWith('ICC_PROFILE')) return null;
+  if(m === 0xE1) return kopf.startsWith('Exif') ? 'EXIF' : 'XMP';
+  if(m === 0xE2 && kopf.startsWith('MPF')) return 'eingebettete Zusatzbilder (MPF)';
+  if(m === 0xED) return 'IPTC/Photoshop';
+  return 'Zusatzsegment APP' + (m - 0xE0);
+}
+
+function jpegBereinigen(b, ausrichtung){
+  if(b.length < 4 || b[0] !== 0xFF || b[1] !== 0xD8) return null;
+  const teile = [b.subarray(0, 2)], entfernt = [];
+  if(ausrichtung > 1) teile.push(ausrichtungsSegment(ausrichtung));
+  let i = 2;
+  while(i + 2 <= b.length){
+    if(b[i] !== 0xFF) return null;                 // ungewöhnlich aufgebaut — lieber nichts kaputt machen
+    const m = b[i+1];
+    if(m === 0xDA){
+      // Ab dem Bildstrom bis zum Bildende alles übernehmen; was danach noch
+      // in der Datei hängt (z. B. „bewegte Fotos“), wird abgeschnitten
+      let ende = b.length;
+      for(let j = i; j + 1 < b.length; j++){
+        if(b[j] === 0xFF && b[j+1] === 0xD9){ ende = j + 2; break; }
+      }
+      teile.push(b.subarray(i, ende));
+      if(ende < b.length) entfernt.push(`angehängte Daten nach dem Bildende (${AK.fmtBytes(b.length - ende)})`);
+      return { teile, entfernt };
+    }
+    if((m >= 0xD0 && m <= 0xD7) || m === 0x01){ teile.push(b.subarray(i, i + 2)); i += 2; continue; }
+    if(i + 4 > b.length) return null;
+    const len = (b[i+2] << 8) | b[i+3];
+    if(len < 2 || i + 2 + len > b.length) return null;
+    const seg = b.subarray(i, i + 2 + len);
+    const grund = segmentRaus(m, seg);
+    if(grund) entfernt.push(grund); else teile.push(seg);
+    i += 2 + len;
+  }
+  return null;                                     // kein Bildstrom gefunden
+}
+
+function pngBereinigen(b){
+  const SIG = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+  if(b.length < 8 || SIG.some((v, i) => b[i] !== v)) return null;
+  const RAUS = { tEXt:'Textangaben (tEXt)', zTXt:'Textangaben (zTXt)', iTXt:'Textangaben/XMP (iTXt)', eXIf:'EXIF', tIME:'Änderungszeit (tIME)' };
+  const teile = [b.subarray(0, 8)], entfernt = [];
+  let i = 8;
+  while(i + 12 <= b.length){
+    const len = ((b[i] << 24) | (b[i+1] << 16) | (b[i+2] << 8) | b[i+3]) >>> 0;
+    const typ = String.fromCharCode(b[i+4], b[i+5], b[i+6], b[i+7]);
+    if(i + 12 + len > b.length) return null;
+    if(RAUS[typ]) entfernt.push(RAUS[typ]); else teile.push(b.subarray(i, i + 12 + len));
+    i += 12 + len;
+    if(typ === 'IEND'){
+      if(i < b.length) entfernt.push(`angehängte Daten nach dem Bildende (${AK.fmtBytes(b.length - i)})`);
+      return { teile, entfernt };
+    }
+  }
+  return null;
+}
+
+function webpBereinigen(b){
+  if(b.length < 12 || String.fromCharCode(b[0], b[1], b[2], b[3]) !== 'RIFF'
+     || String.fromCharCode(b[8], b[9], b[10], b[11]) !== 'WEBP') return null;
+  const teile = [], entfernt = [];
+  let i = 12;
+  while(i + 8 <= b.length){
+    const typ = String.fromCharCode(b[i], b[i+1], b[i+2], b[i+3]);
+    const len = (b[i+4] | (b[i+5] << 8) | (b[i+6] << 16) | (b[i+7] << 24)) >>> 0;
+    const voll = len + (len % 2);                  // Blöcke sind auf gerade Länge aufgefüllt
+    const ende = Math.min(i + 8 + voll, b.length);
+    if(typ === 'EXIF') entfernt.push('EXIF');
+    else if(typ === 'XMP ') entfernt.push('XMP');
+    else if(typ === 'VP8X'){
+      const kopie = new Uint8Array(b.subarray(i, ende));
+      kopie[8] &= ~0x0C;                           // EXIF- und XMP-Merker im Kopf löschen
+      teile.push(kopie);
+    }else teile.push(b.subarray(i, ende));
+    i = ende;
+  }
+  const inhalt = teile.reduce((s, t) => s + t.length, 0) + 4;
+  const kopf = new Uint8Array([0x52, 0x49, 0x46, 0x46,
+    inhalt & 255, (inhalt >> 8) & 255, (inhalt >> 16) & 255, (inhalt >> 24) & 255,
+    0x57, 0x45, 0x42, 0x50]);
+  return { teile: [kopf, ...teile], entfernt };
+}
+
+async function bereinigen(){
+  if(!letzteDatei) return;
+  const clean = AK.$('#clean');
+  clean.disabled = true; clean.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+  try{
+    const b = new Uint8Array(await letzteDatei.arrayBuffer());
+    let ergebnis = null, endung = '', mime = '';
+    if(b[0] === 0xFF && b[1] === 0xD8){
+      let o = 1;
+      try{ o = await exifr.orientation(letzteDatei) || 1; }catch(_){ o = 1; }
+      ergebnis = jpegBereinigen(b, o); endung = 'jpg'; mime = 'image/jpeg';
+    }else if(b[0] === 0x89 && b[1] === 0x50){
+      ergebnis = pngBereinigen(b); endung = 'png'; mime = 'image/png';
+    }else if(b.length > 11 && String.fromCharCode(b[0], b[1], b[2], b[3]) === 'RIFF'){
+      ergebnis = webpBereinigen(b); endung = 'webp'; mime = 'image/webp';
+    }else{
+      AK.log('Direktes Herausschneiden geht für JPG, PNG und WebP. Für dieses Format nimm „Bilder konvertieren“ — beim Neukodieren fallen die Metadaten ebenfalls weg.', true);
+      return;
+    }
+    if(!ergebnis){
+      AK.log('Die Datei ist ungewöhnlich aufgebaut — sicherheitshalber wird nichts gespeichert. Alternative: „Bilder konvertieren“.', true);
+      return;
+    }
+
+    const blob = new Blob(ergebnis.teile, { type: mime });
+
+    // Gegenprobe: die bereinigte Datei noch einmal einlesen. Außer der
+    // bewusst erhaltenen Ausrichtung darf nichts mehr auffindbar sein.
+    let rest = {};
+    try{ rest = await exifr.parse(blob, { tiff:true, exif:true, gps:true, ifd0:true, xmp:true, iptc:true }) || {}; }catch(_){ }
+    const uebrig = Object.keys(rest).filter(k => k !== 'Orientation');
+    if(uebrig.length){
+      AK.log('Gegenprobe fehlgeschlagen: es sind noch Angaben auffindbar (' + uebrig.slice(0, 4).join(', ') + ') — nichts gespeichert. Nimm „Bilder konvertieren“.', true);
+      return;
+    }
+
+    const zaehler = new Map();
+    ergebnis.entfernt.forEach(e => zaehler.set(e, (zaehler.get(e) || 0) + 1));
+    if(!zaehler.size){
+      AK.log('Es gab nichts zu entfernen — die Datei war schon sauber.');
+    }else{
+      AK.log('Entfernt: ' + [...zaehler].map(([k, n]) => n > 1 ? `${k} (${n}×)` : k).join(', ')
+        + ` — ${AK.fmtBytes(letzteDatei.size - blob.size)} kleiner, Bildqualität unverändert.`);
+    }
+    AK.log(rest.Orientation !== undefined
+      ? 'Gegenprobe: außer der Bild-Ausrichtung ist nichts mehr auffindbar.'
+      : 'Gegenprobe: keine Metadaten mehr auffindbar.');
+    AK.offerDownload(blob, basisName + '-ohne-metadaten.' + endung);
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+  }finally{
+    clean.textContent = 'Ohne Metadaten speichern';
+    clean.disabled = !letzteDatei;
+  }
+}
+
+AK.$('#clean').onclick = bereinigen;
 AK.$('#alles').onchange = () => { if(daten && letzteDatei) zeige(letzteDatei); };
 AK.$('#go').onclick = () => {
   AK.clearDownloads(); AK.stamp(false);

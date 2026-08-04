@@ -195,6 +195,34 @@ function formularPdf(){
 const PNG  = png();
 const EPUB = epub();
 
+/* JPEG-EXIF-Segment (APP1) mit Kameraname, Ausrichtung 6 und GPS-Position —
+   von Hand gebaut, um den Metadaten-Entferner mit echtem Inhalt zu prüfen */
+function exifApp1(){
+  const t = [];
+  const p = (...b) => t.push(...b);
+  const rat = (z, n) => p(z & 255, (z >> 8) & 255, (z >> 16) & 255, (z >> 24) & 255,
+                          n & 255, (n >> 8) & 255, (n >> 16) & 255, (n >> 24) & 255);
+  p(0x49, 0x49, 0x2A, 0, 8, 0, 0, 0);              // TIFF, little-endian, IFD0 ab Byte 8
+  p(3, 0);                                          // IFD0: drei Einträge
+  p(0x0F, 0x01, 2, 0, 8, 0, 0, 0, 50, 0, 0, 0);    //   Make → "TestCam" bei Byte 50
+  p(0x12, 0x01, 3, 0, 1, 0, 0, 0, 6, 0, 0, 0);     //   Orientation = 6 (90° gedreht)
+  p(0x25, 0x88, 4, 0, 1, 0, 0, 0, 58, 0, 0, 0);    //   GPS-IFD bei Byte 58
+  p(0, 0, 0, 0);
+  p(...Buffer.from('TestCam\0'));
+  p(4, 0);                                          // GPS-IFD: vier Einträge
+  p(1, 0, 2, 0, 2, 0, 0, 0, 0x4E, 0, 0, 0);        //   LatRef "N"
+  p(2, 0, 5, 0, 3, 0, 0, 0, 112, 0, 0, 0);         //   Lat: 3 Brüche bei Byte 112
+  p(3, 0, 2, 0, 2, 0, 0, 0, 0x45, 0, 0, 0);        //   LonRef "E"
+  p(4, 0, 5, 0, 3, 0, 0, 0, 136, 0, 0, 0);         //   Lon: 3 Brüche bei Byte 136
+  p(0, 0, 0, 0);
+  rat(50, 1); rat(6, 1); rat(3000, 100);            // 50° 6′ 30,00″ N
+  rat(7, 1);  rat(37, 1); rat(1200, 100);           //  7° 37′ 12,00″ O
+  const len = 2 + 6 + t.length;
+  return Buffer.from([0xFF, 0xE1, len >> 8, len & 255,
+    0x45, 0x78, 0x69, 0x66, 0, 0, ...t]).toString('base64');
+}
+const EXIF_APP1 = exifApp1();
+
 const FAELLE = [
   { werkzeug:'pdf-zusammenfuegen', dateien:[['a.pdf', PDF3, 'application/pdf'], ['b.pdf', PDF3, 'application/pdf']] },
   { werkzeug:'pdf-aufteilen',      dateien:[['a.pdf', PDF3, 'application/pdf']] },
@@ -225,6 +253,36 @@ const FAELLE = [
     } },
   { werkzeug:'bild-metadaten',     dateien:[['b.png', PNG, 'image/png']], kein_download:true,
     pruefen: async p => { await p.waitForSelector('table.daten', {timeout:15000}); } },
+  { werkzeug:'bild-metadaten',     kein_download:true,
+    vorher: async p => {
+      // JPEG mit EXIF (Kamera, Ausrichtung, GPS) direkt im Browser zusammensetzen
+      await p.evaluate(async app1b64 => {
+        const c = document.createElement('canvas'); c.width = 40; c.height = 40;
+        const g = c.getContext('2d'); g.fillStyle = '#a04030'; g.fillRect(0, 0, 40, 40);
+        const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9));
+        const jpg = new Uint8Array(await blob.arrayBuffer());
+        const app1 = Uint8Array.from(atob(app1b64), ch => ch.charCodeAt(0));
+        const mit = new Uint8Array(jpg.length + app1.length);
+        mit.set(jpg.subarray(0, 2), 0);
+        mit.set(app1, 2);
+        mit.set(jpg.subarray(2), 2 + app1.length);
+        await window.addFiles([new File([mit], 'foto.jpg', { type:'image/jpeg' })]);
+      }, EXIF_APP1);
+      await p.waitForSelector('.warnung', { timeout:15000 });   // Standortwarnung muss erscheinen
+      await p.click('#clean');
+      await p.waitForSelector('a.download', { timeout:15000 });
+    },
+    pruefen: async p => {
+      // Bereinigte Datei erneut einlesen: GPS und Kamera weg, Ausrichtung bleibt
+      const rest = await p.evaluate(async () => {
+        const a = document.querySelector('a.download');
+        const blob = await (await fetch(a.href)).blob();
+        return await exifr.parse(blob, { tiff:true, exif:true, gps:true, ifd0:true, xmp:true, iptc:true }) || {};
+      });
+      if(rest.latitude !== undefined) throw new Error('GPS überlebt die Bereinigung');
+      if(rest.Make) throw new Error('Kameraname überlebt die Bereinigung');
+      if(rest.Orientation === undefined) throw new Error('Ausrichtung ging verloren');
+    } },
   { werkzeug:'bild-base64',        dateien:[['b.png', PNG, 'image/png']], kein_download:true,
     pruefen: async p => {
       const v = await p.$eval('#ausgabe', e => e.value);

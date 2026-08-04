@@ -3,6 +3,20 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-04 (Bild-Metadaten: jetzt auch entfernen)
+
+### Hinzugefügt
+- **„Ohne Metadaten speichern“** im Werkzeug Bild-Metadaten — bisher konnte es nur anzeigen und verwies zum Entfernen auf „Bilder konvertieren“. Jetzt schneidet es EXIF, XMP, IPTC und Kommentare **verlustfrei** direkt aus der Datei (JPG, PNG, WebP): Es werden nur die Metadaten-Blöcke entfernt, kein einziger Bildpunkt wird neu berechnet.
+  - Bei JPG wird als Positivliste gearbeitet: Behalten wird nur, was zum Bild gehört (JFIF, ICC-Farbprofil, Adobe-Farbkennung) — alles andere fliegt raus, auch **versteckt hinter dem Bildende angehängte Daten** wie das Kurzvideo von „bewegten Fotos“ mancher Handys.
+  - Die **Ausrichtung bleibt als winziges Ersatz-EXIF erhalten** (ein handgebautes 36-Byte-Segment, nur der Orientation-Eintrag) — sonst lägen gedreht aufgenommene Fotos nach dem Entfernen auf der Seite. Sie verrät nichts Persönliches.
+  - **Gegenprobe eingebaut:** Die bereinigte Datei wird vor dem Anbieten noch einmal eingelesen; findet sich außer der Ausrichtung noch irgendetwas, wird nichts gespeichert und stattdessen gewarnt. Lieber kein Ergebnis als ein falsches Sicherheitsgefühl.
+  - Bei ungewöhnlich aufgebauten Dateien bricht das Werkzeug bewusst ab, statt zu raten; für HEIC und andere Formate verweist es weiter auf „Bilder konvertieren“.
+- Testfall dazu: Ein JPEG mit handgebautem EXIF-Segment (Kameraname, Ausrichtung 6, GPS-Position) wird bereinigt und wieder eingelesen — GPS und Kamera müssen weg sein, die Ausrichtung muss bleiben. Jetzt 58 Prüfungen.
+
+### Geändert
+- Die Standortwarnung im Werkzeug bietet „Metadaten jetzt entfernen“ als direkten Klick an, statt zum Konvertierer zu schicken.
+- Startseite und FAQ: Das Werkzeug heißt jetzt „Bild-Metadaten anzeigen & entfernen“; die Datei-Erkennung schlägt es für Bilder und HEIC-Fotos mit vor (FAQ-JSON-LD neu erzeugt).
+
 ## 2026-08-04 (Werkzeug 46: Schwärzen)
 
 ### Hinzugefügt
