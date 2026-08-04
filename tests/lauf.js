@@ -233,6 +233,65 @@ const FAELLE = [
   { werkzeug:'bilder-umbenennen',  dateien:[['a.txt', TXT, 'text/plain'], ['b.txt', TXT, 'text/plain']] },
   { werkzeug:'pdf-kontaktabzug',   dateien:[['a.pdf', PDF3, 'application/pdf']] },
   { werkzeug:'pdf-formular',       formular:true },
+  { werkzeug:'schwaerzen',         dateien:[['a.pdf', PDF3, 'application/pdf']],
+    vorher: async p => {
+      await p.waitForFunction(() => document.querySelectorAll('.flaeche canvas').length === 3, {timeout:20000});
+      // Bereich über dem Text der ersten Seite mit der Maus aufziehen
+      await p.$eval('.flaeche canvas', e => e.scrollIntoView());
+      const r = await p.$eval('.flaeche canvas', e => {
+        const b = e.getBoundingClientRect();
+        return { x:b.x, y:b.y, w:b.width, h:b.height };
+      });
+      await p.mouse.move(r.x + r.w*0.05, r.y + r.h*0.02);
+      await p.mouse.down();
+      await p.mouse.move(r.x + r.w*0.95, r.y + r.h*0.3, { steps:5 });
+      await p.mouse.up();
+      await p.waitForFunction(() => document.querySelectorAll('.rx').length === 1, {timeout:5000});
+    },
+    pruefen: async p => {
+      // „Wirklich entfernt“: Seite 1 darf im Ergebnis keinen Text mehr enthalten,
+      // die unmarkierten Seiten behalten ihren durchsuchbaren Text verlustfrei
+      const texte = await p.evaluate(async () => {
+        const a = document.querySelector('a.download');
+        const buf = await (await fetch(a.href)).arrayBuffer();
+        const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+        const out = [];
+        for(let i = 1; i <= doc.numPages; i++){
+          const inhalt = await (await doc.getPage(i)).getTextContent();
+          out.push(inhalt.items.map(x => x.str).join(''));
+        }
+        await doc.destroy();
+        return out;
+      });
+      if(texte.length !== 3) throw new Error('Seitenzahl: ' + texte.length);
+      if(texte[0].trim()) throw new Error('Seite 1 enthält noch Text: ' + texte[0].slice(0,40));
+      if(!texte[2].includes('Seite 3')) throw new Error('unmarkierte Seite verlor ihren Text');
+    } },
+  { werkzeug:'schwaerzen',         dateien:[['b.png', PNG, 'image/png']],
+    vorher: async p => {
+      await p.waitForSelector('.flaeche canvas', {timeout:15000});
+      await p.$eval('.flaeche canvas', e => e.scrollIntoView());
+      const r = await p.$eval('.flaeche canvas', e => {
+        const b = e.getBoundingClientRect();
+        return { x:b.x, y:b.y, w:b.width, h:b.height };
+      });
+      await p.mouse.move(r.x + r.w*0.3, r.y + r.h*0.3);
+      await p.mouse.down();
+      await p.mouse.move(r.x + r.w*0.7, r.y + r.h*0.7, { steps:3 });
+      await p.mouse.up();
+      await p.waitForFunction(() => document.querySelectorAll('.rx').length === 1, {timeout:5000});
+    },
+    pruefen: async p => {
+      // Der geschwärzte Bereich muss im Ergebnis aus schwarzen Pixeln bestehen
+      const px = await p.evaluate(async () => {
+        const a = document.querySelector('a.download');
+        const bmp = await createImageBitmap(await (await fetch(a.href)).blob());
+        const c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height;
+        const g = c.getContext('2d'); g.drawImage(bmp, 0, 0);
+        return Array.from(g.getImageData(Math.floor(bmp.width/2), Math.floor(bmp.height/2), 1, 1).data);
+      });
+      if(px[0] > 24 || px[1] > 24 || px[2] > 24) throw new Error('Mitte nicht geschwärzt: rgb(' + px.slice(0,3).join(',') + ')');
+    } },
   { werkzeug:'farben',             kein_download:true,
     pruefen: async p => {
       await p.evaluate(() => { const h=document.querySelector('#hex'); h.value='#FF8800'; h.dispatchEvent(new Event('input')); });
@@ -382,6 +441,8 @@ async function randfaelle(browser){
       erwartet:/Abgebrochen|kann nicht gelesen/i, was:'leere DOCX' },
     { werkzeug:'bild-konvertieren', datei:['kaputt.png', KAPUTT, 'image/png'],
       erwartet:/kann nicht gelesen/i, was:'kaputtes Bild' },
+    { werkzeug:'schwaerzen', datei:['kaputt.pdf', KAPUTT, 'application/pdf'],
+      erwartet:/kann nicht gelesen|beschädigt/i, was:'beschädigtes PDF' },
     { werkzeug:'bild-konvertieren', datei:['tabelle.csv', Buffer.from('a;b').toString('base64'), 'text/csv'],
       erwartet:/passt nicht zu diesem Werkzeug/i, was:'falscher Dateityp', ueber_ablage:true },
   ];
@@ -555,7 +616,7 @@ async function bedienbarkeit(browser){
 
   await browser.close();
   srv.close();
-  const gesamt = FAELLE.length + 9;
+  const gesamt = FAELLE.length + 10;
   console.log(`\n${gesamt - fehler} von ${gesamt} Prüfungen in Ordnung.`);
   process.exit(fehler ? 1 : 0);
 })();

@@ -3,6 +3,21 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-04 (Werkzeug 46: Schwärzen)
+
+### Hinzugefügt
+- Werkzeug **Schwärzen (PDF & Bild)** (`tools/schwaerzen/`) — Bereiche direkt auf der Seite mit der Maus aufziehen, beim Speichern wird der Inhalt **wirklich entfernt**, nicht nur überdeckt. Genau die Aufgabe, für die sonst gern dubiose Onlinedienste mit den heikelsten Dokumenten gefüttert werden.
+  - Warum nicht einfach ein schwarzes Rechteck ins PDF zeichnen? Weil der Text darunter erhalten bliebe — markieren, kopieren, Balken verschieben, alles lesbar. Stattdessen werden **geschwärzte Seiten gerastert** (Auflösung wählbar, 100–300 dpi) und als Bild neu ins PDF gelegt; unmarkierte Seiten werden verlustfrei aus dem Original übernommen und behalten ihren durchsuchbaren Text. Der Nachteil (geschwärzte Seiten nicht mehr durchsuchbar, Datei ggf. größer) steht ehrlich auf der Seite.
+  - Bilder (JPG, PNG, WebP, HEIC) werden pixelweise geschwärzt und neu kodiert — dabei fallen nebenbei sämtliche Metadaten weg, auch der GPS-Standort.
+  - Bewusst nur volles Schwarz, kein Verpixeln oder Weichzeichnen: solche Effekte lassen sich teils zurückrechnen.
+  - Passwortgeschützte PDFs gehen mit Öffnungspasswort; dann werden alle Seiten neu aufgebaut, weil pdf-lib die verschlüsselte Vorlage nicht kopieren kann.
+- Die Testsuite prüft beim Schwärzen nicht nur, ob ein Download entsteht, sondern **zieht das Rechteck per Mausereignissen auf und liest das Ergebnis-PDF wieder ein**: Seite 1 darf keinen Text mehr enthalten, Seite 3 muss ihren behalten. Beim Bild wird nachgemessen, dass die Mitte tatsächlich schwarz ist. Dazu ein Randfall (beschädigtes PDF) — jetzt 57 Prüfungen.
+- Neues Hilfsskript `tests/faq-jsonld.js`: erzeugt das JSON-LD der FAQ-Seite aus dem sichtbaren Seitentext neu, damit das nicht mehr von Hand passieren muss.
+
+### Geändert
+- Startseite: PDF-Kategorie zählt jetzt 13 Karten; die Datei-Erkennung schlägt Schwärzen für PDFs und Bilder mit vor; „Weiter zu …“ führt vom Schwärzen zu PDF komprimieren bzw. Bilder konvertieren.
+- FAQ: Werkzeugzahl auf 46 aktualisiert (JSON-LD neu erzeugt).
+
 ## 2026-07-26 (Planungsnotizen privat)
 
 ### Geändert

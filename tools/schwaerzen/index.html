@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF &amp; Bild schwärzen — wirklich entfernt, nicht überdeckt | Alleskonverter</title>
+<meta name="description" content="Vertrauliche Stellen in PDFs und Bildern schwärzen — der Inhalt wird wirklich entfernt, nicht nur mit einem schwarzen Balken überdeckt. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/schwaerzen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="PDF &amp; Bild schwärzen — wirklich entfernt, nicht überdeckt | Alleskonverter">
+<meta property="og:description" content="Vertrauliche Stellen schwärzen, ohne dass sich der Text darunter zurückholen lässt — kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/schwaerzen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF &amp; Bild schwärzen — wirklich entfernt, nicht überdeckt | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF & Bild schwärzen — Alleskonverter","url":"https://alleskonverter.de/tools/schwaerzen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Vertrauliche Stellen in PDFs und Bildern schwärzen — der Inhalt wird wirklich entfernt, nicht nur überdeckt. Ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Warum reicht ein schwarzer Balken im PDF-Editor nicht?","acceptedAnswer":{"@type":"Answer","text":"Weil der Text darunter erhalten bleibt: Wer ihn markiert und kopiert oder den Balken im Editor verschiebt, liest alles. Hier werden geschwärzte Seiten stattdessen als Bild neu aufgebaut — der Inhalt ist danach wirklich weg."}},{"@type":"Question","name":"Wird meine Datei hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Gerade beim Schwärzen vertraulicher Unterlagen wäre ein Upload absurd — die Verarbeitung läuft vollständig in deinem Browser, es gibt keinen Server, der Dateien annehmen könnte."}},{"@type":"Question","name":"Hat das Schwärzen Nachteile?","acceptedAnswer":{"@type":"Answer","text":"Geschwärzte PDF-Seiten werden zum Bild: Text darauf lässt sich nicht mehr markieren oder durchsuchen, und die Datei kann größer werden. Seiten ohne Markierung bleiben unverändert erhalten."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.blatt{position:relative;margin-top:14px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:10px}
+.bnr{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px}
+.flaeche{position:relative;line-height:0;touch-action:none;cursor:crosshair}
+.flaeche canvas{width:100%;height:auto;display:block;background:#fff}
+.rx{position:absolute;background:#0B0C0B;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.rx.temp{opacity:.75;pointer-events:none}
+.rxweg{position:absolute;top:-11px;right:-11px;width:22px;height:22px;padding:0;line-height:20px;font-size:12px;background:var(--paper);color:var(--ink);border:1.5px solid var(--ink);cursor:pointer}
+.rxweg:hover{background:var(--ink);color:var(--paper)}
+.malhinweis{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF &amp; Bild <span>schwärzen</span></h1>
+  <p class="sub">Namen, Kontonummern, Adressen: Bereiche mit der Maus aufziehen und schwärzen. Der Inhalt wird dabei wirklich entfernt — nicht nur mit einem Balken überdeckt, unter dem alles lesbar bleibt.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>PDF oder Bild hierher ziehen</strong>
+      <small>PDF, JPG, PNG, WebP, HEIC — oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf,image/*,.heic,.heif" hidden>
+
+    <div id="stapel"></div>
+    <p class="malhinweis" id="malhinweis" hidden>Zum Schwärzen ein Rechteck direkt auf der Seite aufziehen. Das ✕ an einer Markierung entfernt sie wieder.</p>
+    <div class="empty" id="empty">Noch nichts geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Schwärzen</h2>
+    <div class="count" id="anzahl">0<small>Bereiche markiert</small></div>
+
+    <div class="field" style="margin-top:16px" id="f-dpi">
+      <label for="dpi">Auflösung geschwärzter Seiten</label>
+      <select id="dpi">
+        <option value="100">100 dpi — kleine Datei</option>
+        <option value="150" selected>150 dpi — normal</option>
+        <option value="200">200 dpi — fein</option>
+        <option value="300">300 dpi — druckreif</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-pw" hidden>
+      <label for="pw">Öffnungspasswort</label>
+      <input type="password" id="pw" autocomplete="off">
+    </div>
+
+    <button class="primary" id="go" disabled>Geschwärzt speichern</button>
+    <button class="ghost" id="clearall" disabled style="margin-top:8px">Alle Markierungen entfernen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Vertrag für Dritte, ein Bescheid fürs Forum, ein Screenshot mit fremden Namen darin: Bevor so etwas weitergegeben wird, müssen vertrauliche Stellen unkenntlich gemacht werden. Hier ziehst du die Bereiche direkt auf der Seite auf — und beim Speichern werden sie wirklich entfernt. Genau dafür werden sonst gern Onlinedienste benutzt, denen man ausgerechnet seine heikelsten Dokumente anvertraut; hier verlässt die Datei dein Gerät nicht.</p>
+  <h3>Warum reicht ein schwarzer Balken im PDF-Editor nicht?</h3>
+  <p>Weil er nur darüberliegt. Der Text bleibt in der Datei erhalten: Markieren und Kopieren, die Suchfunktion oder das Verschieben des Balkens im Editor holen ihn zurück — mit solchen Pannen sind schon Gerichte und Behörden in die Schlagzeilen geraten. Dieses Werkzeug baut geschwärzte Seiten stattdessen als Bild neu auf. Was schwarz ist, ist aus der Datei verschwunden.</p>
+  <h3>Wird meine Datei hochgeladen?</h3>
+  <p>Nein — und gerade hier wäre es absurd. Ein Dokument, das so vertraulich ist, dass man es schwärzen muss, sollte man keinem fremden Server geben. Die Verarbeitung läuft vollständig in deinem Browser; es gibt keinen Server, der Dateien annehmen könnte.</p>
+  <h3>Hat das Schwärzen Nachteile?</h3>
+  <p>Geschwärzte PDF-Seiten werden zum Bild: Text darauf lässt sich danach nicht mehr markieren oder durchsuchen, und je nach Auflösung kann die Datei größer werden. Seiten ohne Markierung bleiben unverändert und verlustfrei erhalten. Bei Bildern werden schlicht die Bildpunkte ersetzt — nebenbei fallen dabei sämtliche Metadaten weg, auch der GPS-Standort.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p><strong>Wichtig zu wissen:</strong> Unkenntlich machen durch Verpixeln oder Weichzeichnen ist unsicher — solche Effekte lassen sich teils zurückrechnen. Deshalb gibt es hier nur volles Schwarz. Sehr große PDFs vorher mit <a href="../pdf-aufteilen/index.html">PDF aufteilen</a> auf die betroffenen Seiten verkleinern.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js?v=20260804"></script>
+<script src="../../js/uebergabe.js?v=20260804"></script>
+<script src="../../js/weiter.js?v=20260804"></script>
+<script src="../../js/einstellungen.js?v=20260804"></script>
+<script src="../../js/dropzone.js?v=20260804"></script>
+<script src="../../js/pdf-common.js?v=20260804"></script>
+<script>
+const { PDFDocument } = PDFLib;
+
+let modus = null;      // 'pdf' oder 'bild'
+let src = null;        // pdf: { bytes, password } — bild: { bitmap, breite, hoehe, mime }
+let seiten = [];       // je Seite: { rects:[{x,y,w,h} als Anteil 0–1], fl, canvas }
+let basis = 'dokument';
+
+function leeren(){
+  seiten = []; modus = null; src = null;
+  AK.$('#stapel').innerHTML = '';
+  AK.$('#empty').style.display = '';
+  AK.$('#malhinweis').hidden = true;
+}
+
+async function addFiles(list){
+  const file = list.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf'
+    || f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|hei[cf]|avif)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  leeren();
+  basis = file.name.replace(/\.[^.]+$/, '');
+  try{
+    if(/\.pdf$/i.test(file.name) || file.type === 'application/pdf') await ladePdf(file);
+    else await ladeBild(file);
+    AK.$('#empty').style.display = 'none';
+    AK.$('#malhinweis').hidden = false;
+    AK.$('#f-pw').hidden = true;
+  }catch(err){
+    leeren();
+    if(err && err.name === 'PasswordException'){
+      AK.$('#f-pw').hidden = false;
+      AK.log('Dieses PDF braucht ein Öffnungspasswort — eingeben und Datei erneut hineinziehen.', true);
+    }else{
+      console.error(err);
+      AK.log('Datei kann nicht gelesen werden — vermutlich beschädigt.', true);
+    }
+  }
+  zaehle();
+}
+
+/* ---------- Anzeigen ---------- */
+function seiteAnlegen(titel){
+  const blatt = document.createElement('div');
+  blatt.className = 'blatt';
+  if(titel){
+    const h = document.createElement('div');
+    h.className = 'bnr'; h.textContent = titel;
+    blatt.appendChild(h);
+  }
+  const fl = document.createElement('div');
+  fl.className = 'flaeche';
+  const canvas = document.createElement('canvas');
+  fl.appendChild(canvas);
+  blatt.appendChild(fl);
+  AK.$('#stapel').appendChild(blatt);
+
+  const eintrag = { rects: [], fl, canvas };
+  const index = seiten.length;
+  seiten.push(eintrag);
+  fl.addEventListener('pointerdown', ev => startZiehen(ev, index));
+  return eintrag;
+}
+
+async function ladePdf(file){
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const pw = AK.$('#pw').value;
+  const doc = await AK.openWithPdfjs(bytes, pw);   // wirft PasswordException weiter
+  modus = 'pdf';
+  src = { bytes, password: pw };
+  AK.log(`${file.name}: ${doc.numPages} Seiten werden angezeigt …`);
+  for(let i = 0; i < doc.numPages; i++){
+    const page = await doc.getPage(i+1);
+    const grund = page.getViewport({ scale: 1 });
+    const s = Math.min(doc.numPages > 20 ? 1.1 : 1.6, 860 / grund.width);
+    const vp = page.getViewport({ scale: s });
+    const st = seiteAnlegen(`Seite ${i+1}`);
+    st.canvas.width = Math.round(vp.width);
+    st.canvas.height = Math.round(vp.height);
+    const ctx = st.canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, st.canvas.width, st.canvas.height);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    page.cleanup();
+    AK.bar((i+1)/doc.numPages);
+  }
+  await doc.destroy();
+  AK.logClear(); AK.bar(0);
+}
+
+async function ladeBild(file){
+  let blob = file;
+  if(/\.(heic|heif)$/i.test(file.name) || /hei[cf]/.test(file.type)){
+    AK.log('iPhone-Format wird umgewandelt …');
+    blob = await heic2any({ blob: file, toType: 'image/png' });
+    if(Array.isArray(blob)) blob = blob[0];
+  }
+  const bmp = await loadBitmap(blob);
+  modus = 'bild';
+  const jpgArtig = /jpe?g|hei[cf]/i.test(file.type + ' ' + file.name);
+  src = { bitmap: bmp, breite: bmp.width, hoehe: bmp.height, mime: jpgArtig ? 'image/jpeg' : 'image/png' };
+  const st = seiteAnlegen(null);
+  st.canvas.width = bmp.width; st.canvas.height = bmp.height;
+  st.canvas.getContext('2d').drawImage(bmp, 0, 0);
+  AK.logClear();
+}
+
+function loadBitmap(blob){
+  if('createImageBitmap' in window) return createImageBitmap(blob).catch(() => viaImg(blob));
+  return viaImg(blob);
+}
+function viaImg(blob){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img); img.onerror = rej;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+/* ---------- Bereiche aufziehen ---------- */
+let zieh = null;
+
+function punkt(fl, ev){
+  const r = fl.querySelector('canvas').getBoundingClientRect();
+  return {
+    x: Math.min(1, Math.max(0, (ev.clientX - r.left) / r.width)),
+    y: Math.min(1, Math.max(0, (ev.clientY - r.top) / r.height)),
+    bw: r.width, bh: r.height,
+  };
+}
+
+function startZiehen(ev, i){
+  if(ev.target.closest('.rxweg')) return;
+  if(ev.button !== undefined && ev.button !== 0) return;
+  ev.preventDefault();
+  const fl = seiten[i].fl;
+  const temp = document.createElement('div');
+  temp.className = 'rx temp';
+  fl.appendChild(temp);
+  zieh = { i, a: punkt(fl, ev), temp };
+  malTemp(zieh.a, zieh.a);
+}
+
+function malTemp(a, b){
+  const t = zieh.temp;
+  t.style.left   = (Math.min(a.x, b.x) * 100) + '%';
+  t.style.top    = (Math.min(a.y, b.y) * 100) + '%';
+  t.style.width  = (Math.abs(a.x - b.x) * 100) + '%';
+  t.style.height = (Math.abs(a.y - b.y) * 100) + '%';
+}
+
+window.addEventListener('pointermove', ev => {
+  if(!zieh) return;
+  malTemp(zieh.a, punkt(seiten[zieh.i].fl, ev));
+});
+window.addEventListener('pointerup', ev => {
+  if(!zieh) return;
+  const { i, a, temp } = zieh;
+  temp.remove();
+  const b = punkt(seiten[i].fl, ev);
+  const w = Math.abs(a.x - b.x), h = Math.abs(a.y - b.y);
+  // winzige Rechtecke sind versehentliche Klicks
+  if(w * a.bw >= 5 && h * a.bh >= 5){
+    seiten[i].rects.push({ x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w, h });
+    malRects(i);
+  }
+  zieh = null;
+  zaehle();
+});
+window.addEventListener('pointercancel', () => {
+  if(zieh){ zieh.temp.remove(); zieh = null; }
+});
+
+function malRects(i){
+  const { fl, rects } = seiten[i];
+  fl.querySelectorAll('.rx').forEach(el => el.remove());
+  rects.forEach((r, idx) => {
+    const d = document.createElement('div');
+    d.className = 'rx';
+    d.style.left = (r.x*100)+'%'; d.style.top = (r.y*100)+'%';
+    d.style.width = (r.w*100)+'%'; d.style.height = (r.h*100)+'%';
+    const weg = document.createElement('button');
+    weg.type = 'button'; weg.className = 'rxweg'; weg.textContent = '✕';
+    weg.setAttribute('aria-label', 'Diese Markierung entfernen');
+    weg.addEventListener('pointerdown', ev => ev.stopPropagation());
+    weg.onclick = ev => {
+      ev.stopPropagation();
+      rects.splice(idx, 1);
+      malRects(i); zaehle();
+    };
+    d.appendChild(weg);
+    fl.appendChild(d);
+  });
+}
+
+function zaehle(){
+  const n = seiten.reduce((s, p) => s + p.rects.length, 0);
+  AK.$('#anzahl').innerHTML = n + '<small>Bereiche markiert</small>';
+  AK.$('#go').disabled = !n;
+  AK.$('#clearall').disabled = !n;
+  AK.$('#f-dpi').style.display = modus === 'pdf' ? '' : 'none';
+}
+
+AK.$('#clearall').onclick = () => {
+  seiten.forEach((p, i) => { p.rects = []; malRects(i); });
+  zaehle();
+};
+
+/* ---------- Speichern ---------- */
+async function speichern(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    if(modus === 'pdf') await speicherePdf();
+    else await speichereBild();
+    AK.stamp(true);
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Geschwärzt speichern';
+    zaehle();
+  }
+}
+
+async function speicherePdf(){
+  const dpi = +AK.$('#dpi').value;
+  const doc = await AK.openWithPdfjs(src.bytes, src.password);
+
+  /* Unmarkierte Seiten werden verlustfrei übernommen; klappt das Öffnen mit
+     pdf-lib nicht (z. B. verschlüsselt), werden eben alle Seiten neu aufgebaut. */
+  let vorlage = null;
+  try{ vorlage = await PDFDocument.load(src.bytes.slice(), { ignoreEncryption: false }); }
+  catch(_){ vorlage = null; }
+
+  const out = await PDFDocument.create();
+  let geschwaerzt = 0;
+  for(let i = 0; i < seiten.length; i++){
+    const rects = seiten[i].rects;
+    if(!rects.length && vorlage){
+      const [p] = await out.copyPages(vorlage, [i]);
+      out.addPage(p);
+    }else{
+      const { canvas, width, height } = await AK.renderPage(doc, i, dpi/72);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#000';
+      for(const r of rects){
+        ctx.fillRect(Math.floor(r.x*canvas.width), Math.floor(r.y*canvas.height),
+                     Math.ceil(r.w*canvas.width), Math.ceil(r.h*canvas.height));
+      }
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+      AK.freeCanvas(canvas);
+      const img = await out.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+      out.addPage([width, height]).drawImage(img, { x:0, y:0, width, height });
+      if(rects.length) geschwaerzt++;
+    }
+    AK.bar((i+1)/seiten.length);
+  }
+  await doc.destroy();
+
+  out.setProducer('Alleskonverter');
+  const bytes = await out.save();
+  const blob = new Blob([bytes], { type:'application/pdf' });
+  AK.offerDownload(blob, basis + '-geschwaerzt.pdf');
+  AK.log(`Fertig: ${seiten.length} Seiten, ${geschwaerzt} davon geschwärzt und als Bild neu aufgebaut (${AK.fmtBytes(blob.size)}).`);
+  if(!vorlage && seiten.length > geschwaerzt){
+    AK.log('Da das Original geschützt war, wurden auch die unmarkierten Seiten neu aufgebaut.');
+  }
+  AK.log('Der geschwärzte Inhalt ist wirklich entfernt — auch Kopieren oder ein PDF-Editor holen ihn nicht zurück.');
+}
+
+async function speichereBild(){
+  const rects = seiten[0].rects;
+  const c = document.createElement('canvas');
+  c.width = src.breite; c.height = src.hoehe;
+  const ctx = c.getContext('2d');
+  if(src.mime === 'image/jpeg'){ ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); }
+  ctx.drawImage(src.bitmap, 0, 0);
+  ctx.fillStyle = '#000';
+  for(const r of rects){
+    ctx.fillRect(Math.floor(r.x*c.width), Math.floor(r.y*c.height),
+                 Math.ceil(r.w*c.width), Math.ceil(r.h*c.height));
+  }
+  AK.bar(0.6);
+  const blob = await new Promise(res => c.toBlob(res, src.mime, src.mime === 'image/jpeg' ? 0.92 : undefined));
+  c.width = c.height = 0;
+  if(!blob) throw new Error('Format wird nicht unterstützt');
+  AK.bar(1);
+  AK.offerDownload(blob, `${basis}-geschwaerzt.${src.mime === 'image/png' ? 'png' : 'jpg'}`);
+  AK.log(`Fertig: ${AK.fmtBytes(blob.size)}. Die schwarzen Flächen ersetzen die Bildpunkte endgültig.`);
+  AK.log('Beim Neuaufbau sind nebenbei sämtliche Metadaten entfernt worden — auch ein etwaiger GPS-Standort.');
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = speichern;
+zaehle();
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

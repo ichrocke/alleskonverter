@@ -71,11 +71,11 @@
   /* ---------- Datei hineinziehen → passende Werkzeuge ---------- */
   const REGELN = [
     { test: n => /\.pdf$/i.test(n), art: 'PDF-Dokument',
-      tools: ['pdf-zusammenfuegen','pdf-aufteilen','pdf-bearbeiten','pdf-komprimieren','pdf-zu-bild','pdf-stempeln','pdf-text','pdf-passwort','texterkennung'] },
+      tools: ['pdf-zusammenfuegen','pdf-aufteilen','pdf-bearbeiten','pdf-komprimieren','pdf-zu-bild','pdf-stempeln','pdf-text','pdf-passwort','schwaerzen','texterkennung'] },
     { test: n => /\.(hei[cf])$/i.test(n), art: 'iPhone-Foto (HEIC)',
-      tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','texterkennung'] },
+      tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','schwaerzen','texterkennung'] },
     { test: n => /\.(jpe?g|png|webp|gif|bmp|avif|tiff?)$/i.test(n), art: 'Bild',
-      tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','bildergalerie','texterkennung','favicon','qr-code'] },
+      tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','schwaerzen','bildergalerie','texterkennung','favicon','qr-code'] },
     { test: n => /\.(csv|tsv|xlsx?|ods)$/i.test(n), art: 'Tabelle',
       tools: ['tabellen','csv-bereinigen','vergleichen'] },
     { test: n => /\.json$/i.test(n), art: 'JSON-Datei',
