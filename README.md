@@ -51,6 +51,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Tabellen-Konverter](tools/tabellen/index.html) | CSV/TSV/JSON/XLSX/XLS ↔ CSV/JSON/XLSX, Vorschau |
 | [CSV bereinigen](tools/csv-bereinigen/index.html) | Spalten wählen und per Ziehen sortieren, Duplikate entfernen, Zeilen filtern, Export CSV/XLSX/JSON |
 | [JSON &amp; YAML](tools/json-yaml/index.html) | JSON formatieren/prüfen/minimieren, YAML ↔ JSON, Fehler mit Zeilenangabe |
+| [JSON lesen](tools/json-lesen/index.html) | JSON als aufklappbaren Baum ansehen, durchsuchen, Pfade kopieren, Statistik |
 
 **Audio & Video**
 

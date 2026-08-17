@@ -374,6 +374,32 @@ const FAELLE = [
       if(e !== '25,4') throw new Error('1 Zoll ≠ 25,4 mm, sondern ' + e);
     } },
   { werkzeug:'json-yaml',          dateien:[['d.json', JSON_B64, 'application/json']] },
+  { werkzeug:'json-lesen',         dateien:[['d.json', JSON_B64, 'application/json']],
+    vorher: async p => {
+      const s = await p.$eval('#statistik', e => e.textContent);
+      for(const soll of ['2 Objekte', '1 Liste', '4 Werte', 'Tiefe 3'])
+        if(!s.includes(soll)) throw new Error(`Statistik: „${soll}“ fehlt in „${s}“`);
+      // Klick auf das Blatt „z“ muss den Pfad a.z liefern
+      await p.evaluate(() => {
+        [...document.querySelectorAll('#baum .blatt')].find(e => e.dataset.k === 'z').click();
+      });
+      const pfad = await p.$eval('#pfad', e => e.textContent);
+      if(pfad !== 'a.z') throw new Error('Pfad falsch: ' + pfad);
+      // Suche muss den Wert 4 im zugeklappten Ast finden und hinspringen
+      await p.$eval('#suche', e => { e.value = '4'; e.dispatchEvent(new Event('input')); });
+      await new Promise(r => setTimeout(r, 500));
+      const stand = await p.$eval('#tstand', e => e.textContent);
+      if(!/Treffer 1 von/.test(stand)) throw new Error('Suche ohne Treffer: ' + stand);
+    } },
+  { werkzeug:'json-lesen',         kein_download:true,
+    vorher: async p => {
+      await p.type('#eingabe', '{"a":1,]');
+      await new Promise(r => setTimeout(r, 600));
+    },
+    pruefen: async p => {
+      const m = await p.$eval('#meldung', e => e.textContent);
+      if(!/Zeile 1/.test(m)) throw new Error('Fehlerort fehlt: ' + m);
+    } },
   { werkzeug:'gif-erstellen',      nur_laden:true },
   { werkzeug:'ton-verbessern',     nur_laden:true },
   { werkzeug:'pdf-durchsuchbar',   nur_laden:true },

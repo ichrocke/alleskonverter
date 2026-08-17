@@ -42,7 +42,8 @@ window.AK = window.AK || {};
     'tabellen':              ['csv-bereinigen','json-yaml'],
     'csv-bereinigen':        ['tabellen','vergleichen'],
     'testdaten':             ['csv-bereinigen','tabellen'],
-    'json-yaml':             ['tabellen','text-werkzeuge'],
+    'json-yaml':             ['json-lesen','tabellen','text-werkzeuge'],
+    'json-lesen':            ['json-yaml','tabellen'],
     'untertitel':            ['text-werkzeuge','vergleichen'],
     'vergleichen':           ['text-werkzeuge'],
 
@@ -66,6 +67,7 @@ window.AK = window.AK || {};
     'bild-metadaten':'Bild-Metadaten', 'bild-base64':'Bild als Daten-URI',
     'word-zu-html':'Word → HTML', 'markdown-html':'Markdown ↔ HTML',
     'tabellen':'Tabellen-Konverter', 'json-yaml':'JSON & YAML',
+    'json-lesen':'JSON lesen',
     'texterkennung':'Texterkennung', 'untertitel':'Untertitel',
     'medien':'Audio & Video', 'medien-schneiden':'Medien schneiden',
     'ton-verbessern':'Ton verbessern', 'gif-erstellen':'GIF erstellen',

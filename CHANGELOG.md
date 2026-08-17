@@ -3,6 +3,19 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-17 (Werkzeug 47: JSON lesen)
+
+### Hinzugefügt
+- Werkzeug **JSON lesen** (`tools/json-lesen/`) — JSON als aufklappbaren Baum ansehen, durchsuchen und zu jedem Eintrag den Zugriffspfad kopieren (etwa `kunden[2].adresse.ort`). Das bestehende „JSON & YAML“ verändert Daten (formatieren, minimieren, umwandeln); der Reader beantwortet die andere, mindestens so häufige Frage: „Wo steht hier eigentlich was?“
+  - Der Baum entsteht **faul**: Jede Ebene wird erst beim Aufklappen gebaut, Listen mit über 500 Einträgen erscheinen blockweise („Weitere 500 anzeigen“), sehr lange Texte gekürzt mit „mehr anzeigen“. So bleibt der Tab auch bei API-Antworten mit hunderttausenden Einträgen flüssig. Ein „Alles aufklappen“ gibt es bewusst nicht — genau das würde bei solchen Dateien einfrieren; die Suche ersetzt den Anwendungsfall.
+  - Die **Suche läuft über die Daten, nicht über die Anzeige** — sie findet also auch Treffer in zugeklappten Ästen und klappt beim Hinspringen den Weg dorthin auf. Gesucht wird in Schlüsseln und Werten, mit Treffer-Navigation (‹ ›, Enter, Umschalt+Enter).
+  - Gebaut als `<details>`-Verschachtelung: nativ faltbar und tastaturbedienbar, ohne eigenen Klapp-Zustand im Skript. Fehler werden wie beim Schwesterwerkzeug mit Zeile und Spalte gemeldet; ein vorangestelltes BOM wird vor dem Parsen entfernt (der klassische „Fehler in Zeile 1 ohne sichtbaren Grund“).
+- Zwei Testfälle: Baum samt Statistik und Pfad-Anzeige (Klick auf einen Knoten muss `a.z` liefern) und ein kaputtes JSON, das eine Fehlermeldung mit Zeilenangabe zeigen muss. Jetzt 60 Prüfungen.
+
+### Geändert
+- Startseite: „Tabellen & Daten“ zählt jetzt 4 Karten; die Datei-Erkennung schlägt für `.json` jetzt auch den Reader und „JSON & YAML“ vor (letzteres fehlte dort schlicht — behoben); „Weiter zu …“ verbindet beide JSON-Werkzeuge in beide Richtungen.
+- FAQ: Werkzeugzahl auf 47 aktualisiert (JSON-LD neu erzeugt). Dabei eine alte Inkonsistenz behoben: Die Stempel-Antwort sprach von „42 von 45“ Werkzeugen, obwohl es längst 46 waren.
+
 ## 2026-08-04 (Bild-Metadaten: jetzt auch entfernen)
 
 ### Hinzugefügt

@@ -79,7 +79,7 @@
     { test: n => /\.(csv|tsv|xlsx?|ods)$/i.test(n), art: 'Tabelle',
       tools: ['tabellen','csv-bereinigen','vergleichen'] },
     { test: n => /\.json$/i.test(n), art: 'JSON-Datei',
-      tools: ['tabellen','text-werkzeuge'] },
+      tools: ['json-lesen','json-yaml','tabellen','text-werkzeuge'] },
     { test: n => /\.docx?$/i.test(n), art: 'Word-Dokument',
       tools: ['word-zu-html'] },
     { test: n => /\.epub$/i.test(n), art: 'E-Book',
