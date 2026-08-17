@@ -434,6 +434,24 @@ const FAELLE = [
       const m = await p.$eval('#meldung', e => e.textContent);
       if(!/Zeile \d+/.test(m)) throw new Error('parsererror nicht ausgewertet: ' + m);
     } },
+  { werkzeug:'bild-ascii',         dateien:[['b.png', PNG, 'image/png']],
+    vorher: async p => {
+      await p.waitForFunction(() => (document.querySelector('#ausgabe').textContent || '').length > 0, {timeout:15000});
+      const text = await p.$eval('#ausgabe', e => e.textContent);
+      const zeilen = text.split('\n');
+      const breite = +await p.$eval('#breite', e => e.value);
+      if(zeilen[0].length !== breite) throw new Error(`Zeile hat ${zeilen[0].length} statt ${breite} Zeichen`);
+      // Testbild ist quadratisch → Zeilenzahl ≈ Breite × 0,5 (Zeichen sind doppelt so hoch wie breit)
+      if(Math.abs(zeilen.length - Math.round(breite * 0.5)) > 1)
+        throw new Error('Zeilenzahl passt nicht zum Seitenverhältnis: ' + zeilen.length);
+      await p.evaluate(() => {
+        const i = document.querySelector('#invertieren');
+        i.checked = true; i.dispatchEvent(new Event('change'));
+      });
+      await new Promise(r => setTimeout(r, 400));
+      const invertiert = await p.$eval('#ausgabe', e => e.textContent);
+      if(invertiert === text) throw new Error('Invertieren ändert die Ausgabe nicht');
+    } },
   { werkzeug:'gif-erstellen',      nur_laden:true },
   { werkzeug:'ton-verbessern',     nur_laden:true },
   { werkzeug:'pdf-durchsuchbar',   nur_laden:true },

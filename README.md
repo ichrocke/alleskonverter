@@ -70,6 +70,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 |---|---|
 | [Bildergalerie als HTML](tools/bildergalerie/index.html) | Raster/Mauerwerk/Reihe, Bildunterschriften, Großansicht; Bilder eingebettet oder als ZIP |
 | [Bild als Daten-URI](tools/bild-base64/index.html) | Base64-Schnipsel für CSS/HTML/Markdown, mit Größenwarnung |
+| [Bild als ASCII-Art](tools/bild-ascii/index.html) | Bilder in Textzeichen umwandeln; Breite, Zeichensatz und Invertierung einstellbar, Export als .txt |
 | [Favicon-Generator](tools/favicon/index.html) | Alle Symbolgrößen, favicon.ico, Apple-Touch-Icon, Manifest und HTML-Schnipsel als ZIP |
 | [Farbwerte umrechnen](tools/farben/index.html) | HEX/RGB/HSL/CMYK, Pipette für Bilder, Abstufungen, WCAG-Kontrastprüfung |
 | [Regex ausprobieren](tools/regex/index.html) | Treffer live hervorgehoben, Gruppen aufgelistet, Erklärung auf Deutsch, Ersetzen |

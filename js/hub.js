@@ -75,7 +75,7 @@
     { test: n => /\.(hei[cf])$/i.test(n), art: 'iPhone-Foto (HEIC)',
       tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','schwaerzen','bild-metadaten','texterkennung'] },
     { test: n => /\.(jpe?g|png|webp|gif|bmp|avif|tiff?)$/i.test(n), art: 'Bild',
-      tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','schwaerzen','bild-metadaten','bildergalerie','texterkennung','favicon','qr-code'] },
+      tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','schwaerzen','bild-metadaten','bildergalerie','texterkennung','favicon','qr-code','bild-ascii'] },
     { test: n => /\.(csv|tsv|xlsx?|ods)$/i.test(n), art: 'Tabelle',
       tools: ['tabellen','csv-bereinigen','vergleichen'] },
     { test: n => /\.json$/i.test(n), art: 'JSON-Datei',

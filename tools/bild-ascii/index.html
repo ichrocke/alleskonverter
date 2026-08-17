@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bild in ASCII-Art umwandeln — kostenlos | Alleskonverter</title>
+<meta name="description" content="Fotos und Grafiken in ASCII-Art aus Textzeichen umwandeln: Breite, Zeichensatz und Invertierung einstellbar, als .txt speichern oder kopieren. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/bild-ascii/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Bild in ASCII-Art umwandeln — kostenlos | Alleskonverter">
+<meta property="og:description" content="Fotos und Grafiken in ASCII-Art aus Textzeichen umwandeln — ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/bild-ascii/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bild in ASCII-Art umwandeln — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild als ASCII-Art — Alleskonverter","url":"https://alleskonverter.de/tools/bild-ascii/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Bilder in ASCII-Art aus Textzeichen umwandeln — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wird mein Bild hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein, die Umwandlung passiert vollständig im Browser."}},{"@type":"Question","name":"Warum sieht das Ergebnis verzerrt aus?","acceptedAnswer":{"@type":"Answer","text":"ASCII-Art muss in einer Schrift mit fester Zeichenbreite angezeigt werden, etwa in einem Editor oder Code-Block. In Schriften mit variabler Breite verrutscht das Bild."}},{"@type":"Question","name":"Wofür ist „Invertieren“?","acceptedAnswer":{"@type":"Answer","text":"Die Zeichen sind für dunkle Schrift auf hellem Grund gewählt. Soll die ASCII-Art auf dunklem Grund stehen — etwa in einem Terminal —, dreht Invertieren die Zuordnung um, damit helle Stellen im Bild auch dort hell wirken."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.vorschau{max-width:100%;max-height:160px;border:1px solid var(--rule);display:block;margin-top:16px;background:#fff}
+#ausgabe{display:block;margin-top:16px;padding:12px;background:#fff;color:var(--ink);
+  border:1px solid var(--rule);box-shadow:var(--shadow);overflow:auto;max-width:100%;max-height:65vh;
+  font-family:var(--mono);font-size:7px;line-height:1;letter-spacing:0;white-space:pre}
+#ausgabe.dunkel{background:#16191B;color:#E6E4DE}
+.breitewert{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-left:8px}
+input[type=range]{width:100%;accent-color:var(--stamp)}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;margin-bottom:14px;cursor:pointer}
+.check input{width:auto;accent-color:var(--stamp)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bild als <span>ASCII-Art</span></h1>
+  <p class="sub">Ein Foto oder eine Grafik in ein Bild aus Textzeichen verwandeln — für Textdateien, Quellcode-Kommentare, Terminals oder einfach aus Freude an der Sache. Breite und Zeichensatz sind einstellbar, das Ergebnis wird live aktualisiert.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bild</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>JPG, PNG, WebP, GIF … — kontrastreiche Motive wirken am besten</small>
+    </div>
+    <input type="file" id="picker" accept="image/*" hidden>
+
+    <img class="vorschau" id="vorschau" alt="Vorschau des Originals" hidden>
+    <pre id="ausgabe" aria-label="ASCII-Ergebnis" hidden></pre>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="ghost" id="kopieren" disabled>In die Zwischenablage</button>
+    </div>
+
+    <div class="empty" id="empty">Noch kein Bild geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+    <div class="count" id="groesse">—<small>Zeichen (Breite × Zeilen)</small></div>
+
+    <div class="field" style="margin-top:16px">
+      <label for="breite">Breite in Zeichen<span class="breitewert" id="breitewert">100</span></label>
+      <input type="range" id="breite" min="20" max="240" step="2" value="100">
+    </div>
+
+    <div class="field">
+      <label for="zeichensatz">Zeichensatz</label>
+      <select id="zeichensatz">
+        <option value="standard" selected>Standard (10 Stufen)</option>
+        <option value="fein">Fein (70 Stufen)</option>
+        <option value="bloecke">Blockzeichen ░▒▓█</option>
+        <option value="eigene">Eigene Zeichen …</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-eigene" hidden>
+      <label for="eigene">Eigene Zeichen (hell → dunkel)</label>
+      <input type="text" id="eigene" value=" .oO@" spellcheck="false">
+      <div class="hint">von hell nach dunkel sortiert</div>
+    </div>
+
+    <label class="check" for="invertieren">
+      <input type="checkbox" id="invertieren">
+      <span>Invertieren — für dunklen Hintergrund</span>
+    </label>
+
+    <div class="field">
+      <label for="dateiname">Dateiname</label>
+      <input type="text" id="dateiname" value="bild">
+    </div>
+
+    <button class="primary" id="go" disabled>Als .txt herunterladen</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>ASCII-Art ist ein Bild aus Textzeichen: Dunkle Stellen bekommen „schwere“ Zeichen wie <code>@</code> und <code>#</code>, helle Stellen Punkte oder Leerzeichen. Das Werkzeug verkleinert das Bild auf die gewählte Breite, misst für jede Zeichenzelle die Helligkeit und wählt das passende Zeichen. Weil Textzeichen etwa doppelt so hoch wie breit sind, wird die Zeilenzahl entsprechend angepasst — sonst käme das Bild in die Länge gezogen heraus.</p>
+  <h3>Wird mein Bild hochgeladen?</h3>
+  <p>Nein. Die Umwandlung passiert vollständig in deinem Browser.</p>
+  <h3>Warum sieht das Ergebnis woanders verzerrt aus?</h3>
+  <p>ASCII-Art braucht eine Schrift mit fester Zeichenbreite — wie in einem Editor, einem Terminal oder einem Code-Block. In normalen Schriften sind die Zeichen unterschiedlich breit, und das Bild verrutscht. Wenn es krumm aussieht, liegt es fast immer an der Schrift, nicht an der Datei.</p>
+  <h3>Wofür ist „Invertieren“?</h3>
+  <p>Die Zeichenzuordnung geht von dunkler Schrift auf hellem Grund aus. Soll das Ergebnis auf dunklem Grund stehen — etwa im Terminal —, wäre das Bild wie ein Negativ. Invertieren dreht die Zuordnung um; die Vorschau wechselt dann auch auf dunklen Grund, damit man sieht, was am Zielort ankommt.</p>
+  <h3>Welche Motive funktionieren gut?</h3>
+  <p>Kontrastreiche: Porträts vor ruhigem Hintergrund, Logos, klare Formen. Feine Details verschwinden zwangsläufig — ein Bild mit 100 Zeichen Breite hat nur noch 100 „Pixel“ pro Zeile. Mehr Breite bringt mehr Details, braucht aber auch mehr Platz am Ziel.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Soll das Bild stattdessen als Code-Schnipsel in HTML oder CSS: <a href="../bild-base64/index.html">Bild als Daten-URI</a>. Zum Weiterbearbeiten des Textes gibt es die <a href="../text-werkzeuge/index.html">Text-Werkzeuge</a>.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+let quelle = null, basisName = 'bild';
+
+/* Zeichensätze, jeweils von hell nach dunkel sortiert */
+const SAETZE = {
+  standard: ' .:-=+*#%@',
+  fein: ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$',
+  bloecke: ' ░▒▓█',
+};
+
+function zeichensatz(){
+  if(AK.$('#zeichensatz').value === 'eigene'){
+    const eigene = AK.$('#eigene').value;
+    // Über [...str] zerlegen, damit Emoji und Blockzeichen nicht zerrissen werden
+    const z = [...eigene];
+    return z.length >= 2 ? z : [...SAETZE.standard];
+  }
+  return [...SAETZE[AK.$('#zeichensatz').value]];
+}
+
+async function bitmap(){
+  if(!/svg/i.test(quelle.type) && 'createImageBitmap' in window){
+    try{ return await createImageBitmap(quelle); }catch(_){}
+  }
+  return await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = URL.createObjectURL(quelle);
+  });
+}
+
+async function rechne(){
+  if(!quelle) return;
+  let bmp;
+  try{ bmp = await bitmap(); }
+  catch(_){ AK.log('Das Bild kann nicht gelesen werden.', true); return; }
+  const bw = bmp.naturalWidth || bmp.width, bh = bmp.naturalHeight || bmp.height;
+  const breite = +AK.$('#breite').value;
+  // Zeichenzellen sind etwa doppelt so hoch wie breit — Faktor 0,5 hält die Proportion
+  const zeilen = Math.max(1, Math.round(bh / bw * breite * 0.5));
+
+  const c = document.createElement('canvas');
+  c.width = breite; c.height = zeilen;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bmp, 0, 0, breite, zeilen);
+  const px = ctx.getImageData(0, 0, breite, zeilen).data;
+
+  const satz = zeichensatz();
+  const n = satz.length - 1;
+  const invertiert = AK.$('#invertieren').checked;
+  const zeilenText = [];
+  for(let y = 0; y < zeilen; y++){
+    let z = '';
+    for(let x = 0; x < breite; x++){
+      const i = (y * breite + x) * 4;
+      // Luminanz nach Rec. 709; Transparenz wird gegen Weiß gerechnet
+      let L = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+      const a = px[i + 3] / 255;
+      L = L * a + 255 * (1 - a);
+      const anteil = L / 255;
+      z += satz[Math.round((invertiert ? anteil : 1 - anteil) * n)];
+    }
+    zeilenText.push(z);
+  }
+
+  const aus = AK.$('#ausgabe');
+  aus.textContent = zeilenText.join('\n');
+  aus.hidden = false;
+  aus.classList.toggle('dunkel', invertiert);
+  AK.$('#groesse').innerHTML = `${breite} × ${zeilen}<small>Zeichen (Breite × Zeilen)</small>`;
+  AK.$('#kopieren').disabled = AK.$('#go').disabled = false;
+}
+
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|svg|avif|bmp)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false);
+  quelle = file;
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  AK.$('#dateiname').value = basisName;
+  AK.$('#vorschau').src = URL.createObjectURL(file);
+  AK.$('#vorschau').hidden = false;
+  AK.$('#empty').style.display = 'none';
+  await rechne();
+}
+
+AK.$('#kopieren').onclick = async () => {
+  try{
+    await navigator.clipboard.writeText(AK.$('#ausgabe').textContent);
+    AK.log('Kopiert — am besten in eine Schrift mit fester Breite einfügen.');
+  }catch(_){
+    AK.log('Kopieren nicht möglich — Text bitte von Hand markieren.', true);
+  }
+};
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  AK.offerDownload(new Blob([AK.$('#ausgabe').textContent], { type: 'text/plain;charset=utf-8' }),
+                   (AK.$('#dateiname').value || 'bild') + '-ascii.txt');
+  AK.stamp(true);
+};
+
+let schiebeTimer = null;
+AK.$('#breite').addEventListener('input', () => {
+  AK.$('#breitewert').textContent = AK.$('#breite').value;
+  clearTimeout(schiebeTimer);
+  schiebeTimer = setTimeout(rechne, 100);
+});
+AK.$('#zeichensatz').addEventListener('change', () => {
+  AK.$('#f-eigene').hidden = AK.$('#zeichensatz').value !== 'eigene';
+  rechne();
+});
+let eigeneTimer = null;
+AK.$('#eigene').addEventListener('input', () => {
+  clearTimeout(eigeneTimer);
+  eigeneTimer = setTimeout(rechne, 300);
+});
+AK.$('#invertieren').addEventListener('change', rechne);
+
+// Gemerkte Einstellungen (Breite, Zeichensatz) beim Laden in die Anzeige übernehmen
+addEventListener('load', () => {
+  AK.$('#breitewert').textContent = AK.$('#breite').value;
+  AK.$('#f-eigene').hidden = AK.$('#zeichensatz').value !== 'eigene';
+});
+
+AK.dropzone('#drop', '#picker', addFiles);
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

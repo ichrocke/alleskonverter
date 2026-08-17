@@ -3,6 +3,20 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-17 (Werkzeug 49: Bild als ASCII-Art)
+
+### Hinzugefügt
+- Werkzeug **Bild als ASCII-Art** (`tools/bild-ascii/`) — Fotos und Grafiken in Bilder aus Textzeichen verwandeln, mit Live-Vorschau: Breite (20–240 Zeichen), Zeichensatz (10 Stufen, 70 Stufen, Blockzeichen ░▒▓█ oder eigene Zeichen) und Invertieren für dunkle Hintergründe. Ergebnis als .txt oder in die Zwischenablage.
+  - Die Helligkeit je Zeichenzelle kommt aus einem einzigen `getImageData` auf einem auf Zielgröße verkleinerten Canvas — der Browser übernimmt das saubere Herunterrechnen. Gerechnet wird mit der Luminanz nach Rec. 709; transparente Stellen werden gegen Weiß gerechnet, gelten also als hell.
+  - Die Zeilenzahl ist halbiert (Faktor 0,5), weil Monospace-Zeichen etwa doppelt so hoch wie breit sind — ohne die Korrektur käme jedes Bild in die Länge gezogen heraus.
+  - „Invertieren“ dreht nicht nur die Zeichenzuordnung um, sondern stellt auch die Vorschau auf dunklen Grund — man sieht also genau das, was am Zielort (etwa im Terminal) ankommt.
+  - Eigene Zeichensätze werden mit `[...str]` zerlegt, damit auch Emoji und Blockzeichen als ganze Zeichen behandelt werden statt in Surrogat-Hälften zu zerfallen.
+- Testfall: Das 60×60-Testbild muss bei Breite 100 exakt 100 Zeichen je Zeile und ~50 Zeilen ergeben (Seitenverhältnis-Korrektur), und Invertieren muss die Ausgabe tatsächlich ändern. Jetzt 63 Prüfungen.
+
+### Geändert
+- Startseite: „Web & Entwicklung“ zählt jetzt 8 Karten; die Datei-Erkennung schlägt ASCII-Art für Bilder mit vor; „Weiter zu …“ führt zum Text-Werkzeug. Der Daten-URI-Konverter verweist im Fußtext auf das neue Schwesterwerkzeug.
+- FAQ: Werkzeugzahl auf 49 aktualisiert (JSON-LD neu erzeugt).
+
 ## 2026-08-17 (Werkzeug 48: XML lesen)
 
 ### Hinzugefügt
