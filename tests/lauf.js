@@ -104,6 +104,8 @@ const MD   = Buffer.from('# Überschrift\n\nEin **Test**.\n', 'utf8').toString('
 const SRT  = Buffer.from('1\n00:00:01,000 --> 00:00:03,500\nErster Untertitel\n', 'utf8').toString('base64');
 const TXT  = Buffer.from('Hallo Welt mit Umlauten: äöü\n', 'utf8').toString('base64');
 const JSON_B64 = Buffer.from('{"b":2,"a":{"z":1,"y":[3,4]}}', 'utf8').toString('base64');
+const XML_B64 = Buffer.from('<?xml version="1.0"?><kunden><kunde id="1"><name>Anna</name></kunde>' +
+  '<kunde id="2"><name>Bernd</name></kunde><!--Hinweis--></kunden>', 'utf8').toString('base64');
 
 /* ZIP ohne Kompression von Hand — Grundlage für die DOCX- und EPUB-Testdateien */
 function zipBauen(dateien){
@@ -399,6 +401,38 @@ const FAELLE = [
     pruefen: async p => {
       const m = await p.$eval('#meldung', e => e.textContent);
       if(!/Zeile 1/.test(m)) throw new Error('Fehlerort fehlt: ' + m);
+    } },
+  { werkzeug:'xml-lesen',          dateien:[['k.xml', XML_B64, 'application/xml']],
+    vorher: async p => {
+      const s = await p.$eval('#statistik', e => e.textContent);
+      for(const soll of ['5 Elemente', '2 Attribute', '1 Kommentar', 'Tiefe 3'])
+        if(!s.includes(soll)) throw new Error(`Statistik: „${soll}“ fehlt in „${s}“`);
+      // Klick auf das zweite <name> muss den XPath-artigen Pfad liefern
+      await p.evaluate(() => {
+        [...document.querySelectorAll('#baum .blatt')].filter(e => e.dataset.k === 'name')[1].click();
+      });
+      const pfad = await p.$eval('#pfad', e => e.textContent);
+      if(pfad !== '/kunden/kunde[2]/name') throw new Error('Pfad falsch: ' + pfad);
+    },
+    pruefen: async p => {
+      // Gegenprobe: Der formatierte Download muss wieder gültiges XML mit 5 Elementen sein
+      const [elemente, zeilen] = await p.evaluate(async () => {
+        const t = await (await fetch(document.querySelector('a.download').href)).text();
+        const d = new DOMParser().parseFromString(t, 'application/xml');
+        if(d.querySelector('parsererror')) return [-1, 0];
+        return [d.querySelectorAll('*').length, t.split('\n').length];
+      });
+      if(elemente !== 5) throw new Error('Export erneut geparst: ' + elemente + ' statt 5 Elemente');
+      if(zeilen < 5) throw new Error('Export ist nicht eingerückt (' + zeilen + ' Zeilen)');
+    } },
+  { werkzeug:'xml-lesen',          kein_download:true,
+    vorher: async p => {
+      await p.type('#eingabe', '<a><b></a>');
+      await new Promise(r => setTimeout(r, 600));
+    },
+    pruefen: async p => {
+      const m = await p.$eval('#meldung', e => e.textContent);
+      if(!/Zeile \d+/.test(m)) throw new Error('parsererror nicht ausgewertet: ' + m);
     } },
   { werkzeug:'gif-erstellen',      nur_laden:true },
   { werkzeug:'ton-verbessern',     nur_laden:true },

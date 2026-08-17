@@ -80,6 +80,8 @@
       tools: ['tabellen','csv-bereinigen','vergleichen'] },
     { test: n => /\.json$/i.test(n), art: 'JSON-Datei',
       tools: ['json-lesen','json-yaml','tabellen','text-werkzeuge'] },
+    { test: n => /\.(xml|rss|atom|xsd|xslt?)$/i.test(n), art: 'XML-Datei',
+      tools: ['xml-lesen','vergleichen'] },
     { test: n => /\.docx?$/i.test(n), art: 'Word-Dokument',
       tools: ['word-zu-html'] },
     { test: n => /\.epub$/i.test(n), art: 'E-Book',

@@ -31,6 +31,7 @@
   <url><loc>https://alleskonverter.de/tools/einheiten/</loc><priority>0.8</priority></url>
   <url><loc>https://alleskonverter.de/tools/json-yaml/</loc><priority>0.8</priority></url>
   <url><loc>https://alleskonverter.de/tools/json-lesen/</loc><priority>0.8</priority></url>
+  <url><loc>https://alleskonverter.de/tools/xml-lesen/</loc><priority>0.8</priority></url>
   <url><loc>https://alleskonverter.de/tools/bild-base64/</loc><priority>0.8</priority></url>
   <url><loc>https://alleskonverter.de/tools/pdf-kontaktabzug/</loc><priority>0.8</priority></url>
   <url><loc>https://alleskonverter.de/tools/bilder-umbenennen/</loc><priority>0.8</priority></url>

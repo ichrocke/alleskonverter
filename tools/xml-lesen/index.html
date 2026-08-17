@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XML ansehen, prüfen &amp; formatieren (XML-Reader) — kostenlos | Alleskonverter</title>
+<meta name="description" content="XML als aufklappbaren Baum ansehen: durchsuchen, XPath-artige Pfade kopieren, formatiert oder minimiert herunterladen. Auch für RSS und SVG. Ohne Upload, direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/xml-lesen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="XML ansehen, prüfen &amp; formatieren (XML-Reader) — kostenlos | Alleskonverter">
+<meta property="og:description" content="XML als aufklappbaren Baum ansehen, durchsuchen, Pfade kopieren, formatieren — ohne Upload, direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/xml-lesen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="XML ansehen, prüfen &amp; formatieren (XML-Reader) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"XML lesen — Alleskonverter","url":"https://alleskonverter.de/tools/xml-lesen/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"XML als aufklappbaren Baum ansehen, durchsuchen, Pfade kopieren und formatiert herunterladen — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Daten übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Alles wird im Browser verarbeitet — auch bei XML-Exporten voller Kunden- oder Rechnungsdaten bleibt die Datei auf dem eigenen Gerät."}},{"@type":"Question","name":"Funktioniert das auch mit RSS-Feeds und SVG-Dateien?","acceptedAnswer":{"@type":"Answer","text":"Ja. RSS, Atom, SVG, XSD und viele Konfigurationsformate sind XML — sie lassen sich alle als Baum ansehen und durchsuchen."}},{"@type":"Question","name":"Verändert das Formatieren mein XML?","acceptedAnswer":{"@type":"Answer","text":"Nur die Einrückung, nicht die Bedeutung. Abschnitte, in denen Text und Elemente gemischt vorkommen, werden bewusst unverändert übernommen, weil dort jedes Leerzeichen zum Inhalt gehört."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.meldung{margin-top:12px;padding:10px 12px;border:1.5px solid var(--stamp);background:var(--card);
+  font-family:var(--mono);font-size:12px;color:var(--stamp)}
+.meldung.fehler{border-color:var(--alert);color:var(--alert)}
+#eingabe{min-height:110px;height:130px}
+
+.suchzeile{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.suchzeile input{flex:1;min-width:160px;padding:8px 10px;border:1.5px solid var(--rule);background:var(--field);
+  color:var(--ink);font-family:var(--mono);font-size:12.5px;border-radius:0}
+.suchzeile input:focus{border-color:var(--stamp);outline:none}
+#tstand{font-family:var(--mono);font-size:11px;color:var(--ink-soft);white-space:nowrap}
+button.klein{padding:6px 10px}
+
+.pfadzeile{display:flex;gap:10px;align-items:center;margin-top:12px;padding:8px 10px;
+  background:var(--card);border:1.5px solid var(--rule)}
+.pfadzeile .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+#pfad{flex:1;font-family:var(--mono);font-size:12px;overflow-x:auto;white-space:nowrap}
+
+#baum{margin-top:12px;background:var(--field);border:1px solid var(--rule);box-shadow:var(--shadow);
+  padding:10px 12px;font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow:auto;max-height:65vh}
+#baum summary{cursor:pointer;list-style-position:outside}
+#baum details > *:not(summary){margin-left:20px}
+.zeile{padding:0 6px}
+.zeile:hover{background:var(--card)}
+.zeile.aktiv{background:color-mix(in srgb,var(--stamp) 14%,var(--field));outline:1px solid var(--stamp)}
+.zeile.treffer{background:color-mix(in srgb,var(--amber) 18%,var(--field))}
+.blatt{cursor:pointer;white-space:pre-wrap;word-break:break-word}
+.tag{color:var(--ink);font-weight:600}
+.attr{color:var(--amber);cursor:pointer}
+.attr:hover{text-decoration:underline}
+.ns{color:var(--ink-soft);font-size:10.5px;margin-left:8px}
+.anz{color:var(--ink-soft);font-size:11px;margin-left:8px}
+.w{color:var(--stamp)}
+.kom{color:var(--ink-soft);font-style:italic}
+.cdata{border:1px solid currentColor;padding:0 4px;font-size:10px;color:var(--ink-soft);margin-right:6px}
+.leer{color:var(--ink-soft);font-style:italic}
+button.mehr{border:none;background:none;color:var(--ink-soft);text-decoration:underline;cursor:pointer;
+  font-family:var(--mono);font-size:11px;padding:0 2px}
+.mehrblock{margin-top:4px}
+
+.statzeile{display:flex;gap:8px 16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>XML <span>lesen</span></h1>
+  <p class="sub">XML als aufklappbaren Baum ansehen und durchsuchen — mit XPath-artiger Pfad-Anzeige für jedes Element. Zum Mitnehmen gibt es die Datei sauber eingerückt oder minimiert. Funktioniert auch mit RSS-Feeds und SVG.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Daten</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>.xml-, .rss- oder .svg-Datei hierher ziehen</strong>
+      <small>oder klicken — oder unten direkt einfügen</small>
+    </div>
+    <input type="file" id="picker" accept=".xml,.svg,.rss,.atom,.xsd,.xsl,.xslt,.txt" hidden>
+
+    <textarea class="pane" id="eingabe" spellcheck="false" aria-label="XML-Eingabe" style="margin-top:14px"
+      placeholder="Hier XML einfügen — zum Beispiel <kunden><kunde id=&quot;1&quot;>…</kunde></kunden>"></textarea>
+
+    <div class="meldung" id="meldung" hidden></div>
+
+    <div class="suchzeile" id="suchzeile" hidden>
+      <input type="search" id="suche" placeholder="Elemente, Attribute und Inhalte durchsuchen …" aria-label="Suche im Baum">
+      <button class="ghost klein" id="tzurueck" title="Voriger Treffer" aria-label="Voriger Treffer">‹</button>
+      <button class="ghost klein" id="tvor" title="Nächster Treffer" aria-label="Nächster Treffer">›</button>
+      <span id="tstand" aria-live="polite"></span>
+    </div>
+
+    <div class="pfadzeile" id="pfadzeile" hidden>
+      <span class="lbl">Pfad</span>
+      <code id="pfad">—</code>
+      <button class="ghost klein" id="pfadkopie">Kopieren</button>
+    </div>
+
+    <div class="empty" id="empty">Noch nichts geladen. Eine Datei wählen, XML einfügen — oder das Beispiel ansehen.</div>
+    <div id="baum" hidden></div>
+
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="ghost" id="zuklappen" disabled>Alles zuklappen</button>
+      <button class="ghost" id="beispiel">Beispiel einsetzen</button>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Überblick</h2>
+    <div class="count" id="knoten">0<small>Elemente</small></div>
+    <div class="statzeile" id="statistik"></div>
+
+    <div class="field">
+      <label for="modus">Download</label>
+      <select id="modus">
+        <option value="formatiert" selected>Formatiert (eingerückt)</option>
+        <option value="minimiert">Minimiert</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-einzug">
+      <label for="einzug">Einrückung</label>
+      <select id="einzug">
+        <option value="2" selected>2 Leerzeichen</option>
+        <option value="4">4 Leerzeichen</option>
+        <option value="tab">Tabulator</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="dateiname">Dateiname</label>
+      <input type="text" id="dateiname" value="daten">
+    </div>
+
+    <button class="primary" id="go" disabled>Herunterladen</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>XML steckt in mehr Dateien, als man denkt: RSS- und Atom-Feeds, SVG-Grafiken, Rechnungsformate, Sitemaps, Konfigurationsdateien. Lesbar ist es im Rohzustand selten. Dieses Werkzeug zeigt die Struktur als Baum mit Elementen, Attributen und Inhalten, findet per Suche auch Treffer in zugeklappten Ästen — und sagt bei kaputtem XML, in welcher Zeile es hakt. Ein Klick auf ein Element zeigt den Pfad im XPath-Stil, etwa <code>/kunden/kunde[2]/name</code>.</p>
+  <h3>Werden meine Daten übertragen?</h3>
+  <p>Nein, alles läuft im Browser. XML-Exporte aus Warenwirtschaft, Buchhaltung oder Behördenportalen sind oft voller personenbezogener Daten — genau solche Dateien sollte man keinem Online-Dienst anvertrauen müssen.</p>
+  <h3>Funktioniert das auch mit RSS-Feeds und SVG-Dateien?</h3>
+  <p>Ja. RSS, Atom, SVG, XSD und viele Konfigurationsformate sind gewöhnliches XML — einfach hineinziehen. Bei Elementen mit Namensraum steht die zugehörige Adresse klein daneben, damit klar ist, woher ein <code>atom:link</code> kommt.</p>
+  <h3>Verändert das Formatieren mein XML?</h3>
+  <p>Nur die Einrückung, nicht die Bedeutung. Eine Ausnahme wird bewusst gemacht: Abschnitte, in denen Text und Elemente gemischt vorkommen (wie in HTML-artigen Inhalten), werden unverändert übernommen — dort gehört jedes Leerzeichen zum Inhalt, und Einrücken würde ihn verfälschen.</p>
+  <h3>Was bedeutet die Fehlermeldung mit Zeilenangabe?</h3>
+  <p>Anders als HTML verzeiht XML keine Fehler: ein nicht geschlossenes Element, ein <code>&amp;</code> ohne Entität, ein Attribut ohne Anführungszeichen — und die Datei gilt als ungültig. Die Meldung nennt Zeile und Spalte der Stelle, an der der Parser ausgestiegen ist.</p>
+  <h3>Was kostet das? Brauche ich ein Konto?</h3>
+  <p>Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Für JSON gibt es das Schwesterwerkzeug <a href="../json-lesen/index.html">JSON lesen</a>; zwei Fassungen einer XML-Datei stellt <a href="../vergleichen/index.html">Vergleichen</a> nebeneinander.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script>
+let xdoc = null, wurzel = null, basisName = 'daten';
+let wurzelEl = null, begriff = '', treffer = [], trefferI = -1, gedeckelt = false;
+
+const BLOCK = 500;        // Kinder je Renderblock
+const WERT_MAX = 200;     // Zeichen, ab denen Textinhalte gekürzt werden
+const TREFFER_MAX = 1000;
+
+const BEISPIEL = `<?xml version="1.0" encoding="UTF-8"?>
+<kunden stand="2026-08-17">
+  <kunde id="1">
+    <name>Anna Beispiel</name>
+    <adresse><ort>Berlin</ort><plz>10115</plz></adresse>
+  </kunde>
+  <kunde id="2">
+    <name>Bernd Muster</name>
+    <adresse><ort>Köln</ort><plz>50667</plz></adresse>
+  </kunde>
+  <!-- Export aus der Warenwirtschaft -->
+</kunden>`;
+
+function einzug(){
+  const w = AK.$('#einzug').value;
+  return w === 'tab' ? '\t' : ' '.repeat(+w);
+}
+
+function melde(text, istFehler){
+  const el = AK.$('#meldung');
+  el.hidden = !text;
+  el.textContent = text;
+  el.classList.toggle('fehler', !!istFehler);
+}
+
+/* Zeile/Spalte aus der parsererror-Meldung ziehen — Chrome („error on line 1 at
+   column 9“) und Firefox (engl. wie dt. „Zeile Nr. 1, Spalte 9“) formulieren anders */
+function fehlerOrt(t){
+  let m = t.match(/line[^\d]*(\d+)[^\d]+column[^\d]*(\d+)/i);
+  if(!m) m = t.match(/Zeile(?:\s*Nr\.)?\s*(\d+)[^\d]+Spalte\s*(\d+)/i);
+  return m ? { zeile: +m[1], spalte: +m[2] } : null;
+}
+
+function fehlerGrund(t){
+  const m = t.match(/column\s*\d+:\s*([^\n]+)/i);
+  if(m) return m[1].trim();
+  return t.split('\n').map(z => z.trim()).filter(Boolean)[0]?.slice(0, 140) || 'kein gültiges XML';
+}
+
+/* Die Knoten eines Elements, die im Baum eine Zeile bekommen */
+function kinderVon(el){
+  return [...el.childNodes].filter(n =>
+    n.nodeType === 1 || n.nodeType === 8 || n.nodeType === 7 || n.nodeType === 4 ||
+    (n.nodeType === 3 && n.nodeValue.trim()));
+}
+
+/* Elemente, die nur Text enthalten (oder leer sind), werden als eine Zeile gezeigt */
+function istKompakt(el){
+  return kinderVon(el).every(n => n.nodeType === 3 || n.nodeType === 4);
+}
+
+/* Pfadstück im XPath-Stil: /kunde[2], Index nur bei gleichnamigen Geschwistern */
+function elementSeg(el){
+  const eltern = el.parentNode;
+  let n = 0, ich = 0;
+  if(eltern && eltern.children){
+    for(const g of eltern.children) if(g.nodeName === el.nodeName){ n++; if(g === el) ich = n; }
+  }
+  return '/' + el.nodeName + (n > 1 ? '[' + ich + ']' : '');
+}
+
+function gekuerzt(container, text, klasse){
+  const s = document.createElement('span');
+  s.className = klasse;
+  if(text.length > WERT_MAX){
+    s.textContent = text.slice(0, WERT_MAX) + '…';
+    const mehr = document.createElement('button');
+    mehr.type = 'button'; mehr.className = 'mehr'; mehr.textContent = 'mehr anzeigen';
+    mehr.onclick = ev => { ev.stopPropagation(); s.textContent = text; };
+    s.append(mehr);
+  } else s.textContent = text;
+  container.append(s);
+}
+
+/* Öffnenden Tag mit Attributen in eine Zeile schreiben */
+function tagInhalt(ziel, el){
+  const t = document.createElement('span');
+  t.className = 'tag'; t.textContent = '<' + el.nodeName;
+  ziel.append(t);
+  for(const a of el.attributes){
+    const sp = document.createElement('span');
+    sp.className = 'attr'; sp.dataset.attr = a.name;
+    sp.textContent = ' ' + a.name + '="' + a.value + '"';
+    sp.title = 'Klick: Pfad des Attributs';
+    ziel.append(sp);
+  }
+  const zu = document.createElement('span');
+  zu.className = 'tag'; zu.textContent = '>';
+  ziel.append(zu);
+  // Namensraum nur zeigen, wenn er sich vom Elternelement unterscheidet
+  const elternNs = el.parentNode && el.parentNode.nodeType === 1 ? el.parentNode.namespaceURI : null;
+  if(el.namespaceURI && el.namespaceURI !== elternNs){
+    const ns = document.createElement('span');
+    ns.className = 'ns'; ns.textContent = el.namespaceURI;
+    ziel.append(ns);
+  }
+}
+
+function knoten(n, tiefe){
+  if(n.nodeType === 1){
+    if(istKompakt(n)){
+      const div = document.createElement('div');
+      div.className = 'zeile blatt';
+      div.tabIndex = 0;
+      div.dataset.k = n.nodeName; div.dataset.seg = elementSeg(n);
+      div._knoten = n;
+      tagInhalt(div, n);
+      const text = kinderVon(n).map(k => k.nodeValue.trim()).join(' ');
+      if(text){ div.append(' '); gekuerzt(div, text, 'w'); }
+      else { const l = document.createElement('span'); l.className = 'leer'; l.textContent = ' (leer)'; div.append(l); }
+      return div;
+    }
+    const det = document.createElement('details');
+    det.dataset.k = n.nodeName; det.dataset.seg = elementSeg(n);
+    det._knoten = n;
+    det._kinder = kinderVon(n);
+    det._pos = 0;
+    const sum = document.createElement('summary');
+    sum.className = 'zeile';
+    tagInhalt(sum, n);
+    const anz = document.createElement('span');
+    anz.className = 'anz';
+    anz.textContent = det._kinder.length === 1 ? '1 Eintrag' : det._kinder.length.toLocaleString('de-DE') + ' Einträge';
+    sum.append(anz);
+    det.append(sum);
+    if(tiefe < 2){ det.open = true; baueKinder(det, tiefe); }
+    return det;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'zeile blatt';
+  div._knoten = n.parentNode;   // Text/Kommentar zählt als Teil des Elternelements
+  if(n.nodeType === 8){
+    gekuerzt(div, '<!-- ' + n.nodeValue.trim() + ' -->', 'kom');
+  } else if(n.nodeType === 4){
+    const b = document.createElement('span'); b.className = 'cdata'; b.textContent = 'CDATA';
+    div.append(b);
+    gekuerzt(div, n.nodeValue, 'w');
+  } else if(n.nodeType === 7){
+    gekuerzt(div, '<?' + n.target + ' ' + n.data + '?>', 'kom');
+  } else {
+    gekuerzt(div, n.nodeValue.trim(), 'w');
+  }
+  return div;
+}
+
+function baueKinder(det, tiefe){
+  const alterMehr = det.querySelector(':scope > .mehrblock');
+  if(alterMehr) alterMehr.remove();
+  const gesamt = det._kinder.length;
+  const bis = Math.min(det._pos + BLOCK, gesamt);
+  const frag = document.createDocumentFragment();
+  for(let i = det._pos; i < bis; i++) frag.append(knoten(det._kinder[i], (tiefe ?? 99) + 1));
+  det._pos = bis;
+  det.append(frag);
+  if(bis < gesamt){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ghost klein mehrblock';
+    b.textContent = `Weitere ${Math.min(BLOCK, gesamt - bis).toLocaleString('de-DE')} von ${gesamt.toLocaleString('de-DE')} anzeigen`;
+    b.onclick = () => baueKinder(det);
+    det.append(b);
+  }
+  if(begriff) markiereTreffer(det);
+}
+
+function zeichneBaum(){
+  const baum = AK.$('#baum');
+  baum.innerHTML = '';
+  wurzelEl = knoten(wurzel, 0);
+  baum.append(wurzelEl);
+  AK.$('#pfad').textContent = '—';
+}
+
+function waehle(z, attrName){
+  document.querySelectorAll('#baum .aktiv').forEach(el => el.classList.remove('aktiv'));
+  z.classList.add('aktiv');
+  const traeger = z.tagName === 'SUMMARY' ? z.parentElement : z;
+  const teile = [];
+  let n = traeger;
+  const baum = AK.$('#baum');
+  while(n && n !== baum){
+    if(n.dataset && n.dataset.seg) teile.unshift(n.dataset.seg);
+    n = n.parentElement;
+  }
+  let pfad = teile.join('');
+  if(attrName) pfad += '/@' + attrName;
+  AK.$('#pfad').textContent = pfad || '(Wurzel)';
+}
+
+/* Passt ein Element zum Suchbegriff? Name, Attribute oder direkter Textinhalt */
+function passtElement(el){
+  if(el.nodeName.toLowerCase().includes(begriff)) return true;
+  for(const a of el.attributes)
+    if(a.name.toLowerCase().includes(begriff) || a.value.toLowerCase().includes(begriff)) return true;
+  for(const kn of el.childNodes)
+    if((kn.nodeType === 3 || kn.nodeType === 4 || kn.nodeType === 8) &&
+       kn.nodeValue.toLowerCase().includes(begriff)) return true;
+  return false;
+}
+
+function sucheLauf(){
+  begriff = AK.$('#suche').value.trim().toLowerCase();
+  treffer = []; trefferI = -1; gedeckelt = false;
+  markiereTreffer(AK.$('#baum'));
+  if(!wurzel || !begriff){ zeigeTrefferstand(); return; }
+  const stapel = [wurzel];
+  while(stapel.length){
+    if(treffer.length >= TREFFER_MAX){ gedeckelt = true; break; }
+    const el = stapel.pop();
+    if(passtElement(el)) treffer.push(el);
+    for(let i = el.children.length - 1; i >= 0; i--) stapel.push(el.children[i]);
+  }
+  zeigeTrefferstand();
+  if(treffer.length) springe(1);
+}
+
+function zeigeTrefferstand(){
+  const el = AK.$('#tstand');
+  if(!begriff){ el.textContent = ''; return; }
+  if(!treffer.length){ el.textContent = 'keine Treffer'; return; }
+  const n = treffer.length.toLocaleString('de-DE') + (gedeckelt ? '+' : '');
+  el.textContent = trefferI < 0 ? n + ' Treffer' : `Treffer ${trefferI + 1} von ${n}`;
+}
+
+function markiereTreffer(container){
+  container.querySelectorAll('.zeile').forEach(z => {
+    const traeger = z.tagName === 'SUMMARY' ? z.parentElement : z;
+    const el = traeger._knoten;
+    z.classList.toggle('treffer', !!(begriff && el && el.nodeType === 1 && passtElement(el)));
+  });
+}
+
+/* Ein Element im Baum sichtbar machen: Ahnen öffnen, Blöcke nachbauen */
+function zeige(ziel){
+  const kette = [];
+  for(let n = ziel; n && n.nodeType === 1; n = n.parentNode) kette.unshift(n);
+  let det = wurzelEl;
+  for(let i = 1; i < kette.length; i++){
+    if(det.tagName !== 'DETAILS') return det;
+    det.open = true;
+    let kind = null;
+    for(;;){
+      kind = [...det.children].find(c => c._knoten === kette[i] && c.dataset && c.dataset.seg);
+      if(kind) break;
+      if(det._pos >= det._kinder.length) break;
+      baueKinder(det);
+    }
+    if(!kind) return null;
+    det = kind;
+  }
+  if(det.tagName === 'DETAILS') det.open = true;
+  return det;
+}
+
+function springe(richtung){
+  if(!treffer.length) return;
+  trefferI = (trefferI + richtung + treffer.length) % treffer.length;
+  zeigeTrefferstand();
+  const el = zeige(treffer[trefferI]);
+  if(!el) return;
+  const zeile = el.tagName === 'DETAILS' ? el.firstElementChild : el;
+  waehle(zeile);
+  zeile.scrollIntoView({ block: 'center' });
+}
+
+function statistik(){
+  let elemente = 0, attribute = 0, texte = 0, kommentare = 0, tiefeMax = 0;
+  const stapel = [[wurzel, 1]];
+  while(stapel.length){
+    const [el, t] = stapel.pop();
+    elemente++; attribute += el.attributes.length; tiefeMax = Math.max(tiefeMax, t);
+    for(const kn of el.childNodes){
+      if(kn.nodeType === 3 && kn.nodeValue.trim()) texte++;
+      else if(kn.nodeType === 4) texte++;
+      else if(kn.nodeType === 8) kommentare++;
+    }
+    for(let i = el.children.length - 1; i >= 0; i--) stapel.push([el.children[i], t + 1]);
+  }
+  for(const kn of xdoc.childNodes) if(kn.nodeType === 8) kommentare++;
+  AK.$('#knoten').innerHTML = elemente.toLocaleString('de-DE') + '<small>' + (elemente === 1 ? 'Element' : 'Elemente') + '</small>';
+  AK.$('#statistik').innerHTML = [
+    elemente + (elemente === 1 ? ' Element' : ' Elemente'),
+    attribute + (attribute === 1 ? ' Attribut' : ' Attribute'),
+    texte + ' Textknoten',
+    kommentare + (kommentare === 1 ? ' Kommentar' : ' Kommentare'),
+    'Tiefe ' + tiefeMax
+  ].map(s => `<span>${s}</span>`).join('');
+}
+
+/* ---------- Formatierter Download ---------- */
+
+const escText = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escAttr = s => escText(s).replace(/"/g, '&quot;');
+
+function istGemischt(el){
+  let text = false, kind = false;
+  for(const n of el.childNodes){
+    if(n.nodeType === 1) kind = true;
+    else if((n.nodeType === 3 || n.nodeType === 4) && n.nodeValue.trim()) text = true;
+  }
+  return text && kind;
+}
+
+/* Eigener Serializer: der eingebaute XMLSerializer rückt nicht ein. Gemischte
+   Inhalte (Text neben Elementen) werden unverändert übernommen — dort gehört
+   der Weißraum zum Inhalt, Einrücken würde die Bedeutung verändern. */
+function serialisiere(el, ez, tiefe, mini){
+  const pre = mini ? '' : ez.repeat(tiefe);
+  const nl = mini ? '' : '\n';
+  let att = '';
+  for(const a of el.attributes) att += ' ' + a.name + '="' + escAttr(a.value) + '"';
+  const kinder = kinderVon(el);
+  if(!kinder.length) return pre + '<' + el.nodeName + att + '/>' + nl;
+  if(istGemischt(el)) return pre + new XMLSerializer().serializeToString(el) + nl;
+  if(kinder.every(n => n.nodeType === 3 || n.nodeType === 4)){
+    const inhalt = kinder.map(n => n.nodeType === 4
+      ? '<![CDATA[' + n.nodeValue + ']]>' : escText(n.nodeValue.trim())).join('');
+    return pre + '<' + el.nodeName + att + '>' + inhalt + '</' + el.nodeName + '>' + nl;
+  }
+  let s = pre + '<' + el.nodeName + att + '>' + nl;
+  for(const n of kinder){
+    if(n.nodeType === 1) s += serialisiere(n, ez, tiefe + 1, mini);
+    else s += (mini ? '' : ez.repeat(tiefe + 1)) + new XMLSerializer().serializeToString(n) + nl;
+  }
+  return s + pre + '</' + el.nodeName + '>' + nl;
+}
+
+function ausgabeText(){
+  const mini = AK.$('#modus').value === 'minimiert';
+  // Die originale XML-Deklaration steht nicht im DOM — sie wird neu vorangestellt
+  let aus = '<?xml version="1.0" encoding="UTF-8"?>' + (mini ? '' : '\n');
+  for(const n of xdoc.childNodes){
+    if(n.nodeType === 1) aus += serialisiere(n, einzug(), 0, mini);
+    else if(n.nodeType === 8 || n.nodeType === 7)
+      aus += new XMLSerializer().serializeToString(n) + (mini ? '' : '\n');
+  }
+  return aus;
+}
+
+/* ---------- Ablauf ---------- */
+
+function leereAnzeige(){
+  AK.$('#baum').hidden = true; AK.$('#baum').innerHTML = ''; wurzelEl = null;
+  AK.$('#empty').style.display = '';
+  AK.$('#suchzeile').hidden = true; AK.$('#pfadzeile').hidden = true;
+  AK.$('#go').disabled = true; AK.$('#zuklappen').disabled = true;
+  AK.$('#knoten').innerHTML = '0<small>Elemente</small>';
+  AK.$('#statistik').innerHTML = '';
+  treffer = []; trefferI = -1;
+  zeigeTrefferstand();
+}
+
+function parse(){
+  const text = AK.$('#eingabe').value.replace(/^\uFEFF/, '').trim();
+  xdoc = null; wurzel = null;
+  if(!text){ melde(''); leereAnzeige(); return; }
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  // Chrome liefert bei Fehlern teils trotzdem einen Teilbaum — dann zählt nur der Fehler
+  const err = doc.querySelector('parsererror');
+  if(err){
+    const ort = fehlerOrt(err.textContent);
+    melde('Fehler: ' + fehlerGrund(err.textContent) +
+          (ort ? ` — Zeile ${ort.zeile}, Spalte ${ort.spalte}` : ''), true);
+    leereAnzeige();
+    return;
+  }
+  xdoc = doc; wurzel = doc.documentElement;
+  melde('Gültiges XML — keine Fehler gefunden.');
+  AK.$('#empty').style.display = 'none';
+  AK.$('#baum').hidden = false;
+  AK.$('#suchzeile').hidden = false; AK.$('#pfadzeile').hidden = false;
+  AK.$('#go').disabled = false; AK.$('#zuklappen').disabled = false;
+  zeichneBaum();
+  statistik();
+  if(begriff) sucheLauf();
+}
+
+async function addFiles(list){
+  const file = list.find(f => /\.(xml|svg|rss|atom|xsd|xslt?|txt)$/i.test(f.name));
+  if(!file) return;
+  basisName = file.name.replace(/\.[^.]+$/, '');
+  AK.$('#dateiname').value = basisName;
+  AK.$('#eingabe').value = await file.text();
+  parse();
+}
+
+AK.$('#baum').addEventListener('toggle', e => {
+  const det = e.target;
+  if(det.open && det._kinder && det._pos === 0) baueKinder(det);
+}, true);
+
+AK.$('#baum').addEventListener('click', e => {
+  if(e.target.closest('button')) return;
+  const attr = e.target.closest('.attr');
+  const z = e.target.closest('.zeile');
+  if(z) waehle(z, attr ? attr.dataset.attr : null);
+});
+AK.$('#baum').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.classList.contains('blatt')) waehle(e.target);
+});
+
+AK.$('#pfadkopie').onclick = async () => {
+  try{
+    await navigator.clipboard.writeText(AK.$('#pfad').textContent);
+    AK.log('Pfad kopiert.');
+  }catch(_){
+    AK.log('Kopieren nicht möglich — Pfad bitte von Hand markieren.', true);
+  }
+};
+
+AK.$('#zuklappen').onclick = () => {
+  document.querySelectorAll('#baum details[open]').forEach(d => { if(d !== wurzelEl) d.open = false; });
+};
+AK.$('#beispiel').onclick = () => { AK.$('#eingabe').value = BEISPIEL; parse(); };
+
+AK.$('#modus').addEventListener('change', () => {
+  AK.$('#f-einzug').hidden = AK.$('#modus').value === 'minimiert';
+});
+
+AK.$('#go').onclick = () => {
+  AK.clearDownloads(); AK.stamp(false);
+  try{
+    AK.offerDownload(new Blob([ausgabeText()], { type: 'application/xml;charset=utf-8' }),
+                     (AK.$('#dateiname').value || 'daten') + '.xml');
+    AK.stamp(true);
+  }catch(err){
+    AK.log('Konnte nicht serialisieren: ' + err.message, true);
+  }
+};
+
+let tippTimer = null;
+AK.$('#eingabe').addEventListener('input', () => {
+  clearTimeout(tippTimer);
+  tippTimer = setTimeout(parse, 300);
+});
+let suchTimer = null;
+AK.$('#suche').addEventListener('input', () => {
+  clearTimeout(suchTimer);
+  suchTimer = setTimeout(sucheLauf, 300);
+});
+AK.$('#suche').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); springe(e.shiftKey ? -1 : 1); }
+});
+AK.$('#tvor').onclick = () => springe(1);
+AK.$('#tzurueck').onclick = () => springe(-1);
+
+AK.dropzone('#drop', '#picker', addFiles);
+parse();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

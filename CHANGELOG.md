@@ -3,6 +3,19 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-17 (Werkzeug 48: XML lesen)
+
+### Hinzugefügt
+- Werkzeug **XML lesen** (`tools/xml-lesen/`) — das erste XML-Werkzeug der Seite: Baumansicht mit Elementen, Attributen, Kommentaren und CDATA, Suche über Namen, Attribute und Inhalte, XPath-artige Pfad-Anzeige (`/kunden/kunde[2]/name`, Klick auf ein Attribut hängt `/@id` an). Kaputtes XML wird mit Zeile und Spalte gemeldet — die stecken je nach Browser in ganz unterschiedlich formulierten `parsererror`-Meldungen, deshalb liest eine kleine Muster-Kaskade beide Formate. XML steckt in mehr Dateien, als man denkt: RSS, Atom, SVG, Rechnungsformate, Sitemaps — alles davon lässt sich hineinziehen.
+  - Der Download liefert die Datei **sauber eingerückt oder minimiert** — mit einem eigenen Serializer, weil der eingebaute `XMLSerializer` nicht einrücken kann. Wichtigste Regel darin: Abschnitte mit gemischtem Inhalt (Text neben Elementen) werden unverändert übernommen, denn dort gehört jedes Leerzeichen zum Inhalt; Einrücken würde die Bedeutung verändern.
+  - Elemente, die nur Text enthalten, stehen kompakt in einer Zeile (`<name id="1"> Anna`) statt als aufklappbarer Ast mit einem einzigen Kind — sonst bestünde ein Adressbuch fast nur aus Klapp-Pfeilen. Namensräume werden nur dort angezeigt, wo sie sich vom Elternelement unterscheiden.
+  - Baum, Suche und blockweises Nachladen übernehmen das Muster von „JSON lesen“ aus dem vorigen Eintrag.
+- Zwei Testfälle: Baum samt Statistik (5 Elemente, 2 Attribute, 1 Kommentar) und Pfad-Klick (`/kunden/kunde[2]/name`); der heruntergeladene formatierte Export wird zur Gegenprobe erneut geparst und muss fehlerfrei dieselben 5 Elemente ergeben — das sichert den handgeschriebenen Serializer ab. Dazu kaputtes XML, das eine Meldung mit Zeilenangabe zeigen muss. Jetzt 62 Prüfungen.
+
+### Geändert
+- Startseite: „Tabellen & Daten“ zählt jetzt 5 Karten; die Datei-Erkennung kennt erstmals `.xml`, `.rss`, `.atom`, `.xsd` und `.xsl`; „Weiter zu …“ führt vom XML-Reader zum Vergleichen und zu den Text-Werkzeugen.
+- FAQ: Werkzeugzahl auf 48, XML in der Formatliste ergänzt (JSON-LD neu erzeugt).
+
 ## 2026-08-17 (Werkzeug 47: JSON lesen)
 
 ### Hinzugefügt
