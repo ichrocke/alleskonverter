@@ -33,6 +33,7 @@ window.AK = window.AK || {};
     'pdf-formular':          ['pdf-passwort','pdf-komprimieren'],
     'pdf-zu-bild':           ['bild-konvertieren','bild-zuschneiden'],
     'schwaerzen':            ['pdf-komprimieren','bild-konvertieren'],
+    'pdf-text-ersetzen':     ['pdf-komprimieren','pdf-stempeln','pdf-passwort'],
     'bild-zu-pdf':           ['pdf-komprimieren','pdf-stempeln','pdf-zusammenfuegen'],
     'pdf-kontaktabzug':      ['pdf-komprimieren'],
 
@@ -80,7 +81,7 @@ window.AK = window.AK || {};
     'csv-bereinigen':'CSV bereinigen', 'vergleichen':'Texte & Tabellen vergleichen',
     'bildergalerie':'Bildergalerie als HTML', 'testdaten':'Testdaten & Blindtext',
     'termin':'Termin als ICS', 'regex':'Regex ausprobieren',
-    'schwaerzen':'Schwärzen (PDF & Bild)',
+    'schwaerzen':'Schwärzen (PDF & Bild)', 'pdf-text-ersetzen':'PDF-Text ersetzen',
   };
 
   const eigenes = () => {

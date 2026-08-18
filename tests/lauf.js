@@ -327,6 +327,44 @@ const FAELLE = [
       if(texte[0].trim()) throw new Error('Seite 1 enthält noch Text: ' + texte[0].slice(0,40));
       if(!texte[2].includes('Seite 3')) throw new Error('unmarkierte Seite verlor ihren Text');
     } },
+  { werkzeug:'pdf-text-ersetzen',  dateien:[['s.pdf', PDF3, 'application/pdf']],
+    vorher: async p => {
+      await p.waitForFunction(() => /3 Seiten gelesen/.test(document.querySelector('#log').textContent), {timeout:20000});
+      // Zwei Regeln: „Seite“ → „Blatt“ braucht Buchstaben, die im Dokument fehlen (Ersatzschrift);
+      // „1“ → „2“ kommt in der Originalschrift aus, weil die 2 auf Seite 2 steht
+      await p.click('#mehr');
+      await p.evaluate(() => {
+        const rows = document.querySelectorAll('.regel');
+        const setze = (r, s, e) => {
+          r.querySelector('.suchen').value = s; r.querySelector('.suchen').dispatchEvent(new Event('input'));
+          r.querySelector('.ersetzen').value = e; r.querySelector('.ersetzen').dispatchEvent(new Event('input'));
+        };
+        setze(rows[0], 'Seite', 'Blatt'); setze(rows[1], '1', '2');
+      });
+      await p.waitForFunction(() => /^4/.test(document.querySelector('#anzahl').textContent), {timeout:5000});
+      // Klick auf eine gelbe Markierung nimmt die Stelle aus — und wieder auf
+      await p.waitForSelector('.hl', {timeout:5000});
+      await p.evaluate(() => document.querySelector('.hl').click());
+      await p.waitForFunction(() => /^3/.test(document.querySelector('#anzahl').textContent), {timeout:5000});
+      await p.evaluate(() => document.querySelector('.hl.aus').click());
+      await p.waitForFunction(() => /^4/.test(document.querySelector('#anzahl').textContent), {timeout:5000});
+    },
+    pruefen: async p => {
+      // Gegenprobe: Ergebnis erneut lesen — der neue Text muss da sein, der alte weg
+      const texte = await p.evaluate(async () => {
+        const buf = await (await fetch(document.querySelector('a.download').href)).arrayBuffer();
+        const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+        const out = [];
+        for(let i = 1; i <= doc.numPages; i++){
+          const tc = await (await doc.getPage(i)).getTextContent();
+          out.push(tc.items.map(x => x.str).join('').replace(/\s+/g, ' ').trim());
+        }
+        return out;
+      });
+      if(JSON.stringify(texte) !== JSON.stringify(['Blatt 2', 'Blatt 2', 'Blatt 3'])) throw new Error('Text nach Ersetzen: ' + JSON.stringify(texte));
+      const log = await p.$eval('#log', e => e.textContent);
+      if(!/Originalschrift/.test(log) || !/Ersatzschrift/.test(log)) throw new Error('Protokoll nennt die Schriftwege nicht: ' + log.slice(0, 120));
+    } },
   { werkzeug:'schwaerzen',         dateien:[['b.png', PNG, 'image/png']],
     vorher: async p => {
       await p.waitForSelector('.flaeche canvas', {timeout:15000});

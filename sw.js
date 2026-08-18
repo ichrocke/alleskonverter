@@ -7,7 +7,7 @@
    • ffmpeg (~32 MB), Texterkennung (~19 MB)
                            → nur bei Bedarf, werden nach dem ersten Einsatz behalten
 */
-const VERSION = '2026-07-26b';
+const VERSION = '2026-08-18a';
 const CACHE = 'alleskonverter-' + VERSION;
 
 /* Beim Installieren: Grundgerüst und alle Bibliotheken mitnehmen (~5 MB).
@@ -137,7 +137,8 @@ self.addEventListener('fetch', event => {
 
   const pfad = url.pathname;
   const eigenerCode = pfad.startsWith('/css/') || pfad.startsWith('/js/') ||
-                      pfad.startsWith('/tools/qr-code/js/') || pfad.startsWith('/tools/qr-code/css/');
+                      pfad.startsWith('/tools/qr-code/js/') || pfad.startsWith('/tools/qr-code/css/') ||
+                      (pfad.startsWith('/tools/') && pfad.endsWith('.js'));
   const istSeite = request.mode === 'navigate' || pfad.endsWith('.html') || pfad.endsWith('/');
 
   event.respondWith((async () => {

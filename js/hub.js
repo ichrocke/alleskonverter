@@ -71,7 +71,7 @@
   /* ---------- Datei hineinziehen → passende Werkzeuge ---------- */
   const REGELN = [
     { test: n => /\.pdf$/i.test(n), art: 'PDF-Dokument',
-      tools: ['pdf-zusammenfuegen','pdf-aufteilen','pdf-bearbeiten','pdf-komprimieren','pdf-zu-bild','pdf-stempeln','pdf-text','pdf-passwort','schwaerzen','texterkennung'] },
+      tools: ['pdf-zusammenfuegen','pdf-aufteilen','pdf-bearbeiten','pdf-komprimieren','pdf-zu-bild','pdf-stempeln','pdf-text','pdf-text-ersetzen','pdf-passwort','schwaerzen','texterkennung'] },
     { test: n => /\.(hei[cf])$/i.test(n), art: 'iPhone-Foto (HEIC)',
       tools: ['bild-konvertieren','bild-zuschneiden','hintergrund-entfernen','bilder-zusammenfuegen','bild-zu-pdf','schwaerzen','bild-metadaten','texterkennung'] },
     { test: n => /\.(jpe?g|png|webp|gif|bmp|avif|tiff?)$/i.test(n), art: 'Bild',

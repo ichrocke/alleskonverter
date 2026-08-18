@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF-Text ersetzen — Wörter in einer PDF ändern, ohne Acrobat | Alleskonverter</title>
+<meta name="description" content="Text in einer bestehenden PDF ändern: Wörter, Namen, Daten oder Beträge suchen und ersetzen — direkt im Inhalt, nicht überdeckt. Kostenlos, ohne Upload, lokal im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/pdf-text-ersetzen/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="PDF-Text ersetzen — Wörter in einer PDF ändern | Alleskonverter">
+<meta property="og:description" content="Text in einer PDF suchen und ersetzen — direkt im Inhalt, nicht überdeckt. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/pdf-text-ersetzen/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF-Text ersetzen — Wörter in einer PDF ändern | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"PDF-Text ersetzen — Alleskonverter","url":"https://alleskonverter.de/tools/pdf-text-ersetzen/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Text in einer bestehenden PDF suchen und ersetzen — direkt im Inhalt der Datei, nicht überdeckt. Ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wird der Text wirklich ersetzt oder nur überdeckt?","acceptedAnswer":{"@type":"Answer","text":"Wirklich ersetzt. Der alte Text wird aus dem Inhaltsstrom der Seite entfernt und der neue an derselben Stelle eingesetzt — mit derselben Farbe, Größe und Ausrichtung. Alles andere auf der Seite bleibt Byte für Byte unverändert."}},{"@type":"Question","name":"Bleibt die Schrift erhalten?","acceptedAnswer":{"@type":"Answer","text":"Wenn alle Zeichen des neuen Textes in dieser Schrift bereits im Dokument vorkommen, ja — dann wird die eingebettete Originalschrift weiterverwendet. Fehlen Zeichen (etwa ein Buchstabe, der auf keiner Seite steht), wird eine passende Standardschrift gewählt: serifenlos, mit Serifen oder Schreibmaschine, fett oder kursiv wie das Original."}},{"@type":"Question","name":"Was passiert, wenn der neue Text länger ist?","acceptedAnswer":{"@type":"Answer","text":"Text in derselben Zeile rückt nach, soweit er zum ersetzten Stück gehört. Stößt der neue Text an separat gesetzten Nachbartext, wird er leicht schmaler gesetzt, damit er in die Lücke passt. Ein Umbruch auf die nächste Zeile ist in PDF nicht möglich — dafür braucht es das Ursprungsdokument."}},{"@type":"Question","name":"Wird meine PDF hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Verträge, Rechnungen, Zeugnisse — genau solche Dateien werden hier bearbeitet, und genau deshalb passiert alles im Browser auf deinem Gerät. Es gibt keinen Server, der die Datei annehmen könnte."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+.blatt{position:relative;margin-top:14px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:10px}
+.bnr{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px;display:flex;justify-content:space-between;gap:8px}
+.bnr .neu{color:var(--stamp)}
+.flaeche{position:relative;line-height:0;cursor:text}
+.flaeche canvas{width:100%;height:auto;display:block;background:#fff}
+.lage{position:absolute;inset:0}
+.hl{position:absolute;background:rgba(240,190,20,.42);outline:1px solid rgba(160,120,0,.7);border-radius:1px;cursor:pointer}
+.hl.aus{background:rgba(120,120,120,.18);outline-style:dashed}
+.hl.kaputt{background:rgba(169,53,32,.25);outline-color:var(--alert)}
+.hl.neu{background:rgba(27,77,62,.28);outline-color:var(--stamp);cursor:default}
+.hl.aktiv{outline-width:2px}
+.regel{display:grid;grid-template-columns:1fr auto 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.regel .pfeil{font-family:var(--mono);color:var(--ink-soft);font-size:13px}
+.regel input{width:100%;min-width:0}
+.regel .weg{width:28px;height:30px;padding:0;line-height:1;font-size:13px}
+.regel .zahl{grid-column:1/-1;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:-4px}
+.regel .zahl b{color:var(--alert);font-weight:500}
+.malhinweis{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px}
+label.check{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0 12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>PDF-Text <span>ersetzen</span></h1>
+  <p class="sub">Ein falscher Name, ein altes Datum, ein Betrag: Text in einer fertigen PDF suchen und ersetzen — direkt im Inhalt der Seite, in Originalgröße und -farbe. Wofür sonst ein Acrobat-Abo nötig wäre.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dokument</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>PDF hierher ziehen</strong>
+      <small>oder klicken zum Auswählen — Text muss als Text vorliegen, kein Scan</small>
+    </div>
+    <input type="file" id="picker" accept="application/pdf,.pdf" hidden>
+
+    <p class="malhinweis" id="malhinweis" hidden>Ein Klick auf eine Textstelle übernimmt sie ins Suchfeld. Ein Klick auf eine gelbe Markierung nimmt genau diese Stelle vom Ersetzen aus.</p>
+    <div id="stapel"></div>
+    <div class="empty" id="empty">Noch nichts geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Suchen &amp; ersetzen</h2>
+    <div id="regeln"></div>
+    <button class="ghost" id="mehr" type="button" style="width:100%">+ weitere Regel</button>
+    <label class="check"><input type="checkbox" id="gross"> Groß-/Kleinschreibung beachten</label>
+
+    <div class="count" id="anzahl">0<small>Stellen werden ersetzt</small></div>
+    <div class="hint" id="hinweis" style="margin:6px 0 14px"></div>
+
+    <div class="field" id="f-pw" hidden>
+      <label for="pw">Öffnungspasswort</label>
+      <input type="password" id="pw" autocomplete="off">
+    </div>
+
+    <button class="primary" id="go" disabled>Geändertes PDF speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Die Rechnung ist raus, aber die Adresse stimmt nicht mehr. Der Vertrag liegt nur noch als PDF vor, und ein Datum muss geändert werden. Das Zeugnis-Muster braucht einen anderen Namen. In all diesen Fällen fehlt das Ursprungsdokument — und ein PDF-Editor mit Abo ist für ein Wort zu viel. Hier lädst du die PDF, gibst an, was durch was ersetzt werden soll, siehst jede Fundstelle gelb markiert und speicherst. Die Datei verlässt dabei dein Gerät nicht.</p>
+  <h3>Wird der Text wirklich ersetzt oder nur überdeckt?</h3>
+  <p>Wirklich ersetzt. Viele „PDF-Editoren“ legen ein weißes Kästchen über den alten Text und schreiben den neuen darüber — der alte bleibt in der Datei, kopierbar und durchsuchbar. Dieses Werkzeug arbeitet im Inhaltsstrom der Seite: Genau die Bytes, die den alten Text zeichnen, werden entfernt und durch die neuen ersetzt. Farbe, Größe und Ausrichtung übernimmt der neue Text von der Stelle, an der er steht; alles Übrige auf der Seite bleibt unverändert und verlustfrei erhalten.</p>
+  <h3>Bleibt die Schrift erhalten?</h3>
+  <p>Wenn es geht, ja. PDFs betten meist nur die tatsächlich benutzten Buchstaben einer Schrift ein. Kommen alle Zeichen deines neuen Textes in dieser Schrift irgendwo im Dokument vor, wird die eingebettete Originalschrift weiterverwendet — das Ergebnis ist dann nicht vom Original zu unterscheiden. Fehlt ein Zeichen, springt eine passende Standardschrift ein: serifenlos, mit Serifen oder in Schreibmaschinenschrift, fett oder kursiv wie das Original. Das Protokoll sagt dir für jede Stelle, welcher Weg gegangen wurde.</p>
+  <h3>Was passiert, wenn der neue Text länger oder kürzer ist?</h3>
+  <p>PDF kennt keinen Textfluss: Jede Zeile steht, wo sie steht, ein Umbruch auf die nächste Zeile ist nicht möglich. Innerhalb der Zeile rückt der Text nach, der zum ersetzten Stück gehört. Stößt der neue Text an separat gesetzten Nachbartext, wird er leicht schmaler gesetzt, damit er in die Lücke passt (das Protokoll nennt dann den Prozentwert). Für längere Umformulierungen ist das Ursprungsdokument der richtige Ort — dieses Werkzeug ist für Wörter, Zahlen und kurze Passagen gedacht.</p>
+  <h3>Warum findet das Werkzeug meinen Text nicht?</h3>
+  <p>Drei häufige Gründe: Die PDF ist ein Scan — dann ist der Text nur ein Bild; die <a href="../texterkennung/index.html">Texterkennung</a> holt ihn heraus, ändern lässt er sich so aber nicht. Der Text steckt in einem Formularfeld oder Kommentar — die werden hier nicht angefasst. Oder das Wort ist im PDF in Einzelbuchstaben mit ungewöhnlicher Positionierung zerlegt, wie es manche Layoutprogramme tun; dann hilft es, kürzer zu suchen.</p>
+  <h3>Wird meine PDF hochgeladen?</h3>
+  <p>Nein. Verträge, Rechnungen, Zeugnisse — genau solche Dateien landen hier, und genau deshalb passiert alles im Browser auf deinem Gerät. Es gibt keinen Server, der die Datei annehmen könnte. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p><strong>Grenzen, ehrlich benannt:</strong> Formularfelder, Kommentare und Text in Bildern bleiben unberührt; verschlüsselte PDFs erst mit <a href="../pdf-passwort/index.html">PDF-Passwort</a> entsperren; für Scans zuerst <a href="../pdf-durchsuchbar/index.html">durchsuchbar machen</a> — ändern lässt sich Bildtext aber nicht. Wer Stellen entfernen statt ändern will, ist beim <a href="../schwaerzen/index.html">Schwärzen</a> richtig.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/pdf-lib.min.js"></script>
+<script src="../../vendor/pdf.min.js"></script>
+<script src="../../js/ui.js?v=20260804"></script>
+<script src="../../js/uebergabe.js?v=20260804"></script>
+<script src="../../js/weiter.js?v=20260804"></script>
+<script src="../../js/einstellungen.js?v=20260804"></script>
+<script src="../../js/dropzone.js?v=20260804"></script>
+<script src="../../js/pdf-common.js?v=20260804"></script>
+<script src="textstrom.js?v=20260818"></script>
+<script>
+const { PDFDocument, PDFName, PDFDict, PDFRef, StandardFonts } = PDFLib;
+const T = AK.textstrom;
+
+let src = null;            // { bytes, name }
+let pdfjsDoc = null;       // Original (pdf.js)
+let ergebnisDoc = null;    // zuletzt gespeichertes Ergebnis (pdf.js), für die Vorschau
+let seiten = [];           // je Seite: { i, vp, canvas, lage, analyse, glyphen, gerendert, sichtbar, quelle, neuQuads }
+let fonts = new Map();     // loadedName → { map, bpc } (gesehene Glyphen je Schrift)
+let fontObj = {};          // loadedName → pdf.js-Schriftobjekt
+let regeln = [];           // { suchen, ersetzen, el }
+let treffer = [];          // { p, li, at, len, regel, kaputt, key }
+let ausgeschlossen = new Set();
+let aktiveRegel = 0;
+let basis = 'dokument';
+let io = null;
+let timer = null;
+
+/* ---------- Regeln (Suchen → Ersetzen) ---------- */
+function regelAnlegen(suchen, ersetzen){
+  const el = document.createElement('div');
+  el.className = 'regel';
+  el.innerHTML = '<input type="text" class="suchen" placeholder="Suchen" aria-label="Suchen" autocomplete="off">' +
+    '<span class="pfeil">→</span>' +
+    '<input type="text" class="ersetzen" placeholder="Ersetzen durch" aria-label="Ersetzen durch" autocomplete="off">' +
+    '<button type="button" class="ghost weg" aria-label="Regel entfernen">✕</button>' +
+    '<div class="zahl"></div>';
+  const r = { suchen: suchen || '', ersetzen: ersetzen || '', el };
+  const inS = el.querySelector('.suchen'), inE = el.querySelector('.ersetzen');
+  inS.value = r.suchen; inE.value = r.ersetzen;
+  inS.addEventListener('input', () => { r.suchen = inS.value; planen(); });
+  inE.addEventListener('input', () => { r.ersetzen = inE.value; planen(); });
+  [inS, inE].forEach(x => x.addEventListener('focus', () => { aktiveRegel = regeln.indexOf(r); }));
+  el.querySelector('.weg').onclick = () => {
+    if(regeln.length === 1){ r.suchen = ''; r.ersetzen = ''; inS.value = ''; inE.value = ''; planen(); return; }
+    regeln.splice(regeln.indexOf(r), 1); el.remove(); aktiveRegel = 0; planen();
+  };
+  AK.$('#regeln').appendChild(el);
+  regeln.push(r);
+  return r;
+}
+AK.$('#mehr').onclick = () => { const r = regelAnlegen(); r.el.querySelector('.suchen').focus(); };
+AK.$('#gross').addEventListener('change', planen);
+regelAnlegen();
+
+function planen(){ clearTimeout(timer); timer = setTimeout(aktualisiere, 150); }
+
+/* ---------- Laden ---------- */
+function leeren(){
+  seiten = []; pdfjsDoc = null; ergebnisDoc = null; fonts = new Map(); fontObj = {}; treffer = []; ausgeschlossen = new Set();
+  if(io) io.disconnect();
+  AK.$('#stapel').innerHTML = '';
+  AK.$('#empty').style.display = '';
+  AK.$('#malhinweis').hidden = true;
+  zaehle();
+}
+
+async function addFiles(list){
+  const file = list.find(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  leeren();
+  basis = file.name.replace(/\.[^.]+$/, '');
+  try{
+    await lade(file);
+    AK.$('#empty').style.display = 'none';
+    AK.$('#malhinweis').hidden = false;
+    AK.$('#f-pw').hidden = true;
+  }catch(err){
+    leeren();
+    if(err && err.name === 'PasswordException'){
+      AK.$('#f-pw').hidden = false;
+      AK.log('Dieses PDF braucht ein Öffnungspasswort — eingeben und Datei erneut hineinziehen. Ändern lässt sich der Text erst nach dem Entfernen des Schutzes (Werkzeug „PDF-Passwort“).', true);
+    }else{
+      console.error(err);
+      AK.log('Datei kann nicht gelesen werden — vermutlich beschädigt.', true);
+    }
+  }
+  aktualisiere();
+}
+
+async function lade(file){
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const pw = AK.$('#pw').value;
+  const doc = await pdfjsLib.getDocument({ data: bytes.slice(), password: pw || '', fontExtraProperties: true }).promise;
+  src = { bytes, name: file.name };
+  let lib;
+  try{ lib = await PDFDocument.load(bytes.slice(), { ignoreEncryption: true, updateMetadata: false }); }
+  catch(e){ await doc.destroy(); throw e; }
+  if(lib.isEncrypted){
+    await doc.destroy();
+    src = null;
+    AK.log('Diese PDF ist verschlüsselt (auch wenn sie sich öffnen lässt). Text lässt sich nur in einer ungeschützten Datei ändern — bitte zuerst mit „PDF-Passwort“ den Schutz entfernen.', true);
+    return;
+  }
+  const n = doc.numPages;
+  AK.log(`${file.name}: ${n} Seiten werden gelesen …`);
+  const t0 = performance.now();
+  for(let i = 0; i < n; i++){
+    const page = await doc.getPage(i + 1);
+    const vp = page.getViewport({ scale: 1 });
+    const s = seiteAnlegen(i, vp, n);
+    let analyse, glyphen = [];
+    try{
+      const ol = await page.getOperatorList({ annotationMode: pdfjsLib.AnnotationMode.DISABLE });
+      glyphen = await sammleGlyphen(page, ol);
+      analyse = T.analysiere({ doc: lib, page: lib.getPage(i), fonts, glyphenListe: glyphen, fontObj });
+    }catch(err){
+      console.warn('Seite ' + (i+1), err);
+      analyse = { streams: [], runs: [], lines: [], fehler: [err && err.message || 'Fehler'] };
+    }
+    page.cleanup();
+    s.analyse = analyse; s.glyphen = glyphen;
+    AK.bar((i + 1) / n);
+    if(i % 4 === 3) await new Promise(r => setTimeout(r));   // Luft für die Oberfläche
+  }
+  pdfjsDoc = doc;
+  const kaputte = seiten.filter(s => s.analyse.fehler.length);
+  const textlos = seiten.every(s => !s.analyse.runs.length);
+  AK.logClear(); AK.bar(0);
+  AK.log(`${n === 1 ? '1 Seite' : n + ' Seiten'} gelesen${performance.now() - t0 > 1500 ? ` (${((performance.now() - t0) / 1000).toFixed(1)} s)` : ''}. Jetzt rechts eintragen, was ersetzt werden soll — oder auf eine Textstelle klicken.`);
+  if(textlos) AK.log('Auf keiner Seite wurde Text gefunden. Vermutlich ein Scan — dann liegt der Text nur als Bild vor und lässt sich hier nicht ändern.', true);
+  else if(kaputte.length) AK.log(`Auf ${kaputte.length === 1 ? 'Seite ' + (kaputte[0].i + 1) : kaputte.length + ' Seiten'} hat der Seiteninhalt eine ungewöhnliche Struktur (${kaputte[0].analyse.fehler[0]}); dort ist kein Ersetzen möglich.`);
+  // Seiten erst zeichnen, wenn sie ins Bild kommen
+  io = new IntersectionObserver(eintraege => {
+    for(const e of eintraege){
+      const s = seiten[+e.target.dataset.i];
+      if(!s) continue;
+      s.sichtbar = e.isIntersecting;
+      if(e.isIntersecting) rendere(s);
+    }
+  }, { rootMargin: '600px 0px' });
+  seiten.forEach(s => io.observe(s.blatt));
+}
+
+/* pdf.js liefert Fonts erst nach und nach — hier warten, bis alle da sind, und je
+   Textoperator festhalten, welche Schrift gerade galt. */
+async function sammleGlyphen(page, ol){
+  const OPS = pdfjsLib.OPS;
+  const stapel = []; let cur = { loaded: null, size: 0 }; const out = [];
+  const gebraucht = new Set();
+  for(let k = 0; k < ol.fnArray.length; k++){
+    const fn = ol.fnArray[k], a = ol.argsArray[k];
+    switch(fn){
+      case OPS.setFont: cur = { loaded: a[0], size: a[1] }; if(a[0]) gebraucht.add(a[0]); break;
+      case OPS.save: case OPS.paintFormXObjectBegin: stapel.push(cur); break;
+      case OPS.restore: case OPS.paintFormXObjectEnd: if(stapel.length) cur = stapel.pop(); break;
+      case OPS.showText: out.push({ loaded: cur.loaded, size: cur.size, glyphs: a[0] || [] }); break;
+      default: break;
+    }
+  }
+  for(const name of gebraucht){
+    if(fontObj[name]) continue;
+    fontObj[name] = await new Promise(res => {
+      try{
+        if(page.commonObjs.has(name)) return res(page.commonObjs.get(name));
+        page.commonObjs.get(name, obj => res(obj));
+        setTimeout(() => res(null), 4000);
+      }catch(_){ res(null); }
+    });
+  }
+  return out;
+}
+
+/* ---------- Anzeige ---------- */
+function seiteAnlegen(i, vp, n){
+  const blatt = document.createElement('div');
+  blatt.className = 'blatt'; blatt.dataset.i = i;
+  const h = document.createElement('div');
+  h.className = 'bnr'; h.innerHTML = `<span>Seite ${i + 1}</span><span class="neu"></span>`;
+  blatt.appendChild(h);
+  const fl = document.createElement('div');
+  fl.className = 'flaeche';
+  const canvas = document.createElement('canvas');
+  const scale = Math.min(n > 20 ? 1.1 : 1.6, 860 / vp.width);
+  canvas.width = Math.round(vp.width * scale); canvas.height = Math.round(vp.height * scale);
+  const lage = document.createElement('div');
+  lage.className = 'lage';
+  fl.appendChild(canvas); fl.appendChild(lage);
+  blatt.appendChild(fl);
+  AK.$('#stapel').appendChild(blatt);
+  const s = { i, vp, scale, blatt, canvas, lage, analyse: null, glyphen: [], gerendert: false, laeuft: false, sichtbar: false, quelle: 'original', neuQuads: [] };
+  seiten.push(s);
+  lage.addEventListener('click', ev => klickAufSeite(ev, s));
+  return s;
+}
+
+async function rendere(s){
+  if(s.gerendert || s.laeuft) return;
+  const doc = s.quelle === 'ergebnis' && ergebnisDoc ? ergebnisDoc : pdfjsDoc;
+  if(!doc) return;
+  s.laeuft = true;
+  try{
+    const page = await doc.getPage(s.i + 1);
+    const vpS = page.getViewport({ scale: s.scale });
+    const ctx = s.canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, s.canvas.width, s.canvas.height);
+    await page.render({ canvasContext: ctx, viewport: vpS }).promise;
+    page.cleanup();
+    s.gerendert = true;
+  }catch(err){ console.warn(err); }
+  s.laeuft = false;
+}
+
+/* Vier Ecken im Seitensystem → Rechteck in Prozent der Anzeigefläche */
+function quadZuBox(s, quad){
+  const pts = quad.map(([x, y]) => s.vp.convertToViewportPoint(x, y));
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  return { l: x0 / s.vp.width * 100, t: y0 / s.vp.height * 100, w: (x1 - x0) / s.vp.width * 100, h: (y1 - y0) / s.vp.height * 100 };
+}
+
+function zeichneMarkierungen(s){
+  s.lage.innerHTML = '';
+  const meine = treffer.filter(t => t.p === s.i);
+  const frag = document.createDocumentFragment();
+  for(const q of s.neuQuads){
+    const b = quadZuBox(s, q);
+    const d = document.createElement('div');
+    d.className = 'hl neu';
+    d.style.cssText = `left:${b.l}%;top:${b.t}%;width:${b.w}%;height:${b.h}%`;
+    frag.appendChild(d);
+  }
+  if(s.quelle === 'original'){
+    for(const t of meine){
+      const line = s.analyse.lines[t.li];
+      const b = quadZuBox(s, T.trefferQuad(line, t));
+      const d = document.createElement('div');
+      d.className = 'hl' + (t.kaputt ? ' kaputt' : ausgeschlossen.has(t.key) ? ' aus' : '');
+      d.style.cssText = `left:${b.l}%;top:${b.t}%;width:${b.w}%;height:${b.h}%`;
+      d.title = t.kaputt ? 'Nicht ersetzbar: ' + t.kaputt : (ausgeschlossen.has(t.key) ? 'Ausgenommen — Klick nimmt die Stelle wieder auf' : 'Klick nimmt diese Stelle vom Ersetzen aus');
+      d.dataset.key = t.key;
+      frag.appendChild(d);
+    }
+  }
+  s.lage.appendChild(frag);
+}
+
+function klickAufSeite(ev, s){
+  const hl = ev.target.closest('.hl');
+  if(hl && hl.dataset.key){
+    const t = treffer.find(x => x.key === hl.dataset.key);
+    if(t && t.kaputt){ AK.log('Diese Stelle lässt sich nicht ersetzen: ' + t.kaputt + '.'); return; }
+    if(ausgeschlossen.has(hl.dataset.key)) ausgeschlossen.delete(hl.dataset.key); else ausgeschlossen.add(hl.dataset.key);
+    zeichneMarkierungen(s); zaehle();
+    return;
+  }
+  if(!s.analyse || !s.analyse.runs.length) return;
+  // Textlauf unter dem Klick suchen (in Prozent der Fläche)
+  const r = s.lage.getBoundingClientRect();
+  const px = (ev.clientX - r.left) / r.width * 100, py = (ev.clientY - r.top) / r.height * 100;
+  if(!s.runBoxen) s.runBoxen = s.analyse.runs.map(run => ({ run, b: quadZuBox(s, T.runQuad(run)) }));
+  let best = null, bestFl = Infinity;
+  for(const { run, b } of s.runBoxen){
+    if(px >= b.l - 0.3 && px <= b.l + b.w + 0.3 && py >= b.t && py <= b.t + b.h){
+      const fl = b.w * b.h;
+      if(fl < bestFl){ best = run; bestFl = fl; }
+    }
+  }
+  if(!best) return;
+  const text = best.text.replace(/\s+/g, ' ').trim();
+  if(!text) return;
+  const regel = regeln[Math.min(aktiveRegel, regeln.length - 1)] || regelAnlegen();
+  regel.suchen = text;
+  regel.el.querySelector('.suchen').value = text;
+  regel.el.querySelector('.ersetzen').focus();
+  aktualisiere();
+}
+
+/* ---------- Suchen ---------- */
+function aktualisiere(){
+  treffer = [];
+  const gross = AK.$('#gross').checked;
+  if(pdfjsDoc){
+    // Zurück zur Originalansicht, sobald sich etwas ändert
+    for(const s of seiten){ if(s.quelle !== 'original'){ s.quelle = 'original'; s.gerendert = false; s.neuQuads = []; s.blatt.querySelector('.bnr .neu').textContent = ''; if(s.sichtbar) rendere(s); } }
+    const belegt = new Map();   // "p:li" → [[at,ende]]
+    regeln.forEach((r, ri) => {
+      const q = r.suchen.replace(/\s+/g, ' ').trim();
+      if(!q) { r.el.querySelector('.zahl').textContent = ''; return; }
+      let zahl = 0, kaputt = 0;
+      for(const s of seiten){
+        if(!s.analyse || !s.analyse.lines.length) continue;
+        for(const t of T.suche(s.analyse.lines, q, gross)){
+          const k = s.i + ':' + t.li;
+          const liste = belegt.get(k) || [];
+          const ende = t.at + t.len;
+          if(liste.some(([a, b]) => t.at < b && ende > a)) continue;   // überlappt eine frühere Regel
+          liste.push([t.at, ende]); belegt.set(k, liste);
+          const key = `${s.i}:${t.li}:${t.at}:${t.len}`;
+          treffer.push({ p: s.i, li: t.li, at: t.at, len: t.len, regel: ri, kaputt: t.kaputt, key });
+          if(t.kaputt) kaputt++; else zahl++;
+        }
+      }
+      r.el.querySelector('.zahl').innerHTML = (zahl === 1 ? '1 Stelle' : zahl + ' Stellen') + (kaputt ? ` · <b>${kaputt} nicht ersetzbar</b>` : '');
+    });
+  }
+  for(const s of seiten) zeichneMarkierungen(s);
+  zaehle();
+}
+
+function zaehle(){
+  const aktiv = treffer.filter(t => !t.kaputt && !ausgeschlossen.has(t.key));
+  const kaputt = treffer.filter(t => t.kaputt).length;
+  const aus = treffer.filter(t => !t.kaputt && ausgeschlossen.has(t.key)).length;
+  AK.$('#anzahl').innerHTML = aktiv.length + '<small>' + (aktiv.length === 1 ? 'Stelle wird ersetzt' : 'Stellen werden ersetzt') + '</small>';
+  const teile = [];
+  if(aus) teile.push(`${aus} ausgenommen`);
+  if(kaputt) teile.push(`${kaputt} nicht ersetzbar`);
+  const leer = regeln.some(r => r.suchen.trim() && !r.ersetzen);
+  if(leer && aktiv.length) teile.push('leeres Ersatzfeld = Text wird gelöscht');
+  AK.$('#hinweis').textContent = teile.join(' · ');
+  AK.$('#go').disabled = !aktiv.length || !src;
+}
+
+/* ---------- Ersetzen & Speichern ---------- */
+function stilFuer(run){
+  const f = run.font || {};
+  const name = String(f.name || run.loaded || '');
+  const mono = f.isMonospace || /mono|courier|consol|menlo|monaco/i.test(name);
+  const serif = !mono && (f.isSerifFont || (/times|georgia|garamond|book|serif|cambria|roman|palatino|minion|baskerville|century|constantia|charter/i.test(name) && !/sans/i.test(name)));
+  const bold = !!f.bold || /bold|black|heavy|semibold|demi/i.test(name);
+  const italic = !!f.italic || /italic|oblique|kursiv/i.test(name);
+  if(mono) return bold && italic ? 'CourierBoldOblique' : bold ? 'CourierBold' : italic ? 'CourierOblique' : 'Courier';
+  if(serif) return bold && italic ? 'TimesRomanBoldItalic' : bold ? 'TimesRomanBold' : italic ? 'TimesRomanItalic' : 'TimesRoman';
+  return bold && italic ? 'HelveticaBoldOblique' : bold ? 'HelveticaBold' : italic ? 'HelveticaOblique' : 'Helvetica';
+}
+
+async function speichern(){
+  const go = AK.$('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  try{
+    const lib = await PDFDocument.load(src.bytes.slice(), { ignoreEncryption: true, updateMetadata: false });
+    const ersatzCache = new Map();
+    let aktuelleAnalyse = null;
+    const ersatzSchrift = run => {
+      const stil = stilFuer(run);
+      let pdfFont = ersatzCache.get(stil);
+      if(!pdfFont){ pdfFont = lib.embedStandardFont(StandardFonts[stil]); ersatzCache.set(stil, pdfFont); }
+      const st = aktuelleAnalyse.streams[run.sIdx];
+      let res = st.res;
+      if(!res){
+        res = lib.context.obj({});
+        if(st.art === 'seite') lib.getPage(aktuelleAnalyse.p).node.set(PDFName.of('Resources'), res);
+        else st.obj.dict.set(PDFName.of('Resources'), res);
+        st.res = res;
+      }
+      let fd = lib.context.lookupMaybe(res.get(PDFName.of('Font')), PDFDict);
+      if(!fd){ fd = lib.context.obj({}); res.set(PDFName.of('Font'), fd); }
+      for(const [k, v] of fd.entries()) if(v === pdfFont.ref) return { pdfFont, tfName: k.decodeText(), stil };
+      let n = 1; while(fd.has(PDFName.of('AKE' + n))) n++;
+      fd.set(PDFName.of('AKE' + n), pdfFont.ref);
+      return { pdfFont, tfName: 'AKE' + n, stil };
+    };
+    const kod = T.kodierer(fonts, ersatzSchrift);
+
+    const aktiv = treffer.filter(t => !t.kaputt && !ausgeschlossen.has(t.key));
+    for(const s of seiten) s.neuQuads = [];
+    const proSeite = new Map();
+    for(const t of aktiv){ if(!proSeite.has(t.p)) proSeite.set(t.p, []); proSeite.get(t.p).push(t); }
+
+    const seitenAenderungen = [];       // { p, liste }
+    const xobjAenderungen = new Map();  // ref → { stream, liste }
+    let ersetzt = 0, original = 0, ersatz = 0, geloescht = 0, eingepasst = 0, ueberlauf = 0;
+    const ersatzStile = new Set();
+    const geaenderteSeiten = new Set();
+    let k = 0;
+    for(const [p, liste] of proSeite){
+      const s = seiten[p];
+      const analyse = T.analysiere({ doc: lib, page: lib.getPage(p), fonts, glyphenListe: s.glyphen, fontObj });
+      analyse.p = p;
+      if(analyse.fehler.length){ AK.log(`Seite ${p + 1}: übersprungen (${analyse.fehler[0]}).`, true); continue; }
+      aktuelleAnalyse = analyse;
+      const ersetzungen = liste.map(t => ({ line: analyse.lines[t.li], at: t.at, len: t.len, neu: regeln[t.regel].ersetzen, t }));
+      const { aenderungen, berichte } = T.ersetzeAufSeite(analyse, ersetzungen, kod);
+      for(const b of berichte){
+        if(!b.ok){ AK.log(`Seite ${p + 1}, „${b.e.line.text.substr(b.e.at, b.e.len)}“: ${b.warum}.`, true); continue; }
+        ersetzt++;
+        if(b.art === 'original') original++; else if(b.art === 'ersatz'){ ersatz++; } else geloescht++;
+        if(b.skaliert) eingepasst++;
+        if(b.ueberlauf) ueberlauf++;
+        s.neuQuads.push(T.trefferQuad(b.e.line, b.e));
+      }
+      for(const a of aenderungen){
+        if(a.stream.art === 'seite'){
+          let e = seitenAenderungen.find(x => x.p === p);
+          if(!e){ e = { p, stream: a.stream, liste: [] }; seitenAenderungen.push(e); }
+          e.liste.push(a);
+        }else{
+          const key = a.stream.ref ? a.stream.ref.toString() : 'direkt' + p;
+          if(!xobjAenderungen.has(key)) xobjAenderungen.set(key, { stream: a.stream, liste: [], seiten: new Set() });
+          const x = xobjAenderungen.get(key);
+          x.liste.push(a); x.seiten.add(p);
+        }
+      }
+      if(aenderungen.length) geaenderteSeiten.add(p);
+      AK.bar(++k / (proSeite.size + 1));
+      await new Promise(r => setTimeout(r));
+    }
+    for(const f of ersatzCache.values()) ersatzStile.add(f.name);
+
+    // Ströme schreiben
+    for(const e of seitenAenderungen){
+      const bytes = T.baueBytes(e.stream.bytes, e.liste);
+      const neu = lib.context.flateStream(bytes);
+      const ref = lib.context.register(neu);
+      lib.getPage(e.p).node.set(PDFName.of('Contents'), ref);
+    }
+    for(const x of xobjAenderungen.values()){
+      const bytes = T.baueBytes(x.stream.bytes, x.liste);
+      const eintraege = {};
+      for(const [kk, v] of x.stream.obj.dict.entries()){
+        const nm = kk.decodeText();
+        if(nm === 'Filter' || nm === 'DecodeParms' || nm === 'Length' || nm === 'DL') continue;
+        eintraege[nm] = v;
+      }
+      const neu = lib.context.flateStream(bytes, eintraege);
+      if(x.stream.ref) lib.context.assign(x.stream.ref, neu);
+      if(x.seiten.size > 1) AK.log(`Hinweis: Ein Seitenelement liegt auf ${x.seiten.size} Seiten zugleich (z. B. Briefkopf) — die Änderung darin gilt für alle diese Seiten.`);
+    }
+    if(!ersetzt) throw new Error('Es wurde nichts ersetzt');
+
+    lib.setProducer('Alleskonverter');
+    lib.setModificationDate(new Date());
+    const out = await lib.save();
+    const blob = new Blob([out], { type: 'application/pdf' });
+    AK.bar(1);
+    AK.offerDownload(blob, basis + '-geaendert.pdf');
+    const wie = [];
+    if(original) wie.push(`${original} in Originalschrift`);
+    if(ersatz) wie.push(`${ersatz} in Ersatzschrift (${[...ersatzStile].join(', ')})`);
+    if(geloescht) wie.push(`${geloescht} gelöscht`);
+    AK.log(`Fertig: ${ersetzt} ${ersetzt === 1 ? 'Stelle' : 'Stellen'} auf ${geaenderteSeiten.size} ${geaenderteSeiten.size === 1 ? 'Seite' : 'Seiten'} ersetzt${wie.length ? ' — ' + wie.join(', ') : ''}. ${AK.fmtBytes(blob.size)}.`);
+    if(eingepasst) AK.log(`${eingepasst} ${eingepasst === 1 ? 'Stelle wurde' : 'Stellen wurden'} etwas schmaler gesetzt, damit sie in die vorhandene Lücke passen.`);
+    if(ueberlauf) AK.log(`${ueberlauf} ${ueberlauf === 1 ? 'Stelle ist' : 'Stellen sind'} deutlich länger als das Original und ragen vermutlich in Nachbartext — kürzer fassen oder das Ergebnis prüfen.`, true);
+    if(ersatz) AK.log('Ersatzschrift heißt: Nicht alle Zeichen des neuen Textes kamen in der Originalschrift im Dokument vor. Das Ergebnis unten prüfen — meist fällt es kaum auf.');
+    AK.log('Der alte Text ist aus der Datei entfernt, nicht überdeckt. Unveränderte Seiten sind bytegleich geblieben.');
+    AK.stamp(true);
+
+    // Vorschau: geänderte Seiten aus dem Ergebnis neu zeichnen
+    if(ergebnisDoc){ try{ await ergebnisDoc.destroy(); }catch(_){ } }
+    ergebnisDoc = await pdfjsLib.getDocument({ data: out.slice() }).promise;
+    for(const p of geaenderteSeiten){
+      const s = seiten[p];
+      s.quelle = 'ergebnis'; s.gerendert = false;
+      s.blatt.querySelector('.bnr .neu').textContent = 'geändert';
+      zeichneMarkierungen(s);
+      if(s.sichtbar) rendere(s);
+    }
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    AK.bar(0);
+  }finally{
+    go.textContent = 'Geändertes PDF speichern';
+    zaehle();
+  }
+}
+
+AK.dropzone('#drop', '#picker', addFiles);
+AK.$('#go').onclick = speichern;
+zaehle();
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

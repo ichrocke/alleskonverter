@@ -3,6 +3,25 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-18 (Werkzeug 50: PDF-Text ersetzen)
+
+### Hinzugefügt
+- Werkzeug **PDF-Text ersetzen** (`tools/pdf-text-ersetzen/`) — das „härteste Brett“ der Ideenliste, als ehrliche Teillösung: Wörter, Namen, Daten und Beträge in einer fertigen PDF suchen und ersetzen, direkt im Inhaltsstrom der Seite. Mehrere Regeln gleichzeitig (Suchen → Ersetzen), Groß-/Kleinschreibung wählbar, jede Fundstelle gelb auf der Seitenvorschau markiert; ein Klick auf eine Textstelle übernimmt sie ins Suchfeld, ein Klick auf eine Markierung nimmt genau diese Stelle aus. Leeres Ersatzfeld löscht den Text. Nach dem Speichern werden die geänderten Seiten aus dem Ergebnis neu gezeichnet, ersetzte Stellen grün.
+  - **Warum nicht überdecken:** Fast alle „PDF-Editoren“ ohne Acrobat legen ein weißes Kästchen über den alten Text — der bleibt kopierbar und durchsuchbar in der Datei. Hier werden genau die Bytes ausgetauscht, die den Text zeichnen; alles Übrige bleibt bytegleich, unveränderte Seiten sowieso.
+  - **Arbeitsteilung** (`textstrom.js`, ~600 Zeilen, klassisches Skript): pdf.js liefert per `getOperatorList` je Textoperator die Glyphen samt Unicode, Code und Breite (Schriften entschlüsseln will man nicht selbst schreiben). Ein eigener Tokenizer zerlegt den rohen Inhaltsstrom mit Byte-Offsets (Literal-/Hex-Strings, verschachtelte Arrays und Wörterbücher, Inline-Bilder mit Längenberechnung bzw. EI-Suche), verfolgt Textmatrix, Grafikzustand und `Do`-Aufrufe von Formular-XObjects genau so, wie pdf.js sie inline ausführt — die n-te Textstelle im Strom gehört dann zur n-ten Glyphenliste. Stimmen die Zahlen nicht überein, wird die Seite als „ungewöhnliche Struktur“ gemeldet statt falsch bearbeitet. pdf-lib schreibt die geänderten Ströme zurück (Seiteninhalt als neuer Flate-Strom, XObjects an Ort und Stelle).
+  - **Schrift:** Ein neuer Text wird in der **Originalschrift** gesetzt, wenn jedes seiner Zeichen in dieser Schrift irgendwo im Dokument schon vorkam — dann sind Glyphe und Code bekannt, auch bei Subset-Schriften mit 2-Byte-CIDs (Chrome, Word, LibreOffice). Ligaturen werden dabei als Ganzes gefunden, ein fehlendes Leerzeichen (pdfTeX!) wird als Vorschub im TJ-Array geschrieben. Fehlt ein Zeichen, springt eine **Ersatzschrift** ein: Helvetica/Times/Courier nach den pdf.js-Merkmalen der Originalschrift (Serifen, Festbreite, fett, kursiv), eingebettet als Standardschrift und in die Ressourcen des betroffenen Stroms eingetragen. Das Protokoll sagt für jeden Durchlauf, wie viele Stellen welchen Weg gingen.
+  - **Textfluss, so weit PDF ihn hergibt:** Text, der zum selben Operator gehört, rückt nach. Stößt der neue Text an separat gesetzten Nachbartext (nächster Lauf derselben Zeile mit eigener Positionierung), wird er per `Tz` schmaler gesetzt, bis er in die Lücke passt — nie unter 50 %, dann warnt das Protokoll. Zeilenumbruch gibt es nicht; das steht so auch auf der Seite.
+  - **Zeilen** entstehen aus aufeinanderfolgenden Läufen mit gleicher Grundlinie und kleinem Abstand; Lücken über 0,13 em (und große negative TJ-Zahlen) zählen als Leerzeichen. So findet die Suche „Angebot Nr. 4711“ auch in einem Chrome-PDF, das jeden Buchstaben als eigenen Operator schreibt.
+  - **Geteilte XObjects** (Briefkopf auf allen Seiten): Änderungen werden je XObject gesammelt und einmal geschrieben, Duplikate über den Byte-Offset erkannt; das Protokoll weist darauf hin, dass die Änderung auf allen betroffenen Seiten gilt.
+  - **Grenzen, ausdrücklich:** verschlüsselte PDFs (auch nur mit Besitzerpasswort) werden abgewiesen → PDF-Passwort; Formularfelder und Kommentare bleiben unberührt (Annotationen sind für die Analyse abgeschaltet); Type-3- und vertikale Schriften sowie Text über ExtGState-Schriftwechsel gelten als nicht ersetzbar; Scans liefern „kein Text gefunden“.
+  - Geprüft an pdf-lib-Standardschriften, an einem Chrome-Druck-PDF (Georgia/Arial/Courier New, 2-Byte-CIDs, ein Operator je Glyphe), an einem LibreOffice-PDF (23 Seiten), einem 412-Seiten-Dokument mit zwölf Subset-Schriften und Kopfzeilen-XObject (Analyse 1,6 s) und an einem reinen Bild-PDF.
+- Testfall: 3-Seiten-PDF, zwei Regeln („Seite“ → „Blatt“ erzwingt Ersatzschrift, „1“ → „2“ geht in Originalschrift), Ausnehmen und Wiederaufnehmen per Klick auf die Markierung; das Ergebnis wird erneut gelesen und muss „Blatt 2 / Blatt 2 / Blatt 3“ ergeben. Jetzt 64 Prüfungen.
+
+### Geändert
+- Startseite: PDF zählt jetzt 14 Karten; die Datei-Erkennung schlägt das Werkzeug für PDFs vor; „Weiter zu …“ führt zu Komprimieren, Stempeln und Passwort.
+- Service Worker: eigener Code unter `tools/*/…js` wird jetzt wie `js/` „Netz zuerst“ geladen (bisher galt das nur für den QR-Code-Ordner); Cache-Version 2026-08-18a.
+- FAQ: Werkzeugzahl auf 50 aktualisiert (JSON-LD neu erzeugt).
+
 ## 2026-08-17 (Werkzeug 49: Bild als ASCII-Art)
 
 ### Hinzugefügt

@@ -20,6 +20,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [PDF-Formular ausfüllen](tools/pdf-formular/index.html) | Formularfelder auslesen, ausfüllen und speichern, optional festschreiben |
 | [PDF-Übersichtsblatt](tools/pdf-kontaktabzug/index.html) | Kontaktabzug: alle Seiten als Miniaturen, Raster und Format wählbar |
 | [PDF durchsuchbar machen](tools/pdf-durchsuchbar/index.html) | OCR legt eine unsichtbare Textebene über den Scan |
+| [PDF-Text ersetzen](tools/pdf-text-ersetzen/index.html) | Text im Inhaltsstrom suchen und ersetzen; Originalschrift, wo alle Zeichen vorhanden sind, sonst passende Standardschrift |
 
 **Bilder**
 
