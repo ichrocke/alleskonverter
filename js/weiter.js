@@ -17,6 +17,7 @@ window.AK = window.AK || {};
     'bild-metadaten':        ['bild-konvertieren','bild-zuschneiden'],
     'bild-base64':           ['text-werkzeuge'],
     'bild-ascii':            ['text-werkzeuge'],
+    'vektorisieren':         ['bild-konvertieren','favicon'],
     'bildergalerie':         ['zip'],
     'favicon':               ['zip'],
 
@@ -71,7 +72,7 @@ window.AK = window.AK || {};
     'word-zu-html':'Word → HTML', 'markdown-html':'Markdown ↔ HTML',
     'tabellen':'Tabellen-Konverter', 'json-yaml':'JSON & YAML',
     'json-lesen':'JSON lesen', 'xml-lesen':'XML lesen',
-    'bild-ascii':'Bild als ASCII-Art',
+    'bild-ascii':'Bild als ASCII-Art', 'vektorisieren':'Bild vektorisieren',
     'texterkennung':'Texterkennung', 'untertitel':'Untertitel',
     'medien':'Audio & Video', 'medien-schneiden':'Medien schneiden',
     'ton-verbessern':'Ton verbessern', 'gif-erstellen':'GIF erstellen',

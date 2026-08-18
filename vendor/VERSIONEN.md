@@ -29,9 +29,20 @@ Stand: 26.07.2026 (Bibliotheken geprüft und teilweise aktualisiert)
 | `js-yaml.min.js` | js-yaml | 4.1.0 | MIT | YAML lesen und schreiben |
 | `onnx/ort.wasm.min.js`, `ort-wasm-*` | onnxruntime-web | 1.22.0 | MIT | Modelle ausführen |
 | `onnx/u2netp.onnx` | U²-Net (kleine Fassung) | — | Apache-2.0 | Motiv freistellen |
+| `vtracer/vtracer.js`, `vtracer_bg.wasm` | VTracer (visioncortex, npm @visioncortex/vtracer) | 1.0.0-alpha.3 | MIT OR Apache-2.0 | Bilder vektorisieren |
 | `tools/qr-code/vendor/qr-code-styling.js` | qr-code-styling | gevendort | MIT | QR-Codes gestalten |
 | `tools/qr-code/vendor/qrcode-*.js` | qrcode-generator | gevendort | MIT | QR-Codes berechnen |
 | `fonts/anton-*`, `archivo-*`, `ibm-plex-mono-*` | Anton, Archivo, IBM Plex Mono | — | SIL Open Font License 1.1 | Schriften |
+
+## Neu hinzugekommen (18.08.2026)
+
+- **VTracer 1.0.0-alpha.3** für „Bild vektorisieren“. Das npm-Paket `@visioncortex/vtracer`
+  ist ein wasm-bindgen-Build für Node (`--target nodejs`); es gibt keine fertige
+  Browser-Fassung. `vendor/vtracer/vtracer.js` ist deshalb die Node-Bindung mit
+  ausgetauschtem Ladeteil (fetch + `WebAssembly.instantiate` statt `readFileSync`),
+  sonst unverändert — als klassisches Skript, das auch in einem Worker per
+  `importScripts` läuft. Beim Aktualisieren: neue `pkg/vtracer_wasm.js` nehmen und
+  nur die letzten Zeilen (Laden) wieder ersetzen; die `.wasm` heißt hier `vtracer_bg.wasm`.
 
 ## Neu hinzugekommen (26.07.2026)
 

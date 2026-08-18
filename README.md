@@ -30,6 +30,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Bild zuschneiden](tools/bild-zuschneiden/index.html) | Ausschnitt frei oder mit festem Seitenverhältnis, drehen, spiegeln |
 | [Bilder zusammenfügen](tools/bilder-zusammenfuegen/index.html) | Collage: nebeneinander, untereinander oder Raster, mit Abstand und Hintergrund |
 | [Hintergrund entfernen](tools/hintergrund-entfernen/index.html) | Motiv freistellen (U²-Net im Browser), transparent oder mit neuer Farbe |
+| [Bild vektorisieren](tools/vektorisieren/index.html) | PNG/JPG → SVG mit VTracer (WebAssembly); Farbanzahl, Detailgrad, Kurvenart, S/W-Modus, Live-Vorschau |
 | [Bild-Metadaten anzeigen](tools/bild-metadaten/index.html) | EXIF lesen: Kamera, Zeit, Einstellungen, GPS-Standort mit Kartenlink |
 | [Dateien umbenennen](tools/bilder-umbenennen/index.html) | Stapelweise umbenennen mit Muster, Zähler und Datum, Ausgabe als ZIP |
 

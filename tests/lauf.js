@@ -490,6 +490,18 @@ const FAELLE = [
       const invertiert = await p.$eval('#ausgabe', e => e.textContent);
       if(invertiert === text) throw new Error('Invertieren ändert die Ausgabe nicht');
     } },
+  { werkzeug:'vektorisieren',      dateien:[['b.png', PNG, 'image/png']],
+    pruefen: async p => {
+      // Ergebnis muss eine SVG mit mehreren Flächen sein (Kreis + Grund), und ein Wechsel
+      // auf Schwarz-Weiß muss eine neue Vorschau rechnen
+      const svg = await p.evaluate(async () => await (await fetch(document.querySelector('a.download').href)).text());
+      if(!/^<\?xml|<svg/.test(svg.trim()) || !/<svg[^>]*width="60"/.test(svg)) throw new Error('kein SVG in Bildgröße: ' + svg.slice(0, 80));
+      const pfade = (svg.match(/<path\b/g) || []).length;
+      if(pfade < 2) throw new Error('nur ' + pfade + ' Flächen');
+      const werte = await p.$eval('#werte', e => e.textContent);
+      await p.select('#modus', 'sw');
+      await p.waitForFunction(alt => { const t = document.querySelector('#werte').textContent; return /Flächen/.test(t) && !/Vektorisiere/.test(t) && t !== alt; }, {timeout:15000}, werte);
+    } },
   { werkzeug:'gif-erstellen',      nur_laden:true },
   { werkzeug:'ton-verbessern',     nur_laden:true },
   { werkzeug:'pdf-durchsuchbar',   nur_laden:true },

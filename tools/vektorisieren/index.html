@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bild vektorisieren — PNG/JPG in SVG umwandeln, kostenlos &amp; lokal | Alleskonverter</title>
+<meta name="description" content="Pixelbild in eine saubere Vektorgrafik verwandeln: Logo, Zeichnung oder Foto als SVG — mit Reglern für Farben, Detailgrad und Kurven. Kostenlos, ohne Upload, lokal im Browser (VTracer).">
+<link rel="canonical" href="https://alleskonverter.de/tools/vektorisieren/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Bild vektorisieren — PNG/JPG in SVG umwandeln | Alleskonverter">
+<meta property="og:description" content="Logo, Zeichnung oder Foto als SVG-Vektorgrafik — Regler für Farben, Detailgrad und Kurven. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/vektorisieren/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bild vektorisieren — PNG/JPG in SVG umwandeln | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Bild vektorisieren — Alleskonverter","url":"https://alleskonverter.de/tools/vektorisieren/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Pixelbilder (PNG, JPG, WebP, HEIC) in SVG-Vektorgrafiken umwandeln — Farben, Detailgrad und Kurven einstellbar. Ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist der Unterschied zwischen Pixel- und Vektorgrafik?","acceptedAnswer":{"@type":"Answer","text":"Ein Pixelbild (PNG, JPG) besteht aus einem festen Raster von Bildpunkten und wird beim Vergrößern unscharf. Eine Vektorgrafik (SVG) beschreibt Formen als Kurven und Flächen — sie lässt sich beliebig skalieren, bleibt gestochen scharf und ist für Plotter, Stickmaschinen, Laser und Druck die passende Form."}},{"@type":"Question","name":"Wofür eignet sich das Vektorisieren, wofür nicht?","acceptedAnswer":{"@type":"Answer","text":"Sehr gut für Logos, Schriftzüge, Piktogramme, Strichzeichnungen und Grafiken mit klaren Flächen. Fotos werden zu einer posterartigen Fläche aus Farbschichten — als Stilmittel schön, aber kein Ersatz für das Foto. Je klarer die Kanten im Original, desto besser das Ergebnis."}},{"@type":"Question","name":"Wird mein Bild hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die Vektorisierung (VTracer, als WebAssembly) läuft vollständig in deinem Browser. Beim ersten Aufruf wird einmalig das Rechenmodul (rund 650 KB) von dieser Website geladen; dein Bild wird nie übertragen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#buehne{margin-top:18px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:14px;display:none}
+#buehne.on{display:block}
+.paar{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.paar{grid-template-columns:1fr}}
+.paar figure{margin:0;text-align:center;min-width:0}
+.paar figcaption{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+.paar canvas,.paar img{max-width:100%;height:auto;border:1px solid var(--rule);display:block;margin:0 auto;background:#fff}
+#svgbild{background-image:
+  linear-gradient(45deg,#d8d6cf 25%,transparent 25%),
+  linear-gradient(-45deg,#d8d6cf 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#d8d6cf 75%),
+  linear-gradient(-45deg,transparent 75%,#d8d6cf 75%);
+  background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0}
+.werte{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px}
+.werte b{color:var(--ink);font-weight:500}
+.field input[type=range]{width:100%}
+.field .val{font-family:var(--mono);font-size:10.5px;color:var(--ink);float:right}
+details.fein{margin:6px 0 14px}
+details.fein summary{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;margin-bottom:10px}
+label.check{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0 12px;cursor:pointer}
+.arbeit{font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Bild <span>vektorisieren</span></h1>
+  <p class="sub">Aus einem Pixelbild eine saubere Vektorgrafik machen: Logo, Schriftzug oder Zeichnung als SVG — beliebig skalierbar, für Plotter, Stickerei, Laser und Druck. Mit Reglern für Farben, Detailgrad und Kurven, Vorschau bei jeder Änderung.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Bild</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Bild hierher ziehen</strong>
+      <small>PNG, JPG, WebP, GIF, BMP, HEIC — am besten mit klaren Kanten</small>
+    </div>
+    <input type="file" id="picker" accept="image/*,.heic,.heif" hidden>
+
+    <div id="buehne">
+      <div class="paar">
+        <figure><canvas id="vorher"></canvas><figcaption>Original (Pixel)</figcaption></figure>
+        <figure><img id="svgbild" alt="Vektorisiertes Ergebnis"><figcaption>Ergebnis (SVG)</figcaption></figure>
+      </div>
+      <div class="werte" id="werte"></div>
+    </div>
+
+    <div class="empty" id="empty">Noch kein Bild geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Einstellungen</h2>
+
+    <div class="field">
+      <label for="modus">Modus</label>
+      <select id="modus">
+        <option value="farbe" selected>Farbig (Flächen nach Farbe)</option>
+        <option value="sw">Schwarz-Weiß (Strichzeichnung, Schriftzug)</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-vorlage">
+      <label for="vorlage">Vorlage</label>
+      <select id="vorlage">
+        <option value="grafik" selected>Logo / Grafik — wenige klare Flächen</option>
+        <option value="foto">Foto — viele Farbschichten</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-farben">
+      <label for="farben">Farbanzahl begrenzen</label>
+      <select id="farben">
+        <option value="0" selected>Automatisch</option>
+        <option value="2">2 Farben</option>
+        <option value="4">4 Farben</option>
+        <option value="8">8 Farben</option>
+        <option value="16">16 Farben</option>
+        <option value="32">32 Farben</option>
+      </select>
+    </div>
+
+    <div class="field" id="f-detail">
+      <label for="detail">Detailgrad <span class="val" id="detailVal">5</span></label>
+      <input type="range" id="detail" min="1" max="8" value="5">
+      <div class="hint">niedrig = wenige große Flächen, hoch = feine Abstufungen</div>
+    </div>
+
+    <div class="field" id="f-schwelle" hidden>
+      <label for="schwelle">Schwellwert <span class="val" id="schwelleVal">128</span></label>
+      <input type="range" id="schwelle" min="10" max="245" value="128">
+      <div class="hint">alles Dunklere wird zur Form; darunter „Anpassen“ für ungleichmäßig belichtete Scans</div>
+      <label class="check" style="margin-top:8px"><input type="checkbox" id="adaptiv"> Schwellwert an die Umgebung anpassen</label>
+    </div>
+
+    <div class="field">
+      <label for="flecken">Flecken filtern <span class="val" id="fleckenVal">4</span></label>
+      <input type="range" id="flecken" min="0" max="16" value="4">
+      <div class="hint">entfernt Störflächen kleiner als n Pixel</div>
+    </div>
+
+    <div class="field">
+      <label for="kurven">Kurven</label>
+      <select id="kurven">
+        <option value="spline" selected>Weich (Kurven)</option>
+        <option value="polygon">Eckig (Polygone)</option>
+        <option value="pixel">Pixelgenau</option>
+      </select>
+    </div>
+
+    <details class="fein">
+      <summary>Feineinstellungen</summary>
+      <div class="field" id="f-ebenen">
+        <label for="ebenen">Flächenaufbau</label>
+        <select id="ebenen">
+          <option value="stacked" selected>Gestapelt (überlappend, robust)</option>
+          <option value="cutout">Ausgeschnitten (nahtlos, ohne Überlappung)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ecke">Ecken erkennen ab <span class="val" id="eckeVal">60°</span></label>
+        <input type="range" id="ecke" min="0" max="180" value="60">
+      </div>
+      <div class="field">
+        <label for="glatt">Glättung <span class="val" id="glattVal">4</span></label>
+        <input type="range" id="glatt" min="3.5" max="10" step="0.5" value="4">
+        <div class="hint">höher = weniger Stützpunkte, weichere (aber ungenauere) Kurven</div>
+      </div>
+      <div class="field">
+        <label for="groesse">Bild vorher begrenzen auf</label>
+        <select id="groesse">
+          <option value="600">600 px Kante — schnell</option>
+          <option value="1200" selected>1200 px Kante — normal</option>
+          <option value="2000">2000 px Kante — fein, dauert</option>
+          <option value="0">Originalgröße</option>
+        </select>
+      </div>
+      <label class="check" id="f-hintergrund"><input type="checkbox" id="hintergrund"> Unterste Fläche (Hintergrund) weglassen</label>
+    </details>
+
+    <button class="primary" id="go" disabled>SVG speichern</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Das Vereinslogo gibt es nur noch als verwaschenes JPG, der Schriftzug fürs Plotterfolie liegt als Screenshot vor, die Skizze soll gestickt werden: Für all das braucht es eine Vektorgrafik — Formen als Kurven statt als Pixel. Dafür verlangen Onlinedienste ein Abo, und die Datei wandert auf fremde Server. Hier läuft VTracer, ein quelloffener Vektorisierer, als WebAssembly direkt in deinem Browser: Bild rein, Regler stellen, SVG raus.</p>
+  <h3>Was ist der Unterschied zwischen Pixel- und Vektorgrafik?</h3>
+  <p>Ein Pixelbild (PNG, JPG, WebP) ist ein festes Raster von Bildpunkten — beim Vergrößern wird es unscharf oder klötzchenhaft. Eine Vektorgrafik (SVG) beschreibt Formen mathematisch als Kurven und Flächen. Sie lässt sich beliebig groß skalieren und bleibt gestochen scharf; Schneideplotter, Stickmaschinen, Lasercutter und Druckereien wollen genau diese Form.</p>
+  <h3>Wofür eignet sich das Vektorisieren, wofür nicht?</h3>
+  <p>Sehr gut für Logos, Schriftzüge, Piktogramme, Strichzeichnungen, Stempel und Grafiken mit klaren Flächen. Fotos werden zu einer posterartigen Fläche aus Farbschichten — als Stilmittel schön, für Siebdruck oder Poster brauchbar, aber kein Ersatz für das Foto. Faustregel: Je klarer die Kanten im Original, desto besser das Ergebnis. Ein Bild mit störendem Hintergrund vorher <a href="../hintergrund-entfernen/index.html">freistellen</a> oder <a href="../bild-zuschneiden/index.html">zuschneiden</a> hilft.</p>
+  <h3>Was bewirken die Regler?</h3>
+  <p><strong>Modus:</strong> „Farbig“ zerlegt das Bild in Flächen ähnlicher Farbe; „Schwarz-Weiß“ trennt nach Helligkeit — ideal für Schriftzüge und Linien, ergibt schwarze Formen auf durchsichtigem Grund. <strong>Farbanzahl</strong> begrenzt die Palette (für Logos meist 2–8). <strong>Detailgrad</strong> bestimmt, wie fein Farben unterschieden werden. <strong>Flecken filtern</strong> wirft winzige Störflächen weg, wie sie JPG-Artefakte erzeugen. <strong>Kurven</strong> wählt zwischen weichen Splines, eckigen Polygonen und pixelgenauen Umrissen. Alle Änderungen zeigen sofort eine neue Vorschau.</p>
+  <h3>Wird mein Bild hochgeladen?</h3>
+  <p>Nein. Beim ersten Aufruf wird einmalig das Rechenmodul (rund 650&nbsp;KB) von dieser Website geladen und danach zwischengespeichert. Das Bild selbst wird nie übertragen — es gibt keinen Server, der es annehmen könnte. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits nutzbar.</p>
+</section>
+
+<footer>
+  <p>Verwendet wird <a href="https://www.visioncortex.org/vtracer" target="_blank" rel="noopener">VTracer</a> (MIT/Apache-2.0) als WebAssembly. Das Ergebnis lässt sich in Inkscape, Illustrator oder Affinity weiterbearbeiten; für den Plotter meist „Schwarz-Weiß“ wählen. Dieses Werkzeug braucht einen Webserver.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/heic2any.min.js"></script>
+<script src="../../js/ui.js?v=20260804"></script>
+<script src="../../js/uebergabe.js?v=20260804"></script>
+<script src="../../js/weiter.js?v=20260804"></script>
+<script src="../../js/einstellungen.js?v=20260804"></script>
+<script src="../../js/dropzone.js?v=20260804"></script>
+<script>
+let bild = null;        // { bitmap, breite, hoehe, name }
+let worker = null;
+let laufend = false;
+let timer = null;
+let svgText = '';
+let svgUrl = null;
+let basis = 'bild';
+let ausstehend = false;
+
+const $ = AK.$;
+
+async function addFiles(list){
+  const file = list.find(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|hei[cf]|avif|tiff?)$/i.test(f.name));
+  if(!file) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver (das Rechenmodul lässt sich nicht per Doppelklick-Datei laden). Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  basis = file.name.replace(/\.[^.]+$/, '');
+  try{
+    let blob = file;
+    if(/\.(heic|heif)$/i.test(file.name) || /hei[cf]/.test(file.type)){
+      AK.log('iPhone-Format wird umgewandelt …');
+      blob = await heic2any({ blob: file, toType: 'image/png' });
+      if(Array.isArray(blob)) blob = blob[0];
+    }
+    const bmp = await ladeBitmap(blob);
+    bild = { bitmap: bmp, breite: bmp.width, hoehe: bmp.height, name: file.name };
+    const c = $('#vorher');
+    c.width = bmp.width; c.height = bmp.height;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(bmp, 0, 0);
+    $('#buehne').classList.add('on');
+    $('#empty').style.display = 'none';
+    $('#svgbild').removeAttribute('src');
+    AK.logClear();
+    // Bilder mit durchsichtigem Hintergrund: die weiße Grundfläche gleich weglassen
+    pixel();
+    if(bild.transparentAnteil > 0.01){ $('#hintergrund').checked = true; AK.log('Das Bild hat durchsichtige Bereiche — die Hintergrundfläche wird im SVG weggelassen (Feineinstellungen).'); }
+    starte();
+  }catch(err){
+    console.error(err);
+    AK.log('Bild kann nicht gelesen werden — vermutlich beschädigt oder ein unbekanntes Format.', true);
+  }
+}
+
+function ladeBitmap(blob){
+  if('createImageBitmap' in window) return createImageBitmap(blob).catch(() => viaImg(blob));
+  return viaImg(blob);
+}
+function viaImg(blob){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img); img.onerror = rej;
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+/* Einstellungen → VTracer-Optionen */
+function optionen(){
+  const sw = $('#modus').value === 'sw';
+  const foto = $('#vorlage').value === 'foto';
+  const o = {
+    mode: $('#kurven').value,
+    filterSpeckle: +$('#flecken').value,
+    cornerThreshold: +$('#ecke').value,
+    lengthThreshold: +$('#glatt').value,
+    spliceThreshold: 45,
+    maxIterations: 10,
+    pathPrecision: 2,
+  };
+  if(sw){
+    o.clustering = 'bw';
+    o.binaryThreshold = +$('#schwelle').value;
+    if($('#adaptiv').checked) o.adaptive = true;
+  }else{
+    o.clustering = 'color-cluster';
+    o.hierarchical = $('#ebenen').value;
+    const d = +$('#detail').value;                 // 1–8
+    o.colorPrecision = Math.max(1, Math.min(8, d + (foto ? 1 : 0)));
+    o.layerDifference = foto ? Math.max(1, 24 - d * 3) : Math.max(4, 48 - d * 5);
+    const farben = +$('#farben').value;
+    if(farben) o.maxColors = farben;
+  }
+  return o;
+}
+
+/* Bild ggf. verkleinern und als RGBA-Puffer holen (Transparenz gegen Weiß) */
+function pixel(){
+  const max = +$('#groesse').value;
+  let w = bild.breite, h = bild.hoehe;
+  if(max && Math.max(w, h) > max){ const f = max / Math.max(w, h); w = Math.max(1, Math.round(w * f)); h = Math.max(1, Math.round(h * f)); }
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bild.bitmap, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h).data;
+  c.width = c.height = 0;
+  // Transparenz gegen Weiß rechnen — VTracer kennt keine Deckkraft
+  let durchsichtig = 0;
+  for(let i = 0; i < data.length; i += 4){
+    const a = data[i + 3];
+    if(a === 255) continue;
+    if(a < 128) durchsichtig++;
+    const f = a / 255;
+    data[i] = Math.round(data[i] * f + 255 * (1 - f));
+    data[i + 1] = Math.round(data[i + 1] * f + 255 * (1 - f));
+    data[i + 2] = Math.round(data[i + 2] * f + 255 * (1 - f));
+    data[i + 3] = 255;
+  }
+  bild.transparentAnteil = durchsichtig / (w * h);
+  return { rgba: new Uint8Array(data.buffer), w, h };
+}
+
+function planen(){
+  if(!bild) return;
+  clearTimeout(timer);
+  timer = setTimeout(starte, 250);
+}
+
+function starte(){
+  if(!bild) return;
+  if(laufend){ ausstehend = true; abbrechen(); }
+  laufend = true; ausstehend = false;
+  AK.stamp(false); AK.clearDownloads(); AK.bar(0.15);
+  const { rgba, w, h } = pixel();
+  $('#werte').innerHTML = `<span class="arbeit">Vektorisiere ${w} × ${h} px …${Math.max(w, h) > 1000 ? ' (Fotos können eine Weile brauchen)' : ''}</span>`;
+  const t0 = performance.now();
+  worker = new Worker('worker.js?v=20260818');
+  worker.onmessage = e => {
+    laufend = false; worker = null;
+    if(!e.data.ok){
+      AK.log('Vektorisieren fehlgeschlagen: ' + e.data.fehler, true);
+      AK.bar(0); $('#werte').textContent = '';
+      return;
+    }
+    let svg = e.data.svg;
+    if($('#hintergrund').checked && $('#modus').value !== 'sw'){
+      svg = svg.replace(/<path\b[^>]*\/>\s*/, '');
+    }
+    svgText = svg;
+    if(svgUrl) URL.revokeObjectURL(svgUrl);
+    svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    $('#svgbild').src = svgUrl;
+    const pfade = (svg.match(/<path\b/g) || []).length;
+    const ms = Math.round(performance.now() - t0);
+    $('#werte').innerHTML = `<span>Flächen <b>${pfade}</b></span><span>SVG <b>${AK.fmtBytes(svg.length)}</b></span><span>gerechnet auf <b>${w} × ${h} px</b></span><span>Dauer <b>${ms < 1000 ? ms + ' ms' : (ms / 1000).toFixed(1) + ' s'}</b></span>`;
+    AK.bar(1);
+    $('#go').disabled = false;
+    if(ausstehend){ ausstehend = false; starte(); }
+  };
+  worker.onerror = err => {
+    laufend = false; worker = null;
+    console.error(err);
+    AK.log('Das Rechenmodul konnte nicht geladen werden. Bitte Seite neu laden — auf alleskonverter.de wird es von dieser Website ausgeliefert.', true);
+    AK.bar(0); $('#werte').textContent = '';
+  };
+  worker.postMessage({ rgba, w, h, opts: optionen() }, [rgba.buffer]);
+}
+
+function abbrechen(){
+  if(worker){ worker.terminate(); worker = null; }
+  laufend = false;
+}
+
+/* Speichern */
+$('#go').onclick = () => {
+  if(!svgText) return;
+  const blob = new Blob([svgText], { type: 'image/svg+xml' });
+  AK.offerDownload(blob, basis + '.svg', 'SVG herunterladen');
+  AK.log(`Fertig: ${AK.fmtBytes(blob.size)}. Die SVG lässt sich in Inkscape, Illustrator, Affinity oder Plotter-Software öffnen und beliebig skalieren.`);
+  AK.stamp(true);
+};
+
+/* Bedienelemente */
+function zeigeFelder(){
+  const sw = $('#modus').value === 'sw';
+  $('#f-vorlage').hidden = sw; $('#f-farben').hidden = sw; $('#f-detail').hidden = sw; $('#f-ebenen').hidden = sw; $('#f-hintergrund').hidden = sw;
+  $('#f-schwelle').hidden = !sw;
+}
+$('#modus').addEventListener('change', () => { zeigeFelder(); planen(); });
+['vorlage','farben','kurven','ebenen','groesse'].forEach(id => $('#' + id).addEventListener('change', planen));
+['adaptiv','hintergrund'].forEach(id => $('#' + id).addEventListener('change', planen));
+const bind = (id, out, f) => {
+  const el = $('#' + id);
+  const zeige = () => { $('#' + out).textContent = f ? f(el.value) : el.value; };
+  el.addEventListener('input', () => { zeige(); planen(); });
+  zeige();
+};
+bind('detail', 'detailVal'); bind('schwelle', 'schwelleVal'); bind('flecken', 'fleckenVal');
+bind('ecke', 'eckeVal', v => v + '°'); bind('glatt', 'glattVal');
+zeigeFelder();
+
+AK.dropzone('#drop', '#picker', addFiles);
+if(location.protocol === 'file:'){
+  AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+}
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

@@ -3,6 +3,21 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-18 (Werkzeug 51: Bild vektorisieren)
+
+### Hinzugefügt
+- Werkzeug **Bild vektorisieren** (`tools/vektorisieren/`) — PNG, JPG, WebP, GIF, BMP oder HEIC in eine SVG-Vektorgrafik verwandeln, mit VTracer (visioncortex) als WebAssembly, komplett lokal. Vorschau Original neben Ergebnis, jede Reglerbewegung rechnet neu (250 ms entprellt, ein laufender Durchlauf wird abgebrochen). Regler: Modus Farbig/Schwarz-Weiß, Vorlage Logo/Foto, Farbanzahl (automatisch, 2–32), Detailgrad, Flecken filtern, Kurven (Spline/Polygon/Pixel); unter „Feineinstellungen“ Flächenaufbau (gestapelt/ausgeschnitten), Eckenwinkel, Glättung, Größenbegrenzung (600/1200/2000 px/Original) und „unterste Fläche weglassen“. Ausgabe als `.svg`, dazu Flächenzahl, Größe und Rechendauer.
+  - **Warum VTracer und nicht imagetracerjs/Potrace:** VTracer liefert die saubersten Kurven (Spline-Fit mit Eckenerkennung, hierarchisches Farbclustern) — das ist genau der Unterschied zu den Gratis-Uploadseiten. Es gibt aber keine fertige Browser-Ausgabe; das npm-Paket `@visioncortex/vtracer` ist ein wasm-bindgen-Build fürs Node-Ziel. `vendor/vtracer/vtracer.js` ist diese Bindung mit ausgetauschtem Ladeteil (fetch statt `readFileSync`), Rest unverändert, ohne Rust-Werkzeugkette nachbaubar. Details in `vendor/VERSIONEN.md`.
+  - **Worker:** VTracer rechnet in `tools/vektorisieren/worker.js` in einem eigenen Strang — ein Foto mit 1200 px Kante braucht ~2–3 s, mit 2000 px deutlich mehr; die Seite bleibt bedienbar. Abbrechen = Worker beenden und neu starten (Modul kommt aus dem Cache).
+  - **Transparenz:** VTracer kennt keine Deckkraft. Durchsichtige Bereiche werden gegen Weiß gerechnet; hat das Bild mehr als 1 % transparente Pixel, wird „unterste Fläche weglassen“ automatisch gesetzt, damit ein freigestelltes Logo auch im SVG freigestellt bleibt.
+  - Detailgrad und Vorlage werden auf VTracers `colorPrecision`/`layerDifference` abgebildet (Foto: feinere Präzision, kleinere Schichtdifferenz), damit man nicht zwei abstrakte Zahlen einstellen muss. Schwarz-Weiß hat stattdessen Schwellwert und die adaptive Bradley-Roth-Schwelle für ungleich belichtete Scans.
+  - Braucht wie das Freistellen einen Webserver (WASM per fetch); über `file://` gibt es eine Meldung.
+- Testfall: 60-px-Testbild → SVG in Bildgröße mit mindestens zwei Flächen; Wechsel auf Schwarz-Weiß muss eine neue Vorschau rechnen. Jetzt 65 Prüfungen.
+
+### Geändert
+- Startseite: „Bilder“ zählt jetzt 7 Karten; Datei-Erkennung schlägt das Vektorisieren für Bilder und HEIC vor; „Weiter zu …“ führt zu Bilder konvertieren und Favicon.
+- FAQ: Werkzeugzahl 51 (JSON-LD neu erzeugt).
+
 ## 2026-08-18 (Werkzeug 50: PDF-Text ersetzen)
 
 ### Hinzugefügt
