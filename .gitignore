@@ -4,3 +4,6 @@ Thumbs.db
 
 # Persönliche Planungsnotizen — bleiben lokal
 ideen.txt
+
+# Whisper-Modelle (~1 GB): mit vendor/whisper/holen.sh laden, deploy.sh spiegelt sie mit
+vendor/whisper/whisper-*/

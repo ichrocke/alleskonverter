@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transkription — Audio &amp; Video zu Text, lokal im Browser (Whisper) | Alleskonverter</title>
+<meta name="description" content="Interviews, Diktate, Podcasts und Sitzungsmitschnitte in Text verwandeln — mit Whisper direkt im Browser. Deutsch und viele Sprachen, Zeitmarken, Editor, Export als Text, SRT, VTT oder Word. Die Aufnahme verlässt dein Gerät nicht.">
+<link rel="canonical" href="https://alleskonverter.de/tools/transkription/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Transkription — Audio &amp; Video zu Text, lokal im Browser | Alleskonverter">
+<meta property="og:description" content="Aufnahmen in Text verwandeln — Whisper läuft komplett im Browser, die Aufnahme verlässt dein Gerät nicht. Zeitmarken, Editor, Export als Text, SRT, VTT oder Word.">
+<meta property="og:url" content="https://alleskonverter.de/tools/transkription/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Transkription — Audio &amp; Video zu Text, lokal im Browser | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Transkription — Alleskonverter","url":"https://alleskonverter.de/tools/transkription/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Audio- und Videoaufnahmen mit Whisper lokal im Browser in Text verwandeln — mit Zeitmarken, Editor und Export als Text, SRT, VTT oder Word. Ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Wird meine Aufnahme hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Das Spracherkennungsmodell (Whisper) wird einmalig von dieser Website geladen und rechnet danach vollständig in deinem Browser. Die Aufnahme wird nicht übertragen und fließt in kein Training ein — für Interviews, Arztgespräche oder Vereinssitzungen ist genau das entscheidend."}},{"@type":"Question","name":"Wie gut ist die Erkennung?","acceptedAnswer":{"@type":"Answer","text":"Bei klarer Aufnahme und einem Sprecher sehr brauchbar; das größere Modell erkennt Fachwörter und Namen deutlich besser als das kleine. Dialekt, Hintergrundlärm und Durcheinanderreden senken die Qualität — deshalb gibt es den Editor, in dem sich jeder Abschnitt direkt korrigieren lässt."}},{"@type":"Question","name":"Wie lange dauert es?","acceptedAnswer":{"@type":"Answer","text":"Mit Grafikbeschleunigung (WebGPU, in Chrome und Edge) deutlich schneller als die Aufnahme lang ist. Nur mit dem Prozessor etwa so lange wie die Aufnahme selbst, beim großen Modell länger. Die Anzeige zeigt den Fortschritt und die voraussichtliche Restzeit."}},{"@type":"Question","name":"Welche Formate kann ich exportieren?","acceptedAnswer":{"@type":"Answer","text":"Reinen Text, Text mit Zeitmarken, Untertitel als SRT oder VTT sowie ein Word-Dokument (DOCX). Die Zeitmarken stammen aus der Erkennung und lassen sich in den Untertitel- und Audio-Werkzeugen weiterverwenden."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+#player{width:100%;margin-top:14px;display:none}
+#player.on{display:block}
+#abschnitte{margin-top:14px;background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:10px;display:none}
+#abschnitte.on{display:block}
+.abschnitt{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:6px 4px;border-bottom:1px solid var(--rule)}
+.abschnitt:last-child{border-bottom:0}
+.abschnitt.aktiv{background:rgba(27,77,62,.08)}
+.abschnitt .zeit{font-family:var(--mono);font-size:11px;color:var(--stamp);background:none;border:0;padding:4px 0;cursor:pointer;white-space:nowrap;text-align:left}
+.abschnitt .zeit:hover{text-decoration:underline}
+.abschnitt textarea{width:100%;min-height:0;resize:none;overflow:hidden;font-family:inherit;font-size:14px;line-height:1.5;padding:4px 6px;border:1px solid transparent;background:transparent}
+.abschnitt textarea:focus{border-color:var(--rule);background:var(--field)}
+.live{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin-top:10px;white-space:pre-wrap;min-height:1.4em}
+.live b{color:var(--ink);font-weight:500}
+.werte{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px}
+.werte b{color:var(--ink);font-weight:500}
+.rechenweg{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin:-8px 0 14px}
+.rechenweg b{color:var(--ink);font-weight:500}
+label.check{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0 12px;cursor:pointer}
+.exportzeile{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+button.ghost.klein{padding:8px 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Transkription <span>Audio → Text</span></h1>
+  <p class="sub">Interviews, Diktate, Podcasts, Sitzungsmitschnitte: Aufnahme hineinziehen, Text mit Zeitmarken herausbekommen — korrigieren, dann als Text, Untertitel oder Word-Datei speichern. Die Aufnahme verlässt dein Gerät nicht.</p>
+</header>
+
+<p class="ki-hinweis"><b>Hier arbeitet KI — und zwar auf deinem Gerät</b>Die Spracherkennung erledigt das neuronale Netz Whisper (OpenAI, MIT-Lizenz). Das Modell wird einmalig von dieser Website geladen und rechnet danach vollständig in deinem Browser: Es wird <strong>kein KI-Dienst angefragt</strong>, deine Aufnahme wird nicht übertragen und fließt in kein Training ein. <a href="../../datenschutz.html#ki">Nachlesen im Datenschutz</a></p>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Aufnahme</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Audio- oder Videodatei hierher ziehen</strong>
+      <small>MP3, WAV, M4A, OGG, FLAC, MP4, WebM u. a. — oder klicken zum Auswählen</small>
+    </div>
+    <input type="file" id="picker" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.opus,.flac,.wma,.aiff,.aif,.mp4,.webm,.mkv,.mov,.m4v" hidden>
+
+    <audio id="player" controls preload="metadata"></audio>
+    <div class="live" id="live"></div>
+    <div id="abschnitte"></div>
+    <div class="werte" id="werte"></div>
+    <div class="empty" id="empty">Noch keine Aufnahme geladen.</div>
+  </section>
+
+  <aside>
+    <h2>Erkennung</h2>
+
+    <div class="field">
+      <label for="modell">Modell</label>
+      <select id="modell">
+        <option value="tiny">Klein — schnell, grob (≈ 100 MB)</option>
+        <option value="base" selected>Mittel — ausgewogen (≈ 150 MB)</option>
+        <option value="small">Groß — genau, langsam (≈ 330 MB)</option>
+      </select>
+      <div class="hint">Wird einmalig von dieser Website geladen und im Browser behalten.</div>
+    </div>
+
+    <div class="field">
+      <label for="sprache">Sprache</label>
+      <select id="sprache">
+        <option value="de" selected>Deutsch</option>
+        <option value="en">Englisch</option>
+        <option value="">Automatisch erkennen</option>
+        <option value="fr">Französisch</option>
+        <option value="es">Spanisch</option>
+        <option value="it">Italienisch</option>
+        <option value="nl">Niederländisch</option>
+        <option value="pl">Polnisch</option>
+        <option value="tr">Türkisch</option>
+        <option value="ru">Russisch</option>
+        <option value="uk">Ukrainisch</option>
+        <option value="ar">Arabisch</option>
+        <option value="pt">Portugiesisch</option>
+      </select>
+    </div>
+
+    <div class="rechenweg" id="rechenweg"></div>
+
+    <button class="primary" id="go" disabled>Transkribieren</button>
+    <button class="ghost" id="stopp" hidden style="margin-top:8px;width:100%">Abbrechen</button>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="log" aria-live="polite"></div>
+
+    <div class="field" id="f-export" hidden style="margin-top:14px">
+      <label for="format">Speichern als</label>
+      <div class="exportzeile">
+        <select id="format">
+          <option value="txt" selected>Text (.txt)</option>
+          <option value="txtz">Text mit Zeitmarken (.txt)</option>
+          <option value="srt">Untertitel SRT</option>
+          <option value="vtt">Untertitel VTT</option>
+          <option value="docx">Word (.docx)</option>
+        </select>
+        <button class="ghost klein" id="export" type="button">Speichern</button>
+      </div>
+      <button class="ghost klein" id="kopieren" type="button" style="margin-top:8px;width:100%">Text in die Zwischenablage</button>
+    </div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Interview für den Artikel, das Diktat für die Akte, der Mitschnitt der Vorstandssitzung, der Podcast fürs Archiv: Abtippen dauert ein Vielfaches der Aufnahme. Dafür zahlen viele ein Abo bei einem Transkriptionsdienst — und laden dabei Aufnahmen hoch, die Namen, Diagnosen oder Vereinsinterna enthalten. Hier läuft die Spracherkennung Whisper direkt in deinem Browser: Aufnahme rein, Text mit Zeitmarken raus, im Editor korrigieren, als Text, Untertitel oder Word-Datei speichern. Kein Konto, kein Upload, keine Aufnahmestunden-Abrechnung.</p>
+  <h3>Wird meine Aufnahme hochgeladen?</h3>
+  <p>Nein — und hier ist das kein Detail, sondern der Punkt. Beim ersten Start wird das Erkennungsmodell einmalig von dieser Website geladen (40 bis 250&nbsp;MB, je nach Wahl) und danach im Browser behalten. Die Aufnahme selbst wird nie übertragen; es gibt keinen Server, der sie annehmen könnte, und sie fließt in kein Training ein. Für Journalisten, Therapeuten, Anwälte oder Vereine, die vertrauliche Gespräche verschriftlichen müssen, ist das der ganze Sinn dieses Werkzeugs.</p>
+  <h3>Wie gut ist die Erkennung?</h3>
+  <p>Bei klarer Aufnahme, wenig Nebengeräuschen und einem Sprecher sehr brauchbar. Das große Modell erkennt Fachwörter, Namen und Satzzeichen deutlich besser als das kleine — es braucht aber mehr Speicher und Zeit. Dialekt, Hall, Durcheinanderreden und leise Sprecher senken die Qualität. Deshalb landet der Text nicht als Block, sondern in Abschnitten mit Zeitmarken: Ein Klick auf die Zeit spielt die Stelle ab, der Text daneben lässt sich direkt korrigieren.</p>
+  <h3>Wie lange dauert es?</h3>
+  <p>Das hängt vom Gerät ab. Mit Grafikbeschleunigung (WebGPU — Chrome und Edge auf aktuellen Rechnern) läuft die Erkennung um ein Vielfaches schneller als die Aufnahme lang ist. Nur mit dem Prozessor dauert es etwa so lange wie die Aufnahme, beim großen Modell länger; auf Handys entsprechend mehr. Die Anzeige nennt den gewählten Rechenweg und schätzt nach dem ersten Abschnitt die Restzeit. Für lange Aufnahmen: Rechner am Strom lassen und den Tab offen halten.</p>
+  <h3>Welche Formate kann ich speichern?</h3>
+  <p>Reinen Text, Text mit Zeitmarken (für Protokolle), Untertitel als SRT oder VTT (für Videos, weiter bearbeitbar im <a href="../untertitel/index.html">Untertitel-Werkzeug</a>) und ein Word-Dokument mit Titel und Abschnitten. Der Text aus der Zwischenablage passt in jede Textverarbeitung.</p>
+  <h3>Was ist Whisper?</h3>
+  <p>Ein von OpenAI veröffentlichtes, frei nutzbares Spracherkennungsmodell (MIT-Lizenz), das mit hunderttausenden Stunden Sprache trainiert wurde und rund hundert Sprachen versteht. Hier laufen die Größen „tiny“, „base“ und „small“ als ONNX-Modelle über transformers.js und die ONNX-Laufzeitumgebung — beides quelloffen, beides auf deinem Gerät.</p>
+</section>
+
+<footer>
+  <p>Ton vorher <a href="../ton-verbessern/index.html">verbessern</a> (Lautstärke angleichen, Rauschen dämpfen) hilft der Erkennung; lange Aufnahmen vorher <a href="../medien-schneiden/index.html">schneiden</a>. Verwendet werden Whisper (OpenAI, MIT), transformers.js (Apache-2.0) und onnxruntime-web (MIT). Dieses Werkzeug braucht einen Webserver.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../vendor/docx.min.js"></script>
+<script src="../../js/ui.js?v=20260804"></script>
+<script src="../../js/uebergabe.js?v=20260804"></script>
+<script src="../../js/weiter.js?v=20260804"></script>
+<script src="../../js/einstellungen.js?v=20260804"></script>
+<script src="../../js/dropzone.js?v=20260804"></script>
+<script>
+const $ = AK.$;
+const MODELLE = {   // Größen: Prozessor-Weg (q8+q4) / Grafikkarten-Weg (fp32+q4), gerundet
+  tiny:  { id: 'whisper-tiny',  name: 'Klein',  text: 'Klein — schnell, grob',      mb: { wasm: 100, webgpu: 120 } },
+  base:  { id: 'whisper-base',  name: 'Mittel', text: 'Mittel — ausgewogen',        mb: { wasm: 150, webgpu: 210 } },
+  small: { id: 'whisper-small', name: 'Groß',   text: 'Groß — genau, langsam',      mb: { wasm: 330, webgpu: 590 } },
+};
+const SPRACHEN = { de:'Deutsch', en:'Englisch', fr:'Französisch', es:'Spanisch', it:'Italienisch', nl:'Niederländisch', pl:'Polnisch', tr:'Türkisch', ru:'Russisch', uk:'Ukrainisch', ar:'Arabisch', pt:'Portugiesisch' };
+
+let T = null;                 // transformers.js-Modul
+let geladen = null;           // { key, geraet, model, processor, tokenizer }
+let audio = null;             // { samples: Float32Array (16 kHz mono), dauer, name, url }
+let abschnitte = [];          // [{ von, bis, text }]
+let laeuft = false;
+let stoppen = null;           // InterruptableStoppingCriteria
+let abbruch = false;
+let geraet = null;            // 'webgpu' | 'wasm'
+let basis = 'aufnahme';
+
+/* ---------- Rechenweg feststellen ---------- */
+async function rechenweg(){
+  let gpu = false;
+  const safari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+  if(navigator.gpu && !safari){
+    try{ gpu = !!(await navigator.gpu.requestAdapter()); }catch(_){ gpu = false; }
+  }
+  geraet = gpu ? 'webgpu' : 'wasm';
+  const kerne = navigator.hardwareConcurrency || 1;
+  const threads = self.crossOriginIsolated ? Math.min(8, kerne) : 1;
+  for(const o of $('#modell').options){ const m = MODELLE[o.value]; if(m) o.textContent = `${m.text} (≈ ${m.mb[geraet]} MB)`; }
+  $('#rechenweg').innerHTML = gpu
+    ? 'Rechnet auf der <b>Grafikkarte (WebGPU)</b> — schnell.'
+    : `Rechnet auf dem <b>Prozessor</b>${threads > 1 ? ` (${threads} Kerne)` : ''} — etwa so lange wie die Aufnahme dauert.` +
+      (!navigator.gpu ? ' Chrome oder Edge mit WebGPU wären deutlich schneller.' : '');
+  return threads;
+}
+
+/* ---------- Bibliothek und Modell ---------- */
+async function bibliothek(){
+  if(T) return T;
+  T = await import('../../vendor/transformers/transformers.min.js');
+  const { env } = T;
+  const wurzel = new URL('../../', location.href).href;
+  env.allowRemoteModels = false;
+  env.allowLocalModels = true;
+  env.localModelPath = '../../vendor/whisper/';   // relativ! Eine absolute http-Adresse behandelt transformers.js als „fern“
+  env.useBrowserCache = true;
+  const threads = await rechenweg();
+  const w = env.backends.onnx.wasm;
+  const variante = geraet === 'webgpu' ? 'ort-wasm-simd-threaded.asyncify' : 'ort-wasm-simd-threaded';
+  w.wasmPaths = { mjs: wurzel + 'vendor/transformers/' + variante + '.mjs', wasm: wurzel + 'vendor/transformers/' + variante + '.wasm' };
+  w.numThreads = threads;
+  w.proxy = false;
+  return T;
+}
+
+async function ladeModell(key){
+  const gewuenscht = geraet;
+  if(geladen && geladen.key === key && geladen.geraet === gewuenscht) return geladen;
+  const m = MODELLE[key];
+  const fortschritt = {};
+  const cb = p => {
+    if(p.status === 'progress' && p.file){
+      fortschritt[p.file] = [p.loaded || 0, p.total || 0];
+      let l = 0, t = 0; for(const [a, b] of Object.values(fortschritt)){ l += a; t += b; }
+      if(t){ AK.bar(l / t * 0.9); $('#live').innerHTML = `Modell „${m.name}“ wird geladen … <b>${AK.fmtBytes(l)} / ${AK.fmtBytes(t)}</b>`; }
+    }
+  };
+  const lade = async (dev) => {
+    // Schlüssel doppelt (Sitzungsname und Dateiname), weil transformers.js 4.2 an einer Stelle
+    // nach dem einen, an anderer nach dem anderen sucht. Warum genau diese Fassungen:
+    // vendor/whisper/holen.sh. Kurz: q8-Decoder lädt in ORT 1.26 nicht, fp16-Encoder rechnet
+    // auf WebGPU falsch, q8-Encoder ist auf WebGPU nicht schneller als auf dem Prozessor.
+    const dtype = dev === 'webgpu'
+      ? { model: 'fp32', encoder_model: 'fp32', decoder_model_merged: 'q4' }
+      : { model: 'q8', encoder_model: 'q8', decoder_model_merged: 'q4' };
+    const [processor, tokenizer, model] = await Promise.all([
+      T.AutoProcessor.from_pretrained(m.id, { progress_callback: cb }),
+      T.AutoTokenizer.from_pretrained(m.id, { progress_callback: cb }),
+      T.WhisperForConditionalGeneration.from_pretrained(m.id, { dtype, device: dev, progress_callback: cb }),
+    ]);
+    return { key, geraet: dev, processor, tokenizer, model };
+  };
+  if(geladen && geladen.model){ try{ await geladen.model.dispose(); }catch(_){ } geladen = null; }
+  try{
+    geladen = await lade(gewuenscht);
+  }catch(err){
+    if(gewuenscht !== 'webgpu') throw err;
+    console.warn('WebGPU fehlgeschlagen, Rückfall auf Prozessor', err);
+    AK.log('Die Grafikbeschleunigung ließ sich nicht nutzen — es geht auf dem Prozessor weiter (langsamer).');
+    geraet = 'wasm';
+    T.env.backends.onnx.wasm.wasmPaths = { mjs: new URL('../../vendor/transformers/ort-wasm-simd-threaded.mjs', location.href).href, wasm: new URL('../../vendor/transformers/ort-wasm-simd-threaded.wasm', location.href).href };
+    geladen = await lade('wasm');
+    $('#rechenweg').innerHTML = 'Rechnet auf dem <b>Prozessor</b> (Grafikbeschleunigung nicht verfügbar).';
+  }
+  $('#live').textContent = '';
+  return geladen;
+}
+
+/* ---------- Audio einlesen: beliebiges Format → 16 kHz mono ---------- */
+async function dekodiere(file){
+  const buf = await file.arrayBuffer();
+  const Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  let decoded;
+  try{
+    const ctx = new Ctx(1, 16000, 16000);
+    decoded = await new Promise((res, rej) => { const p = ctx.decodeAudioData(buf, res, rej); if(p && p.then) p.then(res, rej); });
+  }catch(err){
+    throw new Error('Format nicht lesbar');
+  }
+  let mono;
+  if(decoded.sampleRate === 16000){
+    mono = new Float32Array(decoded.length);
+    const nk = decoded.numberOfChannels;
+    for(let c = 0; c < nk; c++){ const d = decoded.getChannelData(c); for(let i = 0; i < d.length; i++) mono[i] += d[i] / nk; }
+  }else{
+    // Browser hat nicht auf 16 kHz umgerechnet (Safari) — Umweg über ein zweites Rendering
+    const n = Math.ceil(decoded.duration * 16000);
+    const ctx = new Ctx(1, n, 16000);
+    const q = ctx.createBufferSource(); q.buffer = decoded; q.connect(ctx.destination); q.start();
+    const out = await ctx.startRendering();
+    mono = out.getChannelData(0).slice();
+  }
+  return { samples: mono, dauer: mono.length / 16000 };
+}
+
+const fmtZeit = (s, ms) => {
+  s = Math.max(0, s || 0);
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = Math.floor(s % 60), rest = Math.round((s - Math.floor(s)) * 1000);
+  const basisT = (h ? String(h).padStart(2, '0') + ':' : '') + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  return ms ? basisT + ms + String(rest).padStart(3, '0') : basisT;
+};
+const fmtDauer = s => s < 60 ? Math.round(s) + ' s' : s < 3600 ? Math.round(s / 60) + ' min' : (s / 3600).toFixed(1) + ' h';
+
+/* ---------- Datei annehmen ---------- */
+async function addFiles(list){
+  const file = list.find(f => /^(audio|video)\//.test(f.type) || /\.(mp3|wav|m4a|aac|ogg|opus|flac|wma|aiff?|mp4|webm|mkv|mov|m4v)$/i.test(f.name));
+  if(!file) return;
+  if(laeuft) return;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  abschnitte = []; zeigeAbschnitte();
+  $('#f-export').hidden = true; $('#werte').textContent = '';
+  if(location.protocol === 'file:'){
+    AK.log('Dieses Werkzeug braucht einen Webserver (Modell und Laufzeit lassen sich nicht per Doppelklick-Datei laden). Auf alleskonverter.de funktioniert es direkt.', true);
+    return;
+  }
+  basis = file.name.replace(/\.[^.]+$/, '');
+  $('#live').textContent = 'Aufnahme wird eingelesen …';
+  try{
+    const a = await dekodiere(file);
+    if(audio && audio.url) URL.revokeObjectURL(audio.url);
+    audio = { ...a, name: file.name, url: URL.createObjectURL(file) };
+    const p = $('#player'); p.src = audio.url; p.classList.add('on');
+    $('#empty').style.display = 'none';
+    $('#live').innerHTML = `<b>${AK.esc(file.name)}</b> — ${fmtDauer(audio.dauer)}, bereit. Modell wählen und „Transkribieren“ drücken.`;
+    if(audio.dauer > 3 * 3600) AK.log('Sehr lange Aufnahme (' + fmtDauer(audio.dauer) + '). Das dauert entsprechend; besser vorher schneiden.', true);
+    $('#go').disabled = false;
+  }catch(err){
+    console.error(err);
+    audio = null; $('#go').disabled = true; $('#live').textContent = '';
+    AK.log('Die Datei lässt sich nicht als Ton lesen — vermutlich beschädigt oder ein Format, das der Browser nicht dekodiert. Tipp: mit „Audio & Video“ zuerst in MP3 oder WAV umwandeln.', true);
+  }
+}
+
+/* ---------- Transkribieren ---------- */
+async function transkribiere(){
+  if(!audio || laeuft) return;
+  laeuft = true; abbruch = false;
+  const go = $('#go'); go.disabled = true; go.textContent = 'Arbeitet …';
+  $('#stopp').hidden = false; $('#f-export').hidden = true;
+  AK.logClear(); AK.clearDownloads(); AK.stamp(false); AK.bar(0);
+  abschnitte = []; zeigeAbschnitte();
+  try{
+    await bibliothek();
+    const key = $('#modell').value;
+    const tl = performance.now();
+    const { model, processor, tokenizer } = await ladeModell(key);
+    if(performance.now() - tl > 2000) AK.log(`Modell „${MODELLE[key].name}“ bereit (${fmtDauer((performance.now() - tl) / 1000)}).`);
+    const t0 = performance.now();
+    const sprache = $('#sprache').value || null;
+    const sr = 16000, chunkS = 30, strideS = 5;
+    const chunkLen = sr * chunkS, strideLen = sr * strideS, schritt = chunkLen - 2 * strideLen;
+    const samples = audio.samples;
+    const timePrecision = processor.feature_extractor.config.chunk_length / model.config.max_source_positions;
+    const hop = processor.feature_extractor.config.hop_length;
+    const teile = [];
+    const anzahl = samples.length <= chunkLen ? 1 : Math.ceil((samples.length - chunkLen) / schritt) + 1;
+    stoppen = new T.InterruptableStoppingCriteria();
+    let start = 0, k = 0, gestartet = performance.now();
+    for(;;){
+      const ende = start + chunkLen;
+      const stueck = samples.subarray(start, ende);
+      const erster = start === 0, letzter = ende >= samples.length;
+      const eingabe = await processor(stueck);
+      let live = '';
+      const streamer = new T.TextStreamer(tokenizer, { skip_prompt: true, skip_special_tokens: true,
+        callback_function: t => { live += t; $('#live').innerHTML = `<b>Abschnitt ${k + 1} von ${anzahl}</b> · ${AK.esc(live.slice(-160))}`; } });
+      const out = await model.generate({
+        inputs: eingabe.input_features, language: sprache, task: 'transcribe',
+        return_timestamps: true, num_frames: Math.floor(stueck.length / hop),
+        streamer, stopping_criteria: stoppen,
+      });
+      teile.push({ stride: [stueck.length / sr, erster ? 0 : strideS, letzter ? 0 : strideS], tokens: out[0].tolist() });
+      k++;
+      // Zwischenstand anzeigen
+      try{
+        const [, info] = tokenizer._decode_asr(teile, { time_precision: timePrecision, return_timestamps: true, force_full_sequences: false });
+        uebernimm(info.chunks || []);
+      }catch(_){ /* Zwischenstand darf scheitern */ }
+      const vergangen = (performance.now() - gestartet) / 1000;
+      const rest = vergangen / k * (anzahl - k);
+      AK.bar(k / anzahl);
+      $('#werte').innerHTML = `<span>Abschnitt <b>${k} / ${anzahl}</b></span><span>Tempo <b>${(k * chunkS / vergangen).toFixed(1)}× Echtzeit</b></span>${k < anzahl ? `<span>Restzeit etwa <b>${fmtDauer(rest)}</b></span>` : ''}`;
+      if(letzter || abbruch) break;
+      start += schritt;
+      await new Promise(r => setTimeout(r));
+    }
+    const [text, info] = tokenizer._decode_asr(teile, { time_precision: timePrecision, return_timestamps: true, force_full_sequences: false });
+    uebernimm(info.chunks || [], text);
+    const dauer = (performance.now() - t0) / 1000;
+    const woerter = abschnitte.reduce((s, a) => s + a.text.trim().split(/\s+/).filter(Boolean).length, 0);
+    $('#live').textContent = '';
+    $('#werte').innerHTML = `<span>Abschnitte <b>${abschnitte.length}</b></span><span>Wörter <b>${woerter}</b></span><span>Dauer <b>${fmtDauer(dauer)}</b> (${(audio.dauer / Math.max(1, dauer)).toFixed(1)}× Echtzeit)</span>`;
+    if(abbruch) AK.log(`Abgebrochen nach ${k} von ${anzahl} Abschnitten — der bis dahin erkannte Text steht unten.`);
+    else AK.log(`Fertig: ${woerter} Wörter in ${abschnitte.length} Abschnitten. Text unten prüfen und korrigieren — dann speichern.`);
+    if(!abschnitte.length) AK.log('Es wurde keine Sprache erkannt. Ist die Aufnahme leise oder ohne Stimme? Ggf. Ton vorher verbessern.', true);
+    $('#f-export').hidden = !abschnitte.length;
+    if(abschnitte.length){ exportiere(); AK.stamp(true); }
+  }catch(err){
+    console.error(err);
+    AK.log('Abgebrochen: ' + (err && err.message ? err.message : 'unbekannter Fehler'), true);
+    if(/memory|allocation|out of/i.test(String(err && err.message))) AK.log('Zu wenig Arbeitsspeicher — kleineres Modell wählen oder die Aufnahme vorher schneiden.', true);
+    AK.bar(0);
+  }finally{
+    laeuft = false; stoppen = null;
+    go.disabled = !audio; go.textContent = 'Transkribieren';
+    $('#stopp').hidden = true;
+  }
+}
+
+$('#stopp').onclick = () => { abbruch = true; if(stoppen) stoppen.interrupt(); $('#stopp').disabled = true; setTimeout(() => $('#stopp').disabled = false, 500); };
+
+/* Erkannte Abschnitte übernehmen — Nutzertext bereits bearbeiteter Abschnitte bleibt erhalten */
+function uebernimm(chunks, gesamt){
+  const neu = chunks.map(c => ({ von: c.timestamp[0] || 0, bis: c.timestamp[1] == null ? null : c.timestamp[1], text: (c.text || '').trim() })).filter(c => c.text);
+  if(!neu.length && gesamt && gesamt.trim()) neu.push({ von: 0, bis: audio ? audio.dauer : null, text: gesamt.trim() });
+  for(let i = 0; i < neu.length; i++){
+    const alt = abschnitte[i];
+    if(alt && alt.bearbeitet && alt.von === neu[i].von) neu[i] = alt;
+  }
+  abschnitte = neu;
+  zeigeAbschnitte();
+}
+
+function zeigeAbschnitte(){
+  const box = $('#abschnitte');
+  box.classList.toggle('on', abschnitte.length > 0);
+  const frag = document.createDocumentFragment();
+  abschnitte.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'abschnitt'; row.dataset.i = i;
+    const z = document.createElement('button');
+    z.type = 'button'; z.className = 'zeit'; z.textContent = fmtZeit(a.von);
+    z.title = 'Ab hier abspielen';
+    z.onclick = () => { const p = $('#player'); p.currentTime = a.von; p.play().catch(() => {}); };
+    const ta = document.createElement('textarea');
+    ta.value = a.text; ta.rows = 1;
+    ta.addEventListener('input', () => { a.text = ta.value; a.bearbeitet = true; wachse(ta); });
+    row.appendChild(z); row.appendChild(ta);
+    frag.appendChild(row);
+  });
+  box.innerHTML = ''; box.appendChild(frag);
+  box.querySelectorAll('textarea').forEach(wachse);
+}
+function wachse(ta){ ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 2) + 'px'; }
+$('#player').addEventListener('timeupdate', () => {
+  const t = $('#player').currentTime;
+  let idx = -1;
+  for(let i = 0; i < abschnitte.length; i++){ if(abschnitte[i].von <= t) idx = i; else break; }
+  document.querySelectorAll('.abschnitt').forEach(r => r.classList.toggle('aktiv', +r.dataset.i === idx));
+});
+addEventListener('resize', () => document.querySelectorAll('.abschnitt textarea').forEach(wachse));
+
+/* ---------- Export ---------- */
+function reinerText(){ return abschnitte.map(a => a.text.trim()).filter(Boolean).join('\n'); }
+function textMitZeiten(){ return abschnitte.map(a => `[${fmtZeit(a.von)}] ${a.text.trim()}`).join('\n'); }
+function endeVon(i){ const a = abschnitte[i]; return a.bis != null ? a.bis : (abschnitte[i+1] ? abschnitte[i+1].von : (audio ? audio.dauer : a.von + 3)); }
+function srt(){ return abschnitte.map((a, i) => `${i+1}\n${fmtZeit(a.von, ',')} --> ${fmtZeit(endeVon(i), ',')}\n${a.text.trim()}\n`).join('\n'); }
+function vtt(){ return 'WEBVTT\n\n' + abschnitte.map((a, i) => `${fmtZeit(a.von, '.')} --> ${fmtZeit(endeVon(i), '.')}\n${a.text.trim()}\n`).join('\n'); }
+async function word(){
+  const { Document, Paragraph, TextRun, Packer, HeadingLevel } = docx;
+  const kinder = [new Paragraph({ text: basis, heading: HeadingLevel.HEADING_1 })];
+  kinder.push(new Paragraph({ children: [new TextRun({ text: `Transkription vom ${new Date().toLocaleDateString('de-DE')} · ${audio ? fmtDauer(audio.dauer) : ''} · erstellt lokal mit alleskonverter.de`, italics: true, size: 18, color: '5C6268' })], spacing: { after: 240 } }));
+  for(const a of abschnitte){
+    kinder.push(new Paragraph({ children: [
+      new TextRun({ text: `[${fmtZeit(a.von)}] `, color: '1B4D3E', font: 'Consolas', size: 18 }),
+      new TextRun({ text: a.text.trim() }),
+    ], spacing: { after: 120 } }));
+  }
+  const doc = new Document({ creator: 'alleskonverter.de', title: basis, sections: [{ children: kinder }] });
+  return Packer.toBlob(doc);
+}
+async function exportiere(){
+  if(!abschnitte.length) return;
+  const f = $('#format').value;
+  let blob, name;
+  if(f === 'txt'){ blob = new Blob([reinerText()], { type: 'text/plain;charset=utf-8' }); name = basis + '.txt'; }
+  else if(f === 'txtz'){ blob = new Blob([textMitZeiten()], { type: 'text/plain;charset=utf-8' }); name = basis + '-zeitmarken.txt'; }
+  else if(f === 'srt'){ blob = new Blob([srt()], { type: 'text/plain;charset=utf-8' }); name = basis + '.srt'; }
+  else if(f === 'vtt'){ blob = new Blob([vtt()], { type: 'text/vtt;charset=utf-8' }); name = basis + '.vtt'; }
+  else { blob = await word(); name = basis + '.docx'; }
+  AK.offerDownload(blob, name);
+}
+$('#export').onclick = exportiere;
+$('#format').addEventListener('change', () => { if(abschnitte.length) exportiere(); });
+$('#kopieren').onclick = async () => {
+  try{ await navigator.clipboard.writeText(reinerText()); AK.log('Text in die Zwischenablage kopiert.'); }
+  catch(_){ AK.log('Kopieren nicht erlaubt — bitte den Text unten markieren und kopieren.', true); }
+};
+
+$('#go').onclick = transkribiere;
+AK.dropzone('#drop', '#picker', addFiles);
+if(location.protocol === 'file:') AK.log('Dieses Werkzeug braucht einen Webserver. Auf alleskonverter.de funktioniert es direkt.', true);
+else rechenweg();
+</script>
+<script>
+/* Website als App installierbar machen und offline verfügbar halten.
+   Über file:// gibt es keine Service Worker — dort still überspringen. */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

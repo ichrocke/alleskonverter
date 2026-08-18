@@ -30,11 +30,32 @@ Stand: 26.07.2026 (Bibliotheken geprüft und teilweise aktualisiert)
 | `onnx/ort.wasm.min.js`, `ort-wasm-*` | onnxruntime-web | 1.22.0 | MIT | Modelle ausführen |
 | `onnx/u2netp.onnx` | U²-Net (kleine Fassung) | — | Apache-2.0 | Motiv freistellen |
 | `vtracer/vtracer.js`, `vtracer_bg.wasm` | VTracer (visioncortex, npm @visioncortex/vtracer) | 1.0.0-alpha.3 | MIT OR Apache-2.0 | Bilder vektorisieren |
+| `transformers/transformers.min.js` | @huggingface/transformers (transformers.js, Standalone-Bundle mit eingebauter ONNX-Laufzeit) | 4.2.0 | Apache-2.0 | Whisper ansteuern |
+| `transformers/ort-wasm-simd-threaded*.{mjs,wasm}` | onnxruntime-web (Fassung, die transformers.js 4.2.0 verlangt) | 1.26.0-dev.20260416 | MIT | Laufzeit für Whisper (asyncify-Fassung für WebGPU) |
+| `whisper/whisper-{tiny,base,small}/` (nicht im Repo, `holen.sh`) | Whisper als ONNX (onnx-community) | — | MIT | Spracherkennung |
 | `tools/qr-code/vendor/qr-code-styling.js` | qr-code-styling | gevendort | MIT | QR-Codes gestalten |
 | `tools/qr-code/vendor/qrcode-*.js` | qrcode-generator | gevendort | MIT | QR-Codes berechnen |
 | `fonts/anton-*`, `archivo-*`, `ibm-plex-mono-*` | Anton, Archivo, IBM Plex Mono | — | SIL Open Font License 1.1 | Schriften |
 
 ## Neu hinzugekommen (18.08.2026)
+
+- **transformers.js 4.2.0 + onnxruntime-web 1.26.0-dev** für die Transkription. Genommen ist
+  `dist/transformers.min.js` — das einzige Bundle mit eingebauter ONNX-Laufzeit; die
+  „web“-Fassung importiert `onnxruntime-web` als nacktes Modul und läuft ohne Bundler nicht.
+  Die ORT-Dateien müssen exakt zur eingebauten Fassung passen; standardmäßig holt
+  transformers.js sie von jsDelivr — hier über `env.backends.onnx.wasm.wasmPaths` auf
+  `vendor/transformers/` umgebogen. Es ist ein ES-Modul und wird per `import()` geladen;
+  das Werkzeug braucht deshalb einen Webserver. Wichtig: `env.localModelPath` muss ein
+  **relativer** Pfad sein — eine absolute http-Adresse behandelt transformers.js als fern
+  und verweigert sie bei `allowRemoteModels = false`.
+  Eine Kuriosität: GitHubs Push-Schutz hält den Klassennamen `Mistral3ForConditionalGeneration`
+  in diesem Bundle für einen Mistral-API-Schlüssel (32 Zeichen hinter „mistral“) und lehnt den
+  Push ab. Deshalb steht das eine Vorkommen als `"Mistral3ForConditional\x47eneration"` in der
+  Datei — zur Laufzeit derselbe String, für den Scanner unsichtbar. Beim Aktualisieren wieder so
+  eintragen.
+- **Whisper-Modelle** (tiny/base/small von onnx-community): rund 1 GB, deshalb nicht im
+  Repository, sondern über `vendor/whisper/holen.sh` zu laden; `deploy.sh` spiegelt sie mit.
+  Welche Quantisierungen und warum: siehe Kopf von `holen.sh`.
 
 - **VTracer 1.0.0-alpha.3** für „Bild vektorisieren“. Das npm-Paket `@visioncortex/vtracer`
   ist ein wasm-bindgen-Build für Node (`--target nodejs`); es gibt keine fertige

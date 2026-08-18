@@ -7,7 +7,7 @@
    • ffmpeg (~32 MB), Texterkennung (~19 MB)
                            → nur bei Bedarf, werden nach dem ersten Einsatz behalten
 */
-const VERSION = '2026-08-18a';
+const VERSION = '2026-08-18b';
 const CACHE = 'alleskonverter-' + VERSION;
 
 /* Beim Installieren: Grundgerüst und alle Bibliotheken mitnehmen (~5 MB).
@@ -134,6 +134,9 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(request.url);
   if(url.origin !== self.location.origin) return;   // nichts Fremdes anfassen
+  // Whisper-Modelle (bis 600 MB) verwaltet transformers.js selbst im Cache-Speicher —
+  // hier nicht noch einmal ablegen, sonst liegt alles doppelt auf der Platte
+  if(url.pathname.startsWith('/vendor/whisper/')) return;
 
   const pfad = url.pathname;
   const eigenerCode = pfad.startsWith('/css/') || pfad.startsWith('/js/') ||

@@ -504,6 +504,35 @@ const FAELLE = [
     } },
   { werkzeug:'gif-erstellen',      nur_laden:true },
   { werkzeug:'ton-verbessern',     nur_laden:true },
+  { werkzeug:'transkription',      nur_laden:true,
+    pruefen: async p => {
+      // Die Modelle liegen nicht im Repo (~1 GB) — echte Erkennung nur, wenn sie lokal da sind
+      // und macOS per „say“ eine Sprachprobe liefern kann; sonst bleibt es beim Ladetest
+      const modell = path.join(WURZEL, 'vendor/whisper/whisper-tiny/onnx/decoder_model_merged_q4.onnx');
+      if(!fs.existsSync(modell) || process.platform !== 'darwin'){ console.log('        (Erkennung übersprungen — Modelle nicht lokal oder kein macOS)'); return; }
+      const { execSync } = require('child_process');
+      const dir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'ak-'));
+      try{ execSync(`say -v Anna -o "${dir}/rede.aiff" "Dies ist ein Test der Transkription im Browser" && afconvert -f WAVE -d LEI16@16000 -c 1 "${dir}/rede.aiff" "${dir}/rede.wav"`); }
+      catch(_){ console.log('        (Erkennung übersprungen — keine Sprachausgabe)'); return; }
+      const wav = fs.readFileSync(dir + '/rede.wav').toString('base64');
+      await p.evaluate(async b64 => {
+        const bin = atob(b64); const arr = new Uint8Array(bin.length);
+        for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        await window.addFiles([new File([arr], 'rede.wav', { type:'audio/wav' })]);
+      }, wav);
+      await p.waitForFunction(() => !document.querySelector('#go').disabled, { timeout:20000 });
+      await p.select('#modell', 'tiny');
+      await p.click('#go');
+      await p.waitForSelector('a.download', { timeout:240000 });
+      const text = await p.$$eval('.abschnitt textarea', els => els.map(e => e.value).join(' '));
+      if(!/Test/i.test(text)) throw new Error('erkannter Text: ' + text.slice(0, 80));
+      // Untertitel-Export muss gültiges SRT liefern
+      await p.select('#format', 'srt');
+      await new Promise(r => setTimeout(r, 500));
+      const srt = await p.evaluate(async () => await (await fetch(document.querySelector('a.download').href)).text());
+      if(!/^1\n\d\d:\d\d,\d{3} --> /.test(srt)) throw new Error('kein SRT: ' + srt.slice(0, 40));
+    } },
+
   { werkzeug:'pdf-durchsuchbar',   nur_laden:true },
   // Schwergewichte: nur laden und auf Fehler prüfen
   { werkzeug:'medien',             nur_laden:true },

@@ -95,9 +95,9 @@
     { test: n => /\.zip$/i.test(n), art: 'ZIP-Archiv',
       tools: ['zip'] },
     { test: n => /\.(mp3|wav|ogg|m4a|flac|aac|opus|wma|aiff?)$/i.test(n), art: 'Audiodatei',
-      tools: ['medien','medien-schneiden'] },
+      tools: ['medien','medien-schneiden','ton-verbessern','transkription'] },
     { test: n => /\.(mp4|webm|mkv|avi|mov|wmv|flv|m4v)$/i.test(n), art: 'Videodatei',
-      tools: ['medien','medien-schneiden'] },
+      tools: ['medien','medien-schneiden','transkription'] },
     { test: n => /\.txt$/i.test(n), art: 'Textdatei',
       tools: ['text-werkzeuge','vergleichen','word-erstellen','untertitel','tabellen'] },
   ];

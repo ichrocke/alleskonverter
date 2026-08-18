@@ -1,0 +1,8 @@
+# Transkription: Seite „cross-origin isolated“ ausliefern, damit SharedArrayBuffer
+# verfügbar ist und die ONNX-Laufzeit auf mehreren Prozessorkernen rechnen darf
+# (ohne diese Kopfzeilen bleibt nur ein Kern — Faktor 3–4 langsamer).
+# Alle Ressourcen der Seite kommen von dieser Website, deshalb ist das gefahrlos.
+<IfModule mod_headers.c>
+  Header set Cross-Origin-Opener-Policy "same-origin"
+  Header set Cross-Origin-Embedder-Policy "require-corp"
+</IfModule>

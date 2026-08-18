@@ -65,6 +65,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Ton verbessern](tools/ton-verbessern/index.html) | Normalisieren nach EBU R128, Stille abschneiden, Rauschdämpfung |
 | [GIF erstellen](tools/gif-erstellen/index.html) | Animiertes GIF aus Bildern, mit eigener Farbtabelle für bessere Farben |
 | [Untertitel SRT ↔ VTT](tools/untertitel/index.html) | Untertitel umwandeln, reinen Text extrahieren, Zeiten verschieben |
+| [Transkription](tools/transkription/index.html) | Audio/Video → Text mit Whisper (transformers.js + onnxruntime-web, WebGPU oder mehrkernig auf dem Prozessor); Zeitmarken, Editor, Export als TXT/SRT/VTT/DOCX. Modelle per `vendor/whisper/holen.sh` |
 
 **Web & Entwicklung**
 

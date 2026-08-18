@@ -44,6 +44,7 @@ ErrorDocument 404 /404.html
 <IfModule mod_setenvif.c>
   SetEnvIf Request_URI "^/(css|js)/"                 EIGENER_CODE
   SetEnvIf Request_URI "^/tools/[^/]+/(css|js)/"     EIGENER_CODE
+  SetEnvIf Request_URI "^/tools/[^/]+/[^/]+\.js$"     EIGENER_CODE
   SetEnvIf Request_URI "^/(sw\.js|manifest\.webmanifest)$" EIGENER_CODE
   SetEnvIf Request_URI "^/assets/"                   EIGENE_BILDER
 </IfModule>
@@ -68,7 +69,7 @@ ErrorDocument 404 /404.html
     Header set Service-Worker-Allowed "/"
   </Files>
   # Unveränderliche Fremdbibliotheken und Schriften lange behalten
-  <FilesMatch "\.(woff2|wasm)$">
+  <FilesMatch "\.(woff2|wasm|onnx|mjs)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
@@ -82,6 +83,8 @@ ErrorDocument 404 /404.html
 # ----- MIME-Typen, die Strato nicht von Haus aus kennt -----
 <IfModule mod_mime.c>
   AddType application/wasm            .wasm
+  AddType text/javascript             .mjs
+  AddType application/octet-stream    .onnx
   AddType application/manifest+json   .webmanifest
   AddType font/woff2                  .woff2
   AddType image/webp                  .webp
