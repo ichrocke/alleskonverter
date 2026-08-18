@@ -250,7 +250,31 @@ const FAELLE = [
   { werkzeug:'text-werkzeuge',     kein_download:true,
     vorher: async p => { await p.type('#input', 'Hallo Welt'); },
     pruefen: async p => {
-      const v = await p.$eval('#output', e => e.value);
+      // Standard-Reiter ist Suchen & Ersetzen: zwei Regeln, ganze Wörter, dann Regex mit Gruppe
+      await p.evaluate(() => {
+        const r = document.querySelector('.regel');
+        r.querySelector('.suchen').value = 'Welt'; r.querySelector('.suchen').dispatchEvent(new Event('input'));
+        r.querySelector('.ersetzen').value = 'Erde'; r.querySelector('.ersetzen').dispatchEvent(new Event('input'));
+        document.querySelector('#input').value = 'Hallo Welt, hallo Weltall'; document.querySelector('#input').dispatchEvent(new Event('input'));
+      });
+      let v = await p.$eval('#output', e => e.value);
+      if(v !== 'Hallo Erde, hallo Erdeall') throw new Error('Ersetzen: ' + v);
+      await p.click('#woerter');
+      v = await p.$eval('#output', e => e.value);
+      if(v !== 'Hallo Erde, hallo Weltall') throw new Error('ganze Wörter: ' + v);
+      await p.click('#regex');
+      await p.evaluate(() => {
+        const r = document.querySelector('.regel');
+        r.querySelector('.suchen').value = '(W)elt'; r.querySelector('.suchen').dispatchEvent(new Event('input'));
+        r.querySelector('.ersetzen').value = '$1ald'; r.querySelector('.ersetzen').dispatchEvent(new Event('input'));
+      });
+      v = await p.$eval('#output', e => e.value);
+      if(v !== 'Hallo Wald, hallo Weltall') throw new Error('Regex-Gruppe: ' + v);
+      const info = await p.$eval('#ersetzinfo', e => e.textContent);
+      if(!/^1 Ersetzung/.test(info)) throw new Error('Zähler: ' + info);
+      // Base64 weiterhin über den Reiter
+      await p.evaluate(() => { document.querySelector('#input').value = 'Hallo Welt'; document.querySelector('#input').dispatchEvent(new Event('input')); [...document.querySelectorAll('#tabs button')].find(b => /Base64 kodieren/.test(b.textContent)).click(); });
+      v = await p.$eval('#output', e => e.value);
       if(v !== 'SGFsbG8gV2VsdA==') throw new Error('Base64 falsch: ' + v);
     } },
   { werkzeug:'bild-metadaten',     dateien:[['b.png', PNG, 'image/png']], kein_download:true,

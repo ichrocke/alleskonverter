@@ -3,6 +3,13 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-18 (Text-Werkzeuge: Suchen & Ersetzen)
+
+### Hinzugefügt
+- **Text-Werkzeuge** haben jetzt als ersten Reiter **Suchen & Ersetzen** für beliebigen Text: einfügen (oder eine Textdatei aufs Eingabefeld ziehen), mehrere Regeln „Suchen → Ersetzen durch“ nacheinander, Trefferzahl je Regel, Optionen Groß-/Kleinschreibung, nur ganze Wörter (Unicode-bewusst, Umlaute zählen zum Wort) und regulärer Ausdruck mit `$1`, `$2`, `$&` im Ersatz; ungültige Ausdrücke werden an der Regel gemeldet statt still ignoriert. Ergebnis wie gewohnt live, kopierbar, als .txt speicherbar. Anlass: Das PDF-Werkzeug ersetzt nur in PDFs — die gleiche Bedienung sollte es auch für normalen Text geben; die beiden Seiten verweisen aufeinander.
+  - Nebenbei nimmt die Seite jetzt Dateien entgegen (`addFiles`), damit die Übergabe von der Startseite und „Weiter zu …“ (etwa aus der Transkription) tatsächlich den Text einfüllt — bisher lief sie hier ins Leere.
+- Testfall erweitert: zwei Regeln, ganze Wörter („Welt“ trifft nicht „Weltall“), Regex-Gruppe (`(W)elt` → `$1ald`), Zähler; Base64 wird weiterhin über den Reiter geprüft.
+
 ## 2026-08-18 (Werkzeug 52: Transkription)
 
 ### Hinzugefügt

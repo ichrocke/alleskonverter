@@ -43,7 +43,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [Markdown ↔ HTML](tools/markdown-html/index.html) | Beide Richtungen, Live-Vorschau |
 | [EPUB lesen & umwandeln](tools/epub/index.html) | E-Book im Browser lesen (EPUB 2 + 3), Export als HTML, Text, Markdown oder ZIP je Kapitel |
 | [Texterkennung (OCR)](tools/texterkennung/index.html) | Text aus Bildern und gescannten PDFs erkennen (Tesseract, deutsch/englisch) |
-| [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
+| [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Suchen & Ersetzen (mehrere Regeln, ganze Wörter, Regex mit Gruppen), Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
 | [Texte & Tabellen vergleichen](tools/vergleichen/index.html) | Diff nach Myers, wortgenaue Hervorhebung, Tabellen zellenweise, Export als .diff oder CSV |
 
 **Tabellen & Daten**

@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Base64, URL-Encode, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter</title>
-<meta name="description" content="Text kodieren und prüfen: Base64, URL-Encode, SHA-256/SHA-1-Hash, Zeichen- und Wortzähler, Groß-/Kleinschreibung. Kostenlos, ohne Upload, lokal im Browser.">
+<title>Text suchen &amp; ersetzen, Base64, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter</title>
+<meta name="description" content="Text einfügen, suchen &amp; ersetzen (auch mehrere Regeln, ganze Wörter, reguläre Ausdrücke), Base64, URL-Encode, SHA-256-Hash, Zeichen- und Wortzähler, Groß-/Kleinschreibung. Kostenlos, ohne Upload, lokal im Browser.">
 <link rel="canonical" href="https://alleskonverter.de/tools/text-werkzeuge/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Alleskonverter">
-<meta property="og:title" content="Base64, URL-Encode, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter">
+<meta property="og:title" content="Text suchen &amp; ersetzen, Base64, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter">
 <meta property="og:description" content="Text kodieren und prüfen: Base64, URL-Encode, SHA-256-Hash, Zeichen- und Wortzähler. Kostenlos, ohne Upload, lokal im Browser.">
 <meta property="og:url" content="https://alleskonverter.de/tools/text-werkzeuge/">
 <meta property="og:image" content="https://alleskonverter.de/assets/og.png">
 <meta property="og:locale" content="de_DE">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Base64, URL-Encode, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter">
+<meta name="twitter:title" content="Text suchen &amp; ersetzen, Base64, Hash &amp; Zeichenzähler — kostenlos | Alleskonverter">
 <meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Text-Werkzeuge — Alleskonverter","url":"https://alleskonverter.de/tools/text-werkzeuge/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Base64, URL-Encode, Hash und Zeichenzähler — kostenlos, ohne Upload, lokal im Browser."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Werden meine Eingaben übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Alles läuft im Browser — auch Hashes werden lokal über die eingebaute Krypto-Schnittstelle berechnet."}},{"@type":"Question","name":"Ist ein SHA-256-Hash eine Verschlüsselung?","acceptedAnswer":{"@type":"Answer","text":"Nein. Ein Hash ist eine Einwegfunktion: Aus dem Ergebnis lässt sich der Ausgangstext nicht zurückrechnen. Er dient dazu, Dateien oder Texte auf Unverändertheit zu prüfen."}},{"@type":"Question","name":"Ist Base64 sicher?","acceptedAnswer":{"@type":"Answer","text":"Nein, Base64 ist keine Verschlüsselung, sondern nur eine andere Schreibweise. Jeder kann sie in Sekunden zurückwandeln."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
@@ -32,6 +32,17 @@
 .stat{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:10px 12px}
 .stat b{display:block;font-family:var(--display);font-size:26px;line-height:1.05;font-weight:400}
 .stat span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.ersetzbox{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px;margin-bottom:12px}
+.regel{display:grid;grid-template-columns:1fr auto 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.regel .pfeil{font-family:var(--mono);color:var(--ink-soft);font-size:13px}
+.regel input{width:100%;min-width:0}
+.regel .weg{width:28px;height:30px;padding:0;line-height:1;font-size:13px}
+.regel .zahl{grid-column:1/-1;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:-4px}
+.regel .zahl b{color:var(--alert);font-weight:500}
+.optionen{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:6px}
+.optionen label{display:flex;gap:6px;align-items:center;font-size:12.5px;cursor:pointer}
+.ersetzinfo{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:8px}
+.ersetzinfo b{color:var(--ink);font-weight:500}
 .hashrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
 .hashout{font-family:var(--mono);font-size:11.5px;word-break:break-all;background:var(--card);border:1px solid var(--rule);padding:8px 10px;margin-bottom:10px}
 .hashout b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:3px}
@@ -43,14 +54,14 @@
 <header>
   <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
   <h1>Text-<span>Werkzeuge</span></h1>
-  <p class="sub">Base64 und URL-Kodierung in beide Richtungen, Prüfsummen berechnen, Groß- und Kleinschreibung umstellen, Zeichen und Wörter zählen — alles in einem Feld, live beim Tippen.</p>
+  <p class="sub">Text einfügen und suchen &amp; ersetzen — mehrere Regeln auf einmal, ganze Wörter, reguläre Ausdrücke. Dazu Base64 und URL-Kodierung in beide Richtungen, Prüfsummen, Groß- und Kleinschreibung, Zeichen- und Wortzähler — alles in einem Feld, live beim Tippen.</p>
 </header>
 
 <main>
 <div class="grid">
   <section>
     <h2>Eingabe</h2>
-    <textarea class="pane" id="input" aria-label="Eingabetext" spellcheck="false" placeholder="Text hier eingeben oder einfügen …" style="min-height:200px"></textarea>
+    <textarea class="pane" id="input" aria-label="Eingabetext" spellcheck="false" placeholder="Text hier eingeben, einfügen oder eine Textdatei hierher ziehen …" style="min-height:200px"></textarea>
 
     <div class="stats" style="margin-top:12px">
       <div class="stat"><b id="cChars">0</b><span>Zeichen</span></div>
@@ -62,6 +73,16 @@
 
     <h2 style="margin-top:26px">Ergebnis</h2>
     <div class="tabs" id="tabs"></div>
+    <div class="ersetzbox" id="ersetzbox" hidden>
+      <div id="regeln"></div>
+      <button class="ghost" id="mehr" type="button" style="width:100%">+ weitere Regel</button>
+      <div class="optionen">
+        <label><input type="checkbox" id="gross"> Groß-/Kleinschreibung beachten</label>
+        <label><input type="checkbox" id="woerter"> Nur ganze Wörter</label>
+        <label><input type="checkbox" id="regex"> Regulärer Ausdruck</label>
+      </div>
+      <div class="ersetzinfo" id="ersetzinfo">Regeln werden nacheinander angewendet; ein leeres Ersatzfeld löscht den Treffer.</div>
+    </div>
     <div id="hashbox" hidden>
       <div class="hashout"><b>SHA-256</b><span id="h256">—</span></div>
       <div class="hashout"><b>SHA-1</b><span id="h1">—</span></div>
@@ -116,6 +137,7 @@
 <script src="../../js/einstellungen.js?v=20260726"></script>
 <script>
 const AKTIONEN = [
+  ['Suchen & Ersetzen', 'ersetzen'],
   ['Base64 kodieren',   t => btoa(String.fromCharCode(...new TextEncoder().encode(t)))],
   ['Base64 dekodieren', t => new TextDecoder().decode(Uint8Array.from(atob(t.replace(/\s+/g,'')), c => c.charCodeAt(0)))],
   ['URL kodieren',      t => encodeURIComponent(t)],
@@ -129,12 +151,13 @@ const AKTIONEN = [
 ];
 
 let aktiv = 0;
+if(/base64/i.test(location.search + location.hash)) aktiv = 1;   // Direktsprung, z. B. …/#base64
 
 const tabs = AK.$('#tabs');
 AKTIONEN.forEach(([label], i) => {
   const b = document.createElement('button');
   b.type = 'button'; b.textContent = label;
-  if(i === 0) b.classList.add('active');
+  if(i === aktiv) b.classList.add('active');
   b.onclick = () => {
     aktiv = i;
     tabs.querySelectorAll('button').forEach((x,j) => x.classList.toggle('active', j === i));
@@ -160,9 +183,18 @@ async function lauf(){
   const text = AK.$('#input').value;
   zaehle(text);
   const istHash = AKTIONEN[aktiv][1] === null;
+  const istErsetzen = AKTIONEN[aktiv][1] === 'ersetzen';
   AK.$('#hashbox').hidden = !istHash;
   AK.$('#output').hidden = istHash;
+  AK.$('#ersetzbox').hidden = !istErsetzen;
   AK.logClear();
+
+  if(istErsetzen){
+    const out = ersetzeAlles(text);
+    AK.$('#output').value = out;
+    ergebnisLaenge(out);
+    return;
+  }
 
   if(istHash){
     if(!text){ ['#h256','#h1','#h512'].forEach(s => AK.$(s).textContent = '—'); ergebnisLaenge(''); return; }
@@ -183,6 +215,76 @@ async function lauf(){
   AK.$('#output').value = out;
   ergebnisLaenge(out);
 }
+
+/* ---------- Suchen & Ersetzen ---------- */
+const regeln = [];
+function regelAnlegen(suchen, ersetzen){
+  const el = document.createElement('div');
+  el.className = 'regel';
+  el.innerHTML = '<input type="text" class="suchen" placeholder="Suchen" aria-label="Suchen" autocomplete="off">' +
+    '<span class="pfeil">→</span>' +
+    '<input type="text" class="ersetzen" placeholder="Ersetzen durch" aria-label="Ersetzen durch" autocomplete="off">' +
+    '<button type="button" class="ghost weg" aria-label="Regel entfernen">✕</button>' +
+    '<div class="zahl"></div>';
+  const r = { suchen: suchen || '', ersetzen: ersetzen || '', el };
+  const inS = el.querySelector('.suchen'), inE = el.querySelector('.ersetzen');
+  inS.value = r.suchen; inE.value = r.ersetzen;
+  inS.addEventListener('input', () => { r.suchen = inS.value; lauf(); });
+  inE.addEventListener('input', () => { r.ersetzen = inE.value; lauf(); });
+  el.querySelector('.weg').onclick = () => {
+    if(regeln.length === 1){ r.suchen = ''; r.ersetzen = ''; inS.value = ''; inE.value = ''; lauf(); return; }
+    regeln.splice(regeln.indexOf(r), 1); el.remove(); lauf();
+  };
+  AK.$('#regeln').appendChild(el);
+  regeln.push(r);
+  return r;
+}
+AK.$('#mehr').onclick = () => { const r = regelAnlegen(); r.el.querySelector('.suchen').focus(); };
+['gross','woerter','regex'].forEach(id => AK.$('#' + id).addEventListener('change', lauf));
+regelAnlegen();
+
+const escRe = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function ersetzeAlles(text){
+  const gross = AK.$('#gross').checked, woerter = AK.$('#woerter').checked, regex = AK.$('#regex').checked;
+  let out = text, gesamt = 0, fehler = 0;
+  for(const r of regeln){
+    const zahl = r.el.querySelector('.zahl');
+    if(!r.suchen){ zahl.textContent = ''; continue; }
+    let quelle = regex ? r.suchen : escRe(r.suchen);
+    if(woerter) quelle = '(?<![\\p{L}\\p{N}_])(?:' + quelle + ')(?![\\p{L}\\p{N}_])';
+    let re;
+    try{ re = new RegExp(quelle, 'gu' + (gross ? '' : 'i')); }
+    catch(err){ zahl.innerHTML = '<b>ungültiger Ausdruck: ' + AK.esc(err.message.replace(/^Invalid regular expression: /, '')) + '</b>'; fehler++; continue; }
+    let n = 0;
+    try{
+      if(regex) out = out.replace(re, (...a) => { n++; return String(r.ersetzen).replace(/\$(\d+|&|\$)/g, (m, g) => g === '&' ? a[0] : g === '$' ? '$' : (a[+g] ?? '')); });
+      else out = out.replace(re, () => { n++; return r.ersetzen; });
+    }catch(err){ zahl.innerHTML = '<b>' + AK.esc(err.message) + '</b>'; fehler++; continue; }
+    gesamt += n;
+    zahl.textContent = n === 1 ? '1 Treffer' : n.toLocaleString('de-DE') + ' Treffer';
+  }
+  const info = AK.$('#ersetzinfo');
+  if(!text) info.textContent = 'Oben Text einfügen; Regeln werden nacheinander angewendet, ein leeres Ersatzfeld löscht den Treffer.';
+  else info.innerHTML = `<b>${gesamt.toLocaleString('de-DE')}</b> ${gesamt === 1 ? 'Ersetzung' : 'Ersetzungen'}` + (fehler ? ` · <b>${fehler}</b> Regel${fehler === 1 ? '' : 'n'} fehlerhaft` : '') + (AK.$('#regex').checked ? ' · in „Ersetzen durch“ gelten $1, $2 … für Gruppen und $&amp; für den Treffer' : '');
+  return out;
+}
+
+/* Textdatei entgegennehmen — per Ablegen auf dem Eingabefeld oder Übergabe von der Startseite */
+async function addFiles(list){
+  const f = list.find(x => /^text\//.test(x.type) || /\.(txt|md|csv|json|xml|html?|srt|vtt|log|ini|yaml|yml)$/i.test(x.name) || !x.type);
+  if(!f) return;
+  AK.$('#input').value = await f.text();
+  AK.$('#dateiname').value = f.name.replace(/\.[^.]+$/, '') + '.txt';
+  lauf();
+}
+window.addFiles = addFiles;
+const eingabe = AK.$('#input');
+['dragenter','dragover'].forEach(t => eingabe.addEventListener(t, e => { e.preventDefault(); eingabe.classList.add('over'); }));
+['dragleave','drop'].forEach(t => eingabe.addEventListener(t, e => { e.preventDefault(); eingabe.classList.remove('over'); }));
+eingabe.addEventListener('drop', e => { if(e.dataTransfer.files.length) addFiles(Array.from(e.dataTransfer.files)); });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
 
 function ergebnisLaenge(s){
   AK.$('#outlen').innerHTML = s.length.toLocaleString('de-DE') + '<small>Zeichen Ergebnis</small>';
