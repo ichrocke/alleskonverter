@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-26 (Markdown ↔ HTML: großer Editor öffnete nicht mit geladener Datei)
+
+### Behoben
+- Der Knopf „Großer Editor“ tat nach dem Einlesen einer .md-Datei nichts mehr: `window.open` stand hinter dem `await` der Dateiübergabe — damit gilt die Klick-Geste für den Browser als verbraucht und der Popup-Blocker schluckt das Fenster. Bei leerem Eingabefeld gab es kein `await`, deshalb ging es nur dort. Jetzt wird das Fenster synchron im Klick geöffnet und erst danach auf `editor.html` navigiert. Der Testlauf hatte das nicht bemerkt, weil Puppeteer Popups nicht blockt — der Testfall prüft jetzt ausdrücklich, dass der `window.open`-Aufruf synchron im Klick fällt.
+
 ## 2026-08-26 (Markdown ↔ HTML: großer Editor, mehr Ausgabeformate, Vorschau ohne Deckel)
 
 ### Hinzugefügt

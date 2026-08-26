@@ -257,6 +257,19 @@ const FAELLE = [
       }, { timeout:10000 });
       const txt = await p.evaluate(async () => await (await fetch(document.querySelector('a.download').href)).text());
       if(!txt.includes('Überschrift') || txt.includes('ÜBERSCHRIFT')) throw new Error('reiner Text: ' + txt.slice(0,60));
+      // Der große Editor muss synchron im Klick aufgehen — mit geladener Datei
+      // kam window.open einmal erst nach einem await, und der Popup-Blocker
+      // schluckte das Fenster (im Test ist er aus, deshalb wird hier direkt
+      // geprüft, wann der Aufruf fällt)
+      const synchron = await p.evaluate(() => {
+        const echt = window.open;
+        let sofort = false;
+        window.open = () => { sofort = true; return null; };
+        document.querySelector('#grosser').click();
+        window.open = echt;
+        return sofort;
+      });
+      if(!synchron) throw new Error('Großer Editor: window.open nicht synchron im Klick');
       // Großer Editor: geteilte Ansicht rendert live
       await p.goto(`http://localhost:${PORT}/tools/markdown-html/editor.html`, { waitUntil:'load' });
       await p.evaluate(() => {

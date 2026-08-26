@@ -227,15 +227,20 @@ function neuerTab(){
 }
 
 /* Großer Editor: eigenes Fenster, links Markdown, rechts die fertige Seite.
-   Der aktuelle Text geht über die lokale Übergabe mit. */
-async function grosserEditor(){
+   Der aktuelle Text geht über die lokale Übergabe mit. Das Fenster muss
+   synchron im Klick aufgehen — nach einem await gilt die Klick-Geste als
+   verbraucht und der Popup-Blocker schluckt es. */
+function grosserEditor(){
+  const fenster = window.open('', '_blank');
+  if(!fenster) return;
+  const ziel = anhang => { fenster.location.href = new URL('editor.html' + anhang, location.href).href; };
   const text = AK.$('#input').value;
-  let anhang = '';
   if(text.trim() && AK.uebergabeSetzen){
     const datei = new File([text], fileBase + '.md', {type:'text/markdown'});
-    if(await AK.uebergabeSetzen([datei])) anhang = '?datei=1';
+    AK.uebergabeSetzen([datei]).then(ok => ziel(ok ? '?datei=1' : ''));
+  }else{
+    ziel('');
   }
-  window.open('editor.html' + anhang, '_blank');
 }
 
 AK.dropzone('#drop', '#picker', addFiles);
