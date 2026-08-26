@@ -3,6 +3,17 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-08-26 (Markdown ↔ HTML: großer Editor, mehr Ausgabeformate, Vorschau ohne Deckel)
+
+### Hinzugefügt
+- **Großer Editor** (`tools/markdown-html/editor.html`, über den Knopf „Großer Editor (geteilte Ansicht)“): eigenes Fenster über die volle Breite, links Markdown, rechts live die fertige HTML-Seite, dazwischen ein verschiebbarer Griff (Maus/Finger, Pfeiltasten zum Feinjustieren, Doppelklick = Mitte). Bewusst ohne Schnickschnack — eine schmale Leiste mit „.md speichern“, „.html speichern“ und „Drucken / PDF“ (druckt nur die gerenderte Seite, der Browser-Dialog kann sie als PDF sichern). Der aktuelle Text wandert über die vorhandene lokale Übergabe (IndexedDB) hin und über „Zurück zum Werkzeug“ auch wieder zurück. Die Vorschau ist die echte Ausgabeseite in einem Rahmen — einmal aufgesetzt, danach wird nur der Seiteninhalt getauscht, damit die Scroll-Position beim Tippen bleibt; darum gibt es keine doppelte Stilpflege zwischen Vorschau und Download. Die Seite steht mit `noindex` nicht in der Sitemap, deshalb ist sie im Service Worker von Hand eingetragen.
+- **Mehr Ausgabeformate** bei Markdown → HTML: statt der Checkbox „Komplette HTML-Datei“ jetzt eine Formatwahl — komplette HTML-Datei, HTML-Fragment (nur Inhalt) oder **reiner Text (.txt)**. Der reine Text entsteht über einen unsichtbaren, stilfreien Rahmen (innerText liefert dort die Zeilenumbrüche der Blockelemente; Listenzeichen werden vorher eingesetzt). Erster Anlauf über ein verstecktes Element in der Seite selbst schlug fehl: Die Seitenstyles färbten hinein und machten aus jeder Überschrift GROSSBUCHSTABEN. Word (DOCX) bleibt beim Werkzeug „Word-Datei erstellen“, das nach dem Umwandeln ohnehin unter „Weiter zu …“ verlinkt ist — kein zweiter DOCX-Erzeuger.
+- **Vorschau ohne Deckel**: Die eingebettete Vorschau hat keine feste Höchsthöhe mehr und lässt sich an der Ecke in beide Richtungen aufziehen; daneben ein Knopf **„In neuem Tab öffnen“**, der die fertige Seite ungebremst im eigenen Tab zeigt.
+
+### Geändert
+- Die erzeugte HTML-Datei ist **nicht mehr auf 72 Zeichen Breite begrenzt**, sondern nutzt die volle Fensterbreite (Wunsch des Users). Die Seitenvorlage liegt jetzt einmal in `tools/markdown-html/gemeinsam.js` und wird von Werkzeugseite, Neuer-Tab-Ansicht und Editor gemeinsam benutzt.
+- Testfall erweitert: Ausgabeformat reiner Text (inklusive der Großbuchstaben-Falle) und die Live-Vorschau des großen Editors; weiterhin 66 Prüfungen.
+
 ## 2026-08-18 (Text-Werkzeuge: Suchen & Ersetzen)
 
 ### Hinzugefügt

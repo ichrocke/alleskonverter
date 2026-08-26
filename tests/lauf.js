@@ -246,7 +246,27 @@ const FAELLE = [
   { werkzeug:'tabellen',           dateien:[['t.csv', CSV, 'text/csv']] },
   { werkzeug:'word-zu-html',       dateien:[['d.docx', docx(), '']] },
   { werkzeug:'untertitel',         dateien:[['u.srt', SRT, 'text/plain']] },
-  { werkzeug:'markdown-html',      dateien:[['t.md', MD, 'text/markdown']] },
+  { werkzeug:'markdown-html',      dateien:[['t.md', MD, 'text/markdown']],
+    pruefen: async p => {
+      // Neues Ausgabeformat: reiner Text ohne die Großschrift der Seitenstyles
+      await p.select('#format', 'text');
+      await p.click('#go');
+      await p.waitForFunction(() => {
+        const a = document.querySelector('a.download');
+        return a && a.download.endsWith('.txt');
+      }, { timeout:10000 });
+      const txt = await p.evaluate(async () => await (await fetch(document.querySelector('a.download').href)).text());
+      if(!txt.includes('Überschrift') || txt.includes('ÜBERSCHRIFT')) throw new Error('reiner Text: ' + txt.slice(0,60));
+      // Großer Editor: geteilte Ansicht rendert live
+      await p.goto(`http://localhost:${PORT}/tools/markdown-html/editor.html`, { waitUntil:'load' });
+      await p.evaluate(() => {
+        const e = document.querySelector('#eingabe');
+        e.value = '# Probe'; e.dispatchEvent(new Event('input'));
+      });
+      const gut = await p.evaluate(() =>
+        document.querySelector('#vorschau').contentDocument.body.innerHTML.includes('<h1>Probe</h1>'));
+      if(!gut) throw new Error('Editor-Vorschau rendert nicht');
+    } },
   { werkzeug:'text-werkzeuge',     kein_download:true,
     vorher: async p => { await p.type('#input', 'Hallo Welt'); },
     pruefen: async p => {

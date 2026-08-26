@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Markdown in HTML umwandeln (und zurück) — kostenlos | Alleskonverter</title>
-<meta name="description" content="Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau beim Tippen. Kostenlos, ohne Upload, lokal im Browser.">
+<meta name="description" content="Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau, großem geteiltem Editor und Ausgabe als HTML-Datei, Fragment oder reiner Text. Kostenlos, ohne Upload, lokal im Browser.">
 <link rel="canonical" href="https://alleskonverter.de/tools/markdown-html/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Alleskonverter">
 <meta property="og:title" content="Markdown in HTML umwandeln (und zurück) — kostenlos | Alleskonverter">
-<meta property="og:description" content="Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau beim Tippen. Kostenlos, ohne Upload, lokal im Browser.">
+<meta property="og:description" content="Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau, großem geteiltem Editor und Ausgabe als HTML-Datei, Fragment oder reiner Text. Kostenlos, ohne Upload, lokal im Browser.">
 <meta property="og:url" content="https://alleskonverter.de/tools/markdown-html/">
 <meta property="og:image" content="https://alleskonverter.de/assets/og.png">
 <meta property="og:locale" content="de_DE">
@@ -19,10 +19,14 @@
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
 <meta name="theme-color" content="#E6E4DE">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Markdown ↔ HTML — Alleskonverter", "url": "https://alleskonverter.de/tools/markdown-html/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau beim Tippen. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Welcher Markdown-Dialekt wird unterstützt?", "acceptedAnswer": {"@type": "Answer", "text": "GitHub-üblicher Markdown: Überschriften, Listen, Links, Bilder, Code-Blöcke, Tabellen, Zitate. Gerendert wird mit der bewährten Bibliothek marked."}}, {"@type": "Question", "name": "Was geht bei HTML → Markdown verloren?", "acceptedAnswer": {"@type": "Answer", "text": "Alles, was Markdown nicht kennt: Formulare, Skripte, komplexe Layouts und Styling. Der Textinhalt mit seiner Struktur bleibt vollständig erhalten."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Markdown ↔ HTML — Alleskonverter", "url": "https://alleskonverter.de/tools/markdown-html/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "de", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "description": "Markdown online in HTML umwandeln oder HTML zurück in Markdown — mit Live-Vorschau, großem geteiltem Editor und Ausgabe als HTML-Datei, Fragment oder reiner Text. Kostenlos, ohne Upload, lokal im Browser."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Werden meine Dateien hochgeladen?", "acceptedAnswer": {"@type": "Answer", "text": "Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt."}}, {"@type": "Question", "name": "Welcher Markdown-Dialekt wird unterstützt?", "acceptedAnswer": {"@type": "Answer", "text": "GitHub-üblicher Markdown: Überschriften, Listen, Links, Bilder, Code-Blöcke, Tabellen, Zitate. Gerendert wird mit der bewährten Bibliothek marked."}}, {"@type": "Question", "name": "Welche Ausgabeformate gibt es?", "acceptedAnswer": {"@type": "Answer", "text": "Aus Markdown wird wahlweise eine komplette HTML-Datei, ein HTML-Fragment zum Einbetten oder reiner Text (.txt); die Gegenrichtung liefert Markdown (.md). Über den Drucken-Knopf des großen Editors lässt sich die fertige Seite außerdem als PDF sichern, und eine Word-Datei (DOCX) erzeugt das nach dem Umwandeln verlinkte Werkzeug „Word-Datei erstellen“."}}, {"@type": "Question", "name": "Was geht bei HTML → Markdown verloren?", "acceptedAnswer": {"@type": "Answer", "text": "Alles, was Markdown nicht kennt: Formulare, Skripte, komplexe Layouts und Styling. Der Textinhalt mit seiner Struktur bleibt vollständig erhalten."}}, {"@type": "Question", "name": "Was kostet das? Brauche ich ein Konto?", "acceptedAnswer": {"@type": "Answer", "text": "Nichts und nein. Alle Werkzeuge auf alleskonverter.de sind kostenlos, ohne Registrierung und ohne Limits bei Dateigröße oder Anzahl nutzbar."}}]}]}</script>
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="stylesheet" href="../../css/base.css?v=20260726">
 <link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+/* Vorschau ohne feste Deckelung: an der Ecke in beide Richtungen aufziehbar */
+#preview{resize:both;height:420px;max-height:none;min-height:220px;min-width:100%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -30,7 +34,7 @@
 <header>
   <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
   <h1>Markdown <span>↔ HTML</span></h1>
-  <p class="sub">In beide Richtungen umwandeln, mit Live-Vorschau beim Tippen. Datei hineinziehen oder direkt lostippen.</p>
+  <p class="sub">In beide Richtungen umwandeln, mit Live-Vorschau beim Tippen. Datei hineinziehen oder direkt lostippen — oder den großen Editor öffnen: links Markdown, rechts die fertige Seite, Teilung verschiebbar.</p>
 </header>
 
 <main>
@@ -54,6 +58,10 @@
         <h2 id="out-label">Vorschau</h2>
         <div class="preview" id="preview"></div>
         <textarea class="pane" id="outcode" aria-label="Ergebnis" spellcheck="false" readonly hidden></textarea>
+        <div id="vorschau-aktionen" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ghost" id="neuertab" type="button" disabled>In neuem Tab öffnen</button>
+          <button class="ghost" id="grosser" type="button">Großer Editor (geteilte Ansicht)</button>
+        </div>
       </div>
     </div>
   </section>
@@ -79,8 +87,13 @@
       </select>
     </div>
 
-    <div class="field">
-      <label><input type="checkbox" id="fullhtml" checked style="width:auto;margin-right:6px">Komplette HTML-Datei erzeugen</label>
+    <div class="field" id="f-format">
+      <label for="format">Ausgabeformat</label>
+      <select id="format">
+        <option value="voll" selected>Komplette HTML-Datei</option>
+        <option value="fragment">HTML-Fragment (nur Inhalt)</option>
+        <option value="text">Reiner Text (.txt)</option>
+      </select>
     </div>
 
     <button class="primary" id="go" disabled>Herunterladen</button>
@@ -92,11 +105,13 @@
 
 <section class="seotext">
   <h2>Gut zu wissen</h2>
-  <p>README schreiben, Blogartikel vorbereiten, HTML-Schnipsel in Markdown übernehmen: Dieses Werkzeug wandelt in beide Richtungen und zeigt das Ergebnis live beim Tippen. Aus Markdown wird wahlweise ein HTML-Fragment zum Einbetten oder eine komplette, fertig formatierte HTML-Datei.</p>
+  <p>README schreiben, Blogartikel vorbereiten, HTML-Schnipsel in Markdown übernehmen: Dieses Werkzeug wandelt in beide Richtungen und zeigt das Ergebnis live beim Tippen. Die Vorschau lässt sich an der Ecke aufziehen, in einem eigenen Tab öffnen oder gleich im großen Editor bearbeiten — links Markdown, rechts die fertige Seite, die Teilung dazwischen frei verschiebbar. Die erzeugte HTML-Seite nutzt die volle Fensterbreite.</p>
   <h3>Werden meine Dateien hochgeladen?</h3>
   <p>Nein. Die Verarbeitung läuft vollständig lokal in deinem Browser — es gibt keinen Server, der Dateien annehmen könnte. Deine Dateien verlassen dein Gerät zu keinem Zeitpunkt.</p>
   <h3>Welcher Markdown-Dialekt wird unterstützt?</h3>
   <p>GitHub-üblicher Markdown: Überschriften, Listen, Links, Bilder, Code-Blöcke, Tabellen, Zitate. Gerendert wird mit der bewährten Bibliothek marked.</p>
+  <h3>Welche Ausgabeformate gibt es?</h3>
+  <p>Aus Markdown wird wahlweise eine komplette HTML-Datei, ein HTML-Fragment zum Einbetten oder reiner Text (.txt); die Gegenrichtung liefert Markdown (.md). Über den Drucken-Knopf des großen Editors lässt sich die fertige Seite außerdem als PDF sichern, und eine Word-Datei (DOCX) erzeugt das nach dem Umwandeln verlinkte Werkzeug „Word-Datei erstellen“.</p>
   <h3>Was geht bei HTML → Markdown verloren?</h3>
   <p>Alles, was Markdown nicht kennt: Formulare, Skripte, komplexe Layouts und Styling. Der Textinhalt mit seiner Struktur bleibt vollständig erhalten.</p>
   <h3>Was kostet das? Brauche ich ein Konto?</h3>
@@ -113,6 +128,7 @@
 <script src="../../vendor/marked.min.js"></script>
 <script src="../../vendor/turndown.min.js"></script>
 <script src="../../js/ui.js?v=20260726"></script>
+<script src="gemeinsam.js?v=20260826"></script>
 <script src="../../js/uebergabe.js?v=20260726"></script>
 <script src="../../js/weiter.js?v=20260726"></script>
 <script src="../../js/einstellungen.js?v=20260726"></script>
@@ -130,6 +146,8 @@ function refresh(){
 
   AK.$('#in-label').textContent = md ? 'Markdown' : 'HTML';
   AK.$('#f-view').style.display = md ? '' : 'none';
+  AK.$('#f-format').style.display = md ? '' : 'none';
+  AK.$('#vorschau-aktionen').hidden = !md;
 
   if(md){
     current = marked.parse(input);
@@ -150,6 +168,27 @@ function refresh(){
 
   AK.$('#charcount').innerHTML = current.length.toLocaleString('de-DE') + '<small>Zeichen Ausgabe</small>';
   AK.$('#go').disabled = !current.trim();
+  AK.$('#neuertab').disabled = !current.trim();
+}
+
+/* Aus dem gerenderten HTML reinen Text machen. Der Umweg über einen unsichtbaren,
+   stilfreien Rahmen liefert die Zeilenumbrüche der Blockelemente gleich mit —
+   ohne dass die Seitenstyles (Großschrift der Überschriften) hineinfärben.
+   Listenzeichen gehen bei innerText verloren und werden vorher eingesetzt. */
+function reinText(html){
+  const rahmen = document.createElement('iframe');
+  rahmen.style.cssText = 'position:fixed;left:-9999px;top:0;width:600px;height:400px';
+  document.body.appendChild(rahmen);
+  const d = rahmen.contentDocument;
+  d.body.innerHTML = html;
+  d.querySelectorAll('ul > li').forEach(li => li.insertBefore(d.createTextNode('– '), li.firstChild));
+  d.querySelectorAll('ol').forEach(ol => {
+    let n = ol.start || 1;
+    ol.querySelectorAll(':scope > li').forEach(li => li.insertBefore(d.createTextNode((n++) + '. '), li.firstChild));
+  });
+  const text = d.body.innerText.replace(/\n{3,}/g, '\n\n').trim() + '\n';
+  rahmen.remove();
+  return text;
 }
 
 async function addFiles(files){
@@ -166,14 +205,37 @@ async function addFiles(files){
 function download(){
   AK.clearDownloads(); AK.stamp(false);
   if(isMd()){
-    const payload = AK.$('#fullhtml').checked
-      ? `<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${AK.esc(fileBase)}</title>\n<style>body{max-width:72ch;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;line-height:1.6}img{max-width:100%;height:auto}pre{background:#f4f4f4;padding:12px;overflow:auto}code{font-family:ui-monospace,monospace}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px 8px}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:1em;color:#555}</style>\n</head>\n<body>\n${current}\n</body>\n</html>\n`
-      : current;
-    AK.offerDownload(new Blob([payload], {type:'text/html;charset=utf-8'}), fileBase + '.html', '.html herunterladen');
+    const format = AK.$('#format').value;
+    if(format === 'text'){
+      AK.offerDownload(new Blob([reinText(current)], {type:'text/plain;charset=utf-8'}), fileBase + '.txt', '.txt herunterladen');
+    }else{
+      const payload = format === 'voll' ? MDH.vollHtml(current, fileBase) : current;
+      AK.offerDownload(new Blob([payload], {type:'text/html;charset=utf-8'}), fileBase + '.html', '.html herunterladen');
+    }
   }else{
     AK.offerDownload(new Blob([current], {type:'text/markdown;charset=utf-8'}), fileBase + '.md', '.md herunterladen');
   }
   AK.stamp(true);
+}
+
+/* Die fertige Seite in einem eigenen Tab zeigen — dort ist nichts begrenzt */
+let tabUrl = null;
+function neuerTab(){
+  if(tabUrl) URL.revokeObjectURL(tabUrl);
+  tabUrl = URL.createObjectURL(new Blob([MDH.vollHtml(current, fileBase)], {type:'text/html;charset=utf-8'}));
+  window.open(tabUrl, '_blank');
+}
+
+/* Großer Editor: eigenes Fenster, links Markdown, rechts die fertige Seite.
+   Der aktuelle Text geht über die lokale Übergabe mit. */
+async function grosserEditor(){
+  const text = AK.$('#input').value;
+  let anhang = '';
+  if(text.trim() && AK.uebergabeSetzen){
+    const datei = new File([text], fileBase + '.md', {type:'text/markdown'});
+    if(await AK.uebergabeSetzen([datei])) anhang = '?datei=1';
+  }
+  window.open('editor.html' + anhang, '_blank');
 }
 
 AK.dropzone('#drop', '#picker', addFiles);
@@ -181,6 +243,8 @@ AK.$('#input').addEventListener('input', refresh);
 AK.$('#mode').onchange = refresh;
 AK.$('#view').onchange = refresh;
 AK.$('#go').onclick = download;
+AK.$('#neuertab').onclick = neuerTab;
+AK.$('#grosser').onclick = grosserEditor;
 refresh();
 </script>
 <script>

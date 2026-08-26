@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Großer Markdown-Editor — Alleskonverter</title>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<style>
+/* Geteilte Ansicht über das ganze Fenster: links Markdown, rechts die fertige
+   HTML-Seite, dazwischen ein verschiebbarer Griff. Bewusst ohne Schnickschnack. */
+html,body{height:100%}
+body{display:flex;flex-direction:column;overflow:hidden;background-image:none}
+.leiste{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-bottom:2px solid var(--ink)}
+.leiste .titel{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-right:auto}
+.leiste a{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);text-decoration:none;border:1px solid var(--ink);padding:8px 12px;background:var(--card)}
+.leiste a:hover{background:var(--ink);color:var(--paper)}
+#flaeche{flex:1;display:flex;min-height:0}
+#links{width:50%;min-width:0;display:flex}
+#eingabe{flex:1;width:100%;border:0;resize:none;padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.6;background:var(--field);color:var(--ink)}
+#eingabe:focus-visible{outline:none}
+#griff{width:10px;flex:none;cursor:col-resize;background:var(--paper);border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
+#griff:hover,body.zieht #griff{background:var(--stamp)}
+#rechts{flex:1;min-width:0;background:#fff}
+#vorschau{width:100%;height:100%;border:0;display:block}
+body.zieht{user-select:none;cursor:col-resize}
+body.zieht #vorschau{pointer-events:none} /* sonst schluckt der Rahmen die Mausbewegung */
+@media(max-width:700px){
+  #flaeche{flex-direction:column}
+  #links{width:100% !important;height:45%;flex:none}
+  #griff{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="leiste">
+  <a href="index.html" id="zurueck">← Zurück zum Werkzeug</a>
+  <span class="titel">Markdown → HTML · läuft lokal im Browser</span>
+  <button class="ghost" id="md-speichern" type="button">.md speichern</button>
+  <button class="ghost" id="html-speichern" type="button">.html speichern</button>
+  <button class="ghost" id="drucken" type="button">Drucken / PDF</button>
+</div>
+
+<div id="flaeche">
+  <div id="links">
+    <textarea id="eingabe" spellcheck="false" aria-label="Markdown-Eingabe" placeholder="# Überschrift&#10;&#10;Hier Markdown eingeben — rechts entsteht live die fertige Seite …"></textarea>
+  </div>
+  <div id="griff" role="separator" aria-orientation="vertical" aria-label="Teilung verschieben (Pfeiltasten, Doppelklick = Mitte)" tabindex="0" aria-valuemin="15" aria-valuemax="85" aria-valuenow="50"></div>
+  <div id="rechts">
+    <iframe id="vorschau" title="HTML-Vorschau"></iframe>
+  </div>
+</div>
+
+<script src="../../vendor/marked.min.js"></script>
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="gemeinsam.js?v=20260826"></script>
+<script>
+let name = 'umgewandelt';
+const eingabe = AK.$('#eingabe');
+
+/* Die Vorschau ist die echte Ausgabeseite in einem Rahmen. Sie wird einmal
+   aufgesetzt, danach wird beim Tippen nur der Seiteninhalt getauscht — so
+   bleibt die Scroll-Position erhalten. */
+const doc = AK.$('#vorschau').contentDocument;
+doc.open(); doc.write(MDH.vollHtml('', name)); doc.close();
+
+function malen(){
+  doc.body.innerHTML = marked.parse(eingabe.value);
+  doc.title = name;
+}
+eingabe.addEventListener('input', malen);
+
+/* Übergabe von der Werkzeugseite (oder eine hineingereichte Datei) übernehmen */
+window.addFiles = async function(dateien){
+  const datei = dateien.find(f => /\.(md|markdown|txt)$/i.test(f.name));
+  if(!datei) return;
+  name = datei.name.replace(/\.[^.]+$/, '');
+  eingabe.value = await datei.text();
+  malen();
+};
+
+/* Griff: ziehen mit Maus, Stift oder Finger; Pfeiltasten zum Feinjustieren;
+   Doppelklick stellt die Mitte wieder her */
+const links = AK.$('#links'), griff = AK.$('#griff'), flaeche = AK.$('#flaeche');
+
+function setzeBreite(prozent){
+  prozent = Math.max(15, Math.min(85, prozent));
+  links.style.width = prozent + '%';
+  griff.setAttribute('aria-valuenow', Math.round(prozent));
+}
+griff.addEventListener('pointerdown', ev => {
+  ev.preventDefault();
+  griff.setPointerCapture(ev.pointerId);
+  document.body.classList.add('zieht');
+});
+griff.addEventListener('pointermove', ev => {
+  if(!document.body.classList.contains('zieht')) return;
+  const r = flaeche.getBoundingClientRect();
+  setzeBreite((ev.clientX - r.left) / r.width * 100);
+});
+griff.addEventListener('pointerup', () => document.body.classList.remove('zieht'));
+griff.addEventListener('pointercancel', () => document.body.classList.remove('zieht'));
+griff.addEventListener('dblclick', () => setzeBreite(50));
+griff.addEventListener('keydown', ev => {
+  const jetzt = links.getBoundingClientRect().width / flaeche.getBoundingClientRect().width * 100;
+  if(ev.key === 'ArrowLeft'){ setzeBreite(jetzt - 3); ev.preventDefault(); }
+  if(ev.key === 'ArrowRight'){ setzeBreite(jetzt + 3); ev.preventDefault(); }
+});
+
+function speichern(blob, dateiname){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = dateiname;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+AK.$('#md-speichern').onclick = () =>
+  speichern(new Blob([eingabe.value], {type:'text/markdown;charset=utf-8'}), name + '.md');
+AK.$('#html-speichern').onclick = () =>
+  speichern(new Blob([MDH.vollHtml(marked.parse(eingabe.value), name)], {type:'text/html;charset=utf-8'}), name + '.html');
+AK.$('#drucken').onclick = () => AK.$('#vorschau').contentWindow.print();
+
+/* Zurück zum Werkzeug — der aktuelle Text geht über die lokale Übergabe mit */
+AK.$('#zurueck').addEventListener('click', async ev => {
+  if(!eingabe.value.trim() || !AK.uebergabeSetzen) return;
+  ev.preventDefault();
+  const datei = new File([eingabe.value], name + '.md', {type:'text/markdown'});
+  const ok = await AK.uebergabeSetzen([datei]);
+  location.href = 'index.html' + (ok ? '?datei=1' : '');
+});
+
+malen();
+</script>
+</body>
+</html>
