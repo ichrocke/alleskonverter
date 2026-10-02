@@ -3,6 +3,20 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-10-02 (Werkzeug 54: Tab-Ton aufnehmen)
+
+### Hinzugefügt
+- Werkzeug **Tab-Ton aufnehmen** (`tools/tab-ton/`, Kategorie Audio & Video) — schneidet mit, was ein anderer Browser-Tab abspielt (Webradio, Livestream, Sprachnachricht im Web-Messenger), digital und ohne Zusatzprogramm. Pegelstreifen mit Uhr und Zustand, Pause/Weiter, Qualität 128/192/256 kbit/s, Ergebnis als WebM (Opus). Fertige Aufnahmen stehen in einer Liste mit Player, Speichern und Löschen; die neueste liegt zusätzlich rechts als „Herunterladen“ — von dort führt „Weiter zu …“ zu Audio & Video (MP3), Transkription und Medien schneiden.
+  - **Geht nicht in jedem Browser — und sagt das deutlich:** Über dem Werkzeug steht ein gelb gerahmter Kasten „Geht nicht in jedem Browser“ (am Computer in Chrome, Edge und anderen Chromium-Browsern; Firefox und Safari geben beim Teilen keinen Tab-Ton weiter, Smartphones gar keinen). Dasselbe steht auf der Karte der Startseite, unter „Gut zu wissen“ und in der FAQ bei „Welche Browser werden unterstützt?“ — die Antwort dort lautete bisher „alle aktuellen“ und hat jetzt ihre erste Ausnahme. Wer es trotzdem in Firefox oder Safari öffnet, bekommt zusätzlich eine rote Meldung; fehlt die Schnittstelle ganz (Handy), ist der Startknopf gesperrt.
+  - **Herkunft:** Marc hat das Werkzeug als fertige Einzelseite mitgebracht. Übernommen sind Ablauf, Texte und die Fehlersuche bei stummer Freigabe (ganzer Bildschirm, Fenster oder fehlender Schalter „Tab-Audio auch teilen“ werden unterschieden); das Aussehen ist auf den Papier-Look umgezogen: heller Pegelstreifen statt dunklem, Balken in Stempelgrün/Gelb/Rot, lokale Schriften, übliche Aufteilung mit Seitenleiste (Anleitung und Ausgabe rechts). Weggefallen ist alles, was nur für die eingebettete Ansicht der Vorlage da war (Speichern über deren Schnittstelle, „als HTML-Datei speichern“).
+  - **Technik:** `getDisplayMedia` mit abgeschalteten Sprachfiltern (Echo, Rauschen, Pegelautomatik — sonst behandelt Chrome Musik wie ein Telefonat), aufgezeichnet wird nur die Tonspur per `MediaRecorder`; das Bild des Tabs verlangt Chrome zwar, es wird aber verworfen. Die Freigabe ist in der Root-`.htaccess` nicht gesperrt (dort stehen nur Mikrofon, Kamera, Standort), eine eigene `.htaccess` war nicht nötig.
+  - **Ein Fehler der Vorlage behoben:** Die Uhr zählte dort über Einzelbilder (`requestAnimationFrame`). Die stehen aber still, sobald man in den anderen Tab wechselt, um die Wiedergabe zu starten — beendet man die Freigabe von dort aus, stimmte die angezeigte Dauer nicht. Jetzt rechnet die Uhr mit Zeitstempeln; der Pegel hat im Hintergrund weiterhin eine Lücke, das ist nur Anzeige.
+  - Die Nachfrage „Seite wirklich verlassen?“ kommt nur noch, solange aufgenommen wird oder eine Aufnahme weder gespeichert noch weitergereicht wurde — sonst hätte sie jeden „Weiter zu …“-Klick aufgehalten.
+- Testfall: Hinweis sichtbar, Startknopf frei; weil sich das Auswahlfenster der Freigabe nicht fernbedienen lässt, bekommt die Aufnahme einen selbst erzeugten Ton (dafür ist `starteAufnahme(strom)` von der Freigabe getrennt) — geprüft werden Pegel, Uhr, Dateiname, Dateigröße, Liste, „Weiter zu …“ und das Löschen. Der echte Weg über `getDisplayMedia` wurde einmal von Hand mit Chromes Auto-Auswahl gegengeprüft (Tonspur kommt stereo und ungefiltert an). Jetzt 68 Prüfungen.
+
+### Geändert
+- Startseite: „Audio & Video“ zählt jetzt 7 Karten. FAQ: Werkzeugzahl 54 („vier von 54“ mit KI, „50 von 54“ ohne), Browser-Antwort mit Ausnahme (JSON-LD neu erzeugt). Service Worker auf neue Fassung.
+
 ## 2026-10-02 (Werkzeug 53: Anhänger-Zuladung)
 
 ### Hinzugefügt

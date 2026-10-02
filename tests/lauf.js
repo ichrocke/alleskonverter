@@ -591,6 +591,38 @@ const FAELLE = [
     } },
   { werkzeug:'gif-erstellen',      nur_laden:true },
   { werkzeug:'ton-verbessern',     nur_laden:true },
+  { werkzeug:'tab-ton',            kein_download:true,
+    pruefen: async p => {
+      const hinweis = await p.$eval('.browserhinweis', e => e.textContent);
+      if(!/Chrome/.test(hinweis) || !/Firefox und Safari/.test(hinweis)) throw new Error('Browser-Hinweis fehlt: ' + hinweis.slice(0, 60));
+      if(await p.$eval('#go', e => e.disabled)) throw new Error('Startknopf gesperrt, obwohl Chrome aufnehmen kann');
+      // Das Auswahlfenster der Tab-Freigabe lässt sich nicht fernbedienen — stattdessen bekommt die
+      // Aufnahme einen selbst erzeugten Ton. Der Klick vorweg erlaubt dem Browser die Tonausgabe.
+      await p.click('h1');
+      await p.evaluate(async () => {
+        const ctx = new AudioContext(); await ctx.resume();
+        const ton = ctx.createOscillator(), ziel = ctx.createMediaStreamDestination();
+        ton.connect(ziel); ton.start();
+        await starteAufnahme(ziel.stream);
+      });
+      if(await p.$eval('#zustand', e => e.textContent) !== 'Nimmt auf') throw new Error('Aufnahme läuft nicht');
+      await new Promise(r => setTimeout(r, 2200));
+      if(!await p.evaluate(() => pegel.some(l => l > 0.1))) throw new Error('Pegel zeigt keinen Ton');
+      if(await p.$eval('#uhr', e => e.textContent) === '00:00') throw new Error('Uhr steht');
+      await p.click('#stopp');
+      await p.waitForSelector('a.download', { timeout:10000 });
+      const name = await p.$eval('a.download', e => e.getAttribute('download'));
+      if(!/^tab-ton-\d{4}-\d{2}-\d{2}-\d{6}\.webm$/.test(name)) throw new Error('Dateiname: ' + name);
+      const bytes = await p.$eval('a.download', async e => (await (await fetch(e.href)).blob()).size);
+      if(bytes < 2000) throw new Error('Aufnahme zu klein: ' + bytes + ' Bytes');
+      const info = await p.$$eval('#aufnahmen .aufnahmeinfo', els => els.map(e => e.textContent));
+      if(info.length !== 1 || !/00:0[2-4] · .* kbit\/s/.test(info[0])) throw new Error('Liste: ' + info.join('|'));
+      const weiter = await p.$$eval('#weiterbox a', els => els.map(e => e.textContent));
+      if(!weiter.includes('Audio & Video') || !weiter.includes('Transkription')) throw new Error('Weiter zu: ' + weiter.join('|'));
+      // Löschen räumt auch das Angebot rechts ab
+      await p.click('#aufnahmen button');
+      if(await p.$('a.download') || await p.$('#aufnahmen li')) throw new Error('Löschen räumt nicht auf');
+    } },
   { werkzeug:'transkription',      nur_laden:true,
     pruefen: async p => {
       // Die Modelle liegen nicht im Repo (~1 GB) — echte Erkennung nur, wenn sie lokal da sind

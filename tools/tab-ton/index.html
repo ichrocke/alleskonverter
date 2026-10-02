@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tab-Ton aufnehmen — Audio aus dem Browser mitschneiden | Alleskonverter</title>
+<meta name="description" content="Aufnehmen, was ein anderer Browser-Tab abspielt, und als Audiodatei speichern — ohne Upload, ohne Zusatzprogramm. Funktioniert am Computer in Chrome und Edge.">
+<link rel="canonical" href="https://alleskonverter.de/tools/tab-ton/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Tab-Ton aufnehmen — Audio aus dem Browser mitschneiden | Alleskonverter">
+<meta property="og:description" content="Aufnehmen, was ein anderer Browser-Tab abspielt — ohne Upload. Funktioniert am Computer in Chrome und Edge.">
+<meta property="og:url" content="https://alleskonverter.de/tools/tab-ton/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tab-Ton aufnehmen — Audio aus dem Browser mitschneiden | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Tab-Ton aufnehmen — Alleskonverter","url":"https://alleskonverter.de/tools/tab-ton/","applicationCategory":"MultimediaApplication","operatingSystem":"Web","browserRequirements":"Chrome, Edge oder ein anderer Chromium-Browser am Computer","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Den Ton eines anderen Browser-Tabs aufnehmen und als Audiodatei speichern — ohne Upload."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"In welchen Browsern funktioniert das?","acceptedAnswer":{"@type":"Answer","text":"Am Computer in Chrome, Edge und anderen Chromium-Browsern. Firefox und Safari geben beim Teilen keinen Tab-Ton weiter, eine Aufnahme bliebe dort stumm. Auf Smartphones und Tablets gibt es die Tab-Freigabe gar nicht."}},{"@type":"Question","name":"Warum kommt kein Ton an?","acceptedAnswer":{"@type":"Answer","text":"Fast immer fehlt der Schalter „Tab-Audio auch teilen“ im Auswahlfenster, oder es wurde ein Fenster oder der ganze Bildschirm statt eines Tabs geteilt. Fenster liefern nie Ton, der ganze Bildschirm auf dem Mac auch nicht. Wähle den Reiter „Chrome-Tab“ und schalte den Ton dort ein."}},{"@type":"Question","name":"In welchem Format wird gespeichert?","acceptedAnswer":{"@type":"Answer","text":"Als WebM-Datei mit Opus-Ton, so wie der Browser sie aufzeichnet. Die Datei spielt in jedem aktuellen Browser und in VLC. Brauchst du MP3 oder M4A, führt „Weiter zu Audio & Video“ direkt zur Umwandlung."}},{"@type":"Question","name":"Wie lange kann ich aufnehmen?","acceptedAnswer":{"@type":"Answer","text":"Eine feste Grenze gibt es nicht. Die Aufnahme liegt bis zum Speichern im Arbeitsspeicher; eine Stunde in hoher Qualität sind etwa 85 MB. Fertige Aufnahmen verschwinden, wenn du die Seite neu lädst oder schließt."}},{"@type":"Question","name":"Wird die Aufnahme hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Browser reicht den Ton des gewählten Tabs an diese Seite weiter, und sie zeichnet ihn auf deinem Gerät auf. Das Bild des Tabs wird nicht aufgezeichnet."}},{"@type":"Question","name":"Darf ich alles aufnehmen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Gespräche und Videokonferenzen darfst du nur mit Einverständnis aller Beteiligten mitschneiden, und bei Musik, Filmen und Hörbüchern gilt das Urheberrecht. Nimm nur auf, was du aufnehmen darfst."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+/* Einschränkung, die man vor dem ersten Klick kennen muss — deshalb oben und auffällig */
+.browserhinweis{
+  border:1.5px solid var(--amber);background:var(--card);box-shadow:var(--shadow);
+  padding:12px 15px;margin:0 0 24px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);
+}
+.browserhinweis b{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink);font-weight:500;margin-bottom:3px;
+}
+.browserhinweis strong{color:var(--ink)}
+
+/* Pegelstreifen */
+.streifen{position:relative;background:var(--field);border:1px solid var(--rule);box-shadow:var(--shadow);overflow:hidden}
+.streifen canvas{display:block;width:100%;height:150px}
+.streifenkopf{position:absolute;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px;pointer-events:none}
+.uhr{font-family:var(--display);font-size:44px;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.zustand{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);padding-top:4px}
+.punkt{width:9px;height:9px;border-radius:50%;background:var(--rule)}
+.streifen[data-zustand="laeuft"] .punkt{background:var(--alert);animation:blinken 1.2s steps(2,start) infinite}
+.streifen[data-zustand="pause"] .punkt{background:var(--amber)}
+@keyframes blinken{50%{opacity:.25}}
+
+.bedienung{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.bedienung .primary{flex:1 1 220px;width:auto}
+.bedienung .ghost{padding:13px 18px}
+.bedienung [hidden]{display:none}
+
+.meldung{margin-top:12px;border:1.5px solid var(--alert);background:var(--card);box-shadow:var(--shadow);padding:12px 15px;font-size:13.5px;line-height:1.6}
+.meldung p{margin:0}
+.meldung p + p{margin-top:6px;color:var(--ink-soft)}
+
+ol.schritte{margin:0 0 20px;padding-left:20px;font-size:13.5px;line-height:1.55}
+ol.schritte li{margin:7px 0;padding-left:2px}
+ol.schritte li::marker{font-family:var(--mono);font-weight:500;color:var(--stamp)}
+
+/* Aufnahmen */
+.aufnahmen{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.aufnahmen li{background:var(--card);border:1px solid var(--rule);box-shadow:var(--shadow);padding:12px 14px}
+.aufnahmekopf{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 14px;align-items:baseline}
+.aufnahmename{font-weight:600;overflow-wrap:anywhere}
+.aufnahmeinfo{font-family:var(--mono);font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.aufnahmen audio{display:block;width:100%;margin:10px 0}
+.aufnahmeknoepfe{display:flex;gap:6px;flex-wrap:wrap}
+.aufnahmeknoepfe a.ghost{
+  display:inline-block;padding:8px 12px;border:1px solid var(--ink);color:var(--ink);text-decoration:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+}
+.aufnahmeknoepfe a.ghost:hover{background:var(--ink);color:var(--paper)}
+footer p a{color:var(--stamp)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Tab-Ton <span>aufnehmen</span></h1>
+  <p class="sub">Nimmt auf, was ein anderer Browser-Tab gerade abspielt, und gibt dir die Aufnahme als Audiodatei. Alles bleibt auf deinem Gerät.</p>
+</header>
+
+<p class="browserhinweis"><b>Geht nicht in jedem Browser</b>Funktioniert <strong>am Computer in Chrome, Edge und anderen Chromium-Browsern</strong>. Firefox und Safari geben beim Teilen keinen Tab-Ton weiter, Smartphones und Tablets gar keinen.</p>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Aufnahme</h2>
+
+    <div class="streifen" id="streifen" data-zustand="bereit">
+      <canvas id="pegel" aria-hidden="true"></canvas>
+      <div class="streifenkopf">
+        <div class="uhr" id="uhr" role="timer" aria-label="Aufnahmedauer">00:00</div>
+        <div class="zustand"><span class="punkt"></span><span id="zustand" aria-live="polite">Bereit</span></div>
+      </div>
+    </div>
+
+    <div class="bedienung">
+      <button class="primary" id="go">Tab auswählen und aufnehmen</button>
+      <button class="ghost" id="pause" hidden>Pause</button>
+      <button class="primary" id="stopp" hidden>Aufnahme beenden</button>
+    </div>
+
+    <div class="meldung" id="meldung" role="alert" hidden>
+      <p id="meldungtext"></p>
+      <p id="meldunghilfe" hidden></p>
+    </div>
+
+    <h2 style="margin-top:30px">Aufnahmen</h2>
+    <ul class="aufnahmen" id="aufnahmen"></ul>
+    <div class="empty" id="empty">Noch keine Aufnahme. Fertige Aufnahmen erscheinen hier und verschwinden, wenn du die Seite neu lädst. Speichere also, was du behalten willst.</div>
+  </section>
+
+  <aside>
+    <h2>So wählst du den Tab aus</h2>
+    <ol class="schritte">
+      <li>Öffne die Webseite, deren Ton du willst, in einem eigenen Tab und lass sie dort geöffnet.</li>
+      <li>Klicke hier auf „Tab auswählen und aufnehmen“. Der Browser zeigt ein Auswahlfenster.</li>
+      <li>Wähle dort den Reiter „Chrome-Tab“ (in Edge „Microsoft Edge-Tab“) und den gewünschten Tab.</li>
+      <li>Schalte im selben Fenster „Tab-Audio auch teilen“ ein und bestätige. Ohne diesen Schalter kommt kein Ton an.</li>
+      <li>Starte die Wiedergabe im anderen Tab. Der Pegel zeigt, ob Ton ankommt.</li>
+    </ol>
+
+    <h2>Ausgabe</h2>
+    <div class="field">
+      <label for="qualitaet">Qualität</label>
+      <select id="qualitaet">
+        <option value="128000">Standard, 128 kbit/s</option>
+        <option value="192000" selected>Hoch, 192 kbit/s</option>
+        <option value="256000">Sehr hoch, 256 kbit/s</option>
+      </select>
+      <div class="hint">Gespeichert wird als WebM (Opus).</div>
+    </div>
+
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Ein Webradio, ein Vortrag im Livestream, die Sprachnachricht in einem Web-Messenger: Manches lässt sich abspielen, aber nicht herunterladen. Dieses Werkzeug nimmt den Ton eines anderen Browser-Tabs direkt auf — digital, ohne Umweg über Lautsprecher und Mikrofon, und ohne dass ein Zusatzprogramm installiert werden muss.</p>
+  <h3>In welchen Browsern funktioniert das?</h3>
+  <p>Am Computer in Chrome, Edge und anderen Chromium-Browsern. Firefox und Safari geben beim Teilen keinen Tab-Ton weiter, eine Aufnahme bliebe dort stumm. Auf Smartphones und Tablets gibt es die Tab-Freigabe gar nicht.</p>
+  <h3>Warum kommt kein Ton an?</h3>
+  <p>Fast immer fehlt der Schalter „Tab-Audio auch teilen“ im Auswahlfenster, oder es wurde ein Fenster oder der ganze Bildschirm statt eines Tabs geteilt. Fenster liefern nie Ton, der ganze Bildschirm auf dem Mac auch nicht. Wähle den Reiter „Chrome-Tab“ und schalte den Ton dort ein.</p>
+  <h3>In welchem Format wird gespeichert?</h3>
+  <p>Als WebM-Datei mit Opus-Ton, so wie der Browser sie aufzeichnet. Die Datei spielt in jedem aktuellen Browser und in VLC. Brauchst du MP3 oder M4A, führt „Weiter zu Audio &amp; Video“ direkt zur Umwandlung.</p>
+  <h3>Wie lange kann ich aufnehmen?</h3>
+  <p>Eine feste Grenze gibt es nicht. Die Aufnahme liegt bis zum Speichern im Arbeitsspeicher; eine Stunde in hoher Qualität sind etwa 85 MB. Fertige Aufnahmen verschwinden, wenn du die Seite neu lädst oder schließt.</p>
+  <h3>Wird die Aufnahme hochgeladen?</h3>
+  <p>Nein. Der Browser reicht den Ton des gewählten Tabs an diese Seite weiter, und sie zeichnet ihn auf deinem Gerät auf. Das Bild des Tabs wird nicht aufgezeichnet.</p>
+  <h3>Darf ich alles aufnehmen?</h3>
+  <p>Nein. Gespräche und Videokonferenzen darfst du nur mit Einverständnis aller Beteiligten mitschneiden, und bei Musik, Filmen und Hörbüchern gilt das Urheberrecht. Nimm nur auf, was du aufnehmen darfst.</p>
+</section>
+
+<footer>
+  <p>Die fertige Aufnahme lässt sich mit <a href="../medien/index.html">Audio &amp; Video</a> in MP3 umwandeln, mit <a href="../medien-schneiden/index.html">Medien schneiden</a> kürzen oder mit der <a href="../transkription/index.html">Transkription</a> in Text verwandeln.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script>
+const streifen = AK.$('#streifen'), leinwand = AK.$('#pegel');
+const startKnopf = AK.$('#go'), pauseKnopf = AK.$('#pause'), stoppKnopf = AK.$('#stopp');
+
+let strom = null, rekorder = null, stuecke = [], audioCtx = null, analyser = null, puffer = null;
+let gefiltert = false, spurInfo = '', mime = '';
+let dauer = 0, letzterTakt = 0, laeuft = false;      // Dauer in ms, ohne Pausen
+let pegel = [], letzterPegel = 0;
+const aufnahmen = [];
+let nummer = 0, angeboten = null;                    // angeboten: Aufnahme, die rechts zum Herunterladen steht
+
+/* ---------- Meldungen ---------- */
+function melde(text, hilfe){
+  AK.$('#meldungtext').textContent = text;
+  AK.$('#meldunghilfe').textContent = hilfe || '';
+  AK.$('#meldunghilfe').hidden = !hilfe;
+  AK.$('#meldung').hidden = false;
+}
+const meldungWeg = () => { AK.$('#meldung').hidden = true; };
+
+function browser(){
+  const ua = navigator.userAgent;
+  if(/Firefox\//.test(ua)) return { name:'Firefox', chromium:false };
+  if(/Safari\//.test(ua) && !/Chrom(e|ium)\//.test(ua)) return { name:'Safari', chromium:false };
+  return { name:'dieser Browser', chromium:true };
+}
+
+function pruefeBrowser(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || !window.MediaRecorder){
+    startKnopf.disabled = true;
+    melde('Dieser Browser kann keinen Tab-Ton aufnehmen.', 'Öffne die Seite am Computer in Chrome oder Edge.');
+    return;
+  }
+  const b = browser();
+  if(!b.chromium) melde(b.name + ' gibt beim Teilen keinen Tab-Ton weiter. Eine Aufnahme bliebe stumm.', 'Öffne diese Seite in Chrome oder Edge am Computer.');
+}
+
+/* ---------- Aufnahme ---------- */
+// Ohne diese Angaben behandelt Chrome den Tab-Ton wie Sprache (Echo-, Rauschfilter, Pegelautomatik).
+const ROH = { echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:2, sampleRate:48000 };
+
+const waehleMime = () => ['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+
+/* Fragt den Browser nach der Tab-Freigabe. Chrome verlangt dabei immer auch das Bild;
+   aufgezeichnet wird trotzdem nur die Tonspur. */
+async function start(){
+  meldungWeg();
+  startKnopf.disabled = true;
+  let freigabe;
+  try{
+    try{
+      freigabe = await navigator.mediaDevices.getDisplayMedia({ video:true, audio:ROH,
+        systemAudio:'include', selfBrowserSurface:'exclude', surfaceSwitching:'include' });
+    }catch(err){
+      // Ältere Fassungen kennen die Zusatzangaben nicht — dann schlicht anfragen
+      if(err && (err.name === 'TypeError' || err.name === 'OverconstrainedError')) freigabe = await navigator.mediaDevices.getDisplayMedia({ video:true, audio:true });
+      else throw err;
+    }
+  }catch(err){
+    startKnopf.disabled = false;
+    if(err && err.name === 'NotAllowedError') melde('Keine Freigabe erteilt, deshalb läuft keine Aufnahme.', 'Klicke noch einmal auf „Tab auswählen und aufnehmen“ und bestätige das Auswahlfenster mit „Teilen“.');
+    else melde('Die Freigabe ließ sich nicht starten.', (err && err.message) || '');
+    return;
+  }
+
+  if(!freigabe.getAudioTracks().length){
+    let flaeche = '';
+    try{ const bild = freigabe.getVideoTracks()[0]; flaeche = (bild && bild.getSettings().displaySurface) || ''; }catch(_){ }
+    freigabe.getTracks().forEach(t => t.stop());
+    startKnopf.disabled = false;
+    const b = browser();
+    if(!b.chromium) melde(`Die Freigabe enthält keinen Ton, weil ${b.name} beim Teilen keinen Ton weitergibt.`, 'Öffne diese Seite in Chrome oder Edge am Computer.');
+    else if(flaeche === 'monitor') melde('Du hast den ganzen Bildschirm geteilt, dabei kam kein Ton mit.', 'Wähle im Auswahlfenster oben den Reiter „Chrome-Tab“ und dann den Tab mit der Webseite. Auf dem Mac liefert nur die Tab-Freigabe Ton.');
+    else if(flaeche === 'window') melde('Du hast ein Fenster geteilt. Fenster liefern nie Ton.', 'Wähle im Auswahlfenster oben den Reiter „Chrome-Tab“ und dann den Tab mit der Webseite.');
+    else melde('Der Tab wurde ohne Ton geteilt.', 'Im Auswahlfenster gibt es unten links den Schalter „Tab-Audio auch teilen“. Er muss eingeschaltet sein, bevor du auf „Teilen“ klickst.');
+    return;
+  }
+  await starteAufnahme(freigabe);
+}
+
+/* Zeichnet die Tonspur eines Stroms auf. Getrennt von der Freigabe, damit der
+   Testlauf einen selbst erzeugten Ton hineinreichen kann. */
+async function starteAufnahme(freigabe){
+  strom = freigabe;
+  const spur = strom.getAudioTracks()[0];
+  let einst = {};
+  try{ einst = spur.getSettings() || {}; }catch(_){ }
+  if(einst.echoCancellation || einst.noiseSuppression || einst.autoGainControl){
+    try{ await spur.applyConstraints(ROH); einst = spur.getSettings() || {}; }catch(_){ }
+  }
+  gefiltert = !!(einst.echoCancellation || einst.noiseSuppression || einst.autoGainControl);
+  spurInfo = (einst.channelCount === 1 ? 'Mono' : 'Stereo') + (einst.sampleRate ? ', ' + Math.round(einst.sampleRate / 1000) + ' kHz' : '');
+  if(gefiltert) melde('Der Browser lässt seine Sprachfilter nicht abschalten. Die Aufnahme klingt dadurch schlechter als das Original.', 'Das passiert in manchen eingebetteten Ansichten. Öffne die Seite direkt in einem aktuellen Chrome oder Edge.');
+
+  const nurTon = new MediaStream([spur]);
+  mime = waehleMime(); stuecke = [];
+  try{
+    rekorder = new MediaRecorder(nurTon, Object.assign({ audioBitsPerSecond:+AK.$('#qualitaet').value }, mime ? { mimeType:mime } : {}));
+  }catch(err){
+    strom.getTracks().forEach(t => t.stop()); strom = null; startKnopf.disabled = false;
+    melde('Der Browser kann diesen Ton nicht aufzeichnen.', (err && err.message) || '');
+    return;
+  }
+  rekorder.ondataavailable = e => { if(e.data && e.data.size) stuecke.push(e.data); };
+  rekorder.onstop = fertig;
+  // Beendet man die Freigabe über die Leiste des Browsers, endet auch die Aufnahme
+  strom.getTracks().forEach(t => t.addEventListener('ended', stopp));
+
+  try{
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser(); analyser.fftSize = 2048;
+    puffer = new Float32Array(analyser.fftSize);
+    audioCtx.createMediaStreamSource(nurTon).connect(analyser);
+  }catch(_){ analyser = null; }
+
+  rekorder.start(1000);
+  dauer = 0; letzterTakt = performance.now(); laeuft = true; pegel = [];
+  AK.stamp(false);
+  zeigeZustand('laeuft');
+  requestAnimationFrame(bild);
+}
+
+/* Die Uhr rechnet mit Zeitstempeln statt mit Einzelbildern: Während man im anderen
+   Tab die Wiedergabe startet, liegt diese Seite im Hintergrund und zeichnet nichts. */
+const dauerJetzt = () => dauer + (laeuft ? performance.now() - letzterTakt : 0);
+
+function pause(){
+  if(!rekorder) return;
+  if(rekorder.state === 'recording'){ dauer = dauerJetzt(); laeuft = false; rekorder.pause(); zeigeZustand('pause'); }
+  else if(rekorder.state === 'paused'){ rekorder.resume(); letzterTakt = performance.now(); laeuft = true; zeigeZustand('laeuft'); }
+}
+
+function stopp(){
+  if(rekorder && rekorder.state !== 'inactive') rekorder.stop();
+}
+
+function fertig(){
+  dauer = dauerJetzt(); laeuft = false;
+  if(strom){ strom.getTracks().forEach(t => t.stop()); strom = null; }
+  if(audioCtx){ audioCtx.close().catch(() => {}); audioCtx = null; analyser = null; }
+  const typ = (rekorder && rekorder.mimeType) || mime || 'audio/webm';
+  const blob = new Blob(stuecke, { type:typ }); stuecke = []; rekorder = null;
+  if(blob.size > 0){
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    const aufnahme = {
+      blob, url:URL.createObjectURL(blob), sekunden:Math.round(dauer / 1000), gesichert:false,
+      titel:`Aufnahme ${++nummer}, ${p(d.getHours())}:${p(d.getMinutes())} Uhr`,
+      dateiname:`tab-ton-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}.${typ.includes('mp4') ? 'mp4' : 'webm'}`,
+      info:`${spurInfo}, ${Math.round(+AK.$('#qualitaet').value / 1000)} kbit/s` + (gefiltert ? ', gefiltert' : ''),
+    };
+    aufnahmen.unshift(aufnahme);
+    zeigeAufnahmen();
+    // Die neueste Aufnahme steht zusätzlich rechts — von dort geht es auch „Weiter zu …“
+    angeboten = aufnahme;
+    AK.offerDownload(blob, aufnahme.dateiname).addEventListener('click', () => { aufnahme.gesichert = true; });
+    AK.log(`${aufnahme.titel}: ${zeit(aufnahme.sekunden)}, ${groesse(blob.size)}`);
+    AK.stamp(true);
+  }else{
+    melde('Die Aufnahme ist leer.', 'Im gewählten Tab lief vermutlich kein Ton.');
+  }
+  zeigeZustand('bereit');
+}
+
+function zeigeZustand(zustand){
+  streifen.dataset.zustand = zustand;
+  const aktiv = zustand !== 'bereit';
+  startKnopf.hidden = aktiv; startKnopf.disabled = false;
+  pauseKnopf.hidden = !aktiv; stoppKnopf.hidden = !aktiv;
+  AK.$('#qualitaet').disabled = aktiv;
+  pauseKnopf.textContent = zustand === 'pause' ? 'Weiter' : 'Pause';
+  AK.$('#zustand').textContent = zustand === 'laeuft' ? 'Nimmt auf' : zustand === 'pause' ? 'Pausiert' : 'Bereit';
+  if(!aktiv && !aufnahmen.length) AK.$('#uhr').textContent = '00:00';
+}
+
+function zeit(sek){
+  const h = Math.floor(sek / 3600), m = Math.floor(sek % 3600 / 60), s = sek % 60, p = n => String(n).padStart(2, '0');
+  return (h ? h + ':' : '') + p(m) + ':' + p(s);
+}
+const groesse = b => b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toFixed(1).replace('.', ',') + ' MB';
+
+/* ---------- Pegel ---------- */
+const stift = leinwand.getContext('2d');
+const farbe = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const FARBEN = { leise:farbe('--stamp'), laut:farbe('--amber'), voll:farbe('--alert'), linie:farbe('--rule') };
+const BALKEN = 4, LUECKE = 3;
+let breite = 0, hoehe = 0;
+
+function passeAn(){
+  const r = leinwand.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  breite = r.width; hoehe = r.height;
+  leinwand.width = Math.round(breite * dpr); leinwand.height = Math.round(hoehe * dpr);
+  stift.setTransform(dpr, 0, 0, dpr, 0, 0);
+  zeichne();
+}
+
+function zeichne(){
+  stift.clearRect(0, 0, breite, hoehe);
+  // Die Balken bleiben unter der Uhr: Mitte tief, Ausschlag knapp
+  const mitte = hoehe * 0.68, ausschlag = hoehe * 0.27;
+  stift.fillStyle = FARBEN.linie;
+  for(let x = 0; x < breite; x += BALKEN + LUECKE) stift.fillRect(x, mitte - 1, BALKEN, 2);
+  const links = breite - pegel.length * (BALKEN + LUECKE);
+  pegel.forEach((l, i) => {
+    const h = Math.max(2, Math.sqrt(l) * ausschlag);
+    stift.fillStyle = l > 0.95 ? FARBEN.voll : l > 0.6 ? FARBEN.laut : FARBEN.leise;
+    stift.fillRect(links + i * (BALKEN + LUECKE), mitte - h, BALKEN, h * 2);
+  });
+}
+
+/* Läuft nur, solange aufgenommen wird — im Leerlauf steht das Bild still */
+function bild(jetzt){
+  if(!rekorder) return;
+  AK.$('#uhr').textContent = zeit(Math.floor(dauerJetzt() / 1000));
+  if(laeuft && jetzt - letzterPegel > 55){
+    let spitze = 0;
+    if(analyser){
+      analyser.getFloatTimeDomainData(puffer);
+      for(let i = 0; i < puffer.length; i++){ const v = Math.abs(puffer[i]); if(v > spitze) spitze = v; }
+    }
+    pegel.push(Math.min(1, spitze)); letzterPegel = jetzt;
+    const platz = Math.ceil(breite / (BALKEN + LUECKE));
+    if(pegel.length > platz) pegel.splice(0, pegel.length - platz);
+  }
+  zeichne();
+  requestAnimationFrame(bild);
+}
+
+if(window.ResizeObserver) new ResizeObserver(passeAn).observe(leinwand); else addEventListener('resize', passeAn);
+passeAn();
+
+/* ---------- Liste ---------- */
+function zeigeAufnahmen(){
+  const liste = AK.$('#aufnahmen');
+  liste.textContent = '';
+  AK.$('#empty').hidden = aufnahmen.length > 0;
+  for(const a of aufnahmen){
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="aufnahmekopf"><span class="aufnahmename">${AK.esc(a.titel)}</span>` +
+      `<span class="aufnahmeinfo">${zeit(a.sekunden)} · ${groesse(a.blob.size)} · ${AK.esc(a.info)}</span></div>` +
+      `<audio controls preload="metadata"></audio>` +
+      `<div class="aufnahmeknoepfe"><a class="ghost" download="${AK.esc(a.dateiname)}">Speichern</a><button class="ghost">Löschen</button></div>`;
+
+    const audio = li.querySelector('audio');
+    audio.src = a.url;
+    // MediaRecorder-Dateien haben keine Längenangabe: einmal ans Ende springen, damit der Player die Dauer kennt
+    audio.addEventListener('loadedmetadata', () => {
+      if(audio.duration !== Infinity) return;
+      const zurueck = () => { audio.removeEventListener('timeupdate', zurueck); audio.currentTime = 0; };
+      audio.addEventListener('timeupdate', zurueck);
+      audio.currentTime = 1e7;
+    }, { once:true });
+
+    const speichern = li.querySelector('a');
+    speichern.href = a.url;
+    speichern.addEventListener('click', () => { a.gesichert = true; });
+    li.querySelector('button').addEventListener('click', () => {
+      aufnahmen.splice(aufnahmen.indexOf(a), 1);
+      if(angeboten === a){ angeboten = null; AK.clearDownloads(); AK.stamp(false); }
+      URL.revokeObjectURL(a.url);
+      zeigeAufnahmen();
+    });
+    liste.appendChild(li);
+  }
+}
+
+/* ---------- Aufbau ---------- */
+startKnopf.onclick = start;
+pauseKnopf.onclick = pause;
+stoppKnopf.onclick = stopp;
+
+// „Weiter zu …“ nimmt die Aufnahme mit — sie gilt damit als gesichert
+document.addEventListener('click', e => {
+  if(angeboten && e.target.closest('#weiterbox a')) angeboten.gesichert = true;
+}, true);
+addEventListener('beforeunload', e => {
+  if(rekorder || aufnahmen.some(a => !a.gesichert)){ e.preventDefault(); e.returnValue = ''; }
+});
+
+zeigeZustand('bereit'); zeigeAufnahmen(); pruefeBrowser();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

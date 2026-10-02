@@ -55,6 +55,7 @@ window.AK = window.AK || {};
     'medien-schneiden':      ['transkription','medien','ton-verbessern'],
     'ton-verbessern':        ['transkription','medien-schneiden','medien'],
     'transkription':         ['text-werkzeuge','untertitel','word-erstellen'],
+    'tab-ton':               ['medien','transkription','medien-schneiden'],
     'gif-erstellen':         ['medien'],
     'zip':                   ['bilder-umbenennen'],
     'bilder-umbenennen':     ['zip'],
@@ -84,6 +85,7 @@ window.AK = window.AK || {};
     'bildergalerie':'Bildergalerie als HTML', 'testdaten':'Testdaten & Blindtext',
     'termin':'Termin als ICS', 'regex':'Regex ausprobieren',
     'schwaerzen':'Schwärzen (PDF & Bild)', 'pdf-text-ersetzen':'PDF-Text ersetzen',
+    'tab-ton':'Tab-Ton aufnehmen',
   };
 
   const eigenes = () => {
