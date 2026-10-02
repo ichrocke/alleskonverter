@@ -3,6 +3,21 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-10-02 (Werkzeug 55: Liedblatt & Akkorde)
+
+### Hinzugefügt
+- Werkzeug **Liedblatt & Akkorde** (`tools/akkorde/`, Kategorie Dokumente & Text) — Liedblätter in die Form bringen, die man braucht, und dabei transponieren. Text einfügen oder Datei hineinziehen (.txt, .cho, .chopro, .crd …), Ergebnis live darunter, kopieren oder als .txt sichern.
+  - **Herkunft und was dazugekommen ist:** Marcs erste Idee war eine Einzelseite für genau einen Fall — „Akkordzeile über Textzeile“ wird zu `[Akkord]` vor der Silbe, um fünf Halbtöne nach oben (Gitarrenblatt mit Capo 5 für die Ukulele), deutsche Schreibweise an. Der Auftrag dazu: allgemein machen. Deshalb gibt es jetzt **drei Zielformate** (`[Akkord]` im Text wie bei ChordPro, Akkorde über dem Text, nur der Text) und die Eingabe darf **beides** sein, auch gemischt — der Weg zurück von ChordPro ins Liederbuch-Format geht also ebenfalls. Transponieren von −11 bis +11 mit „Original“-Knopf; darunter steht, was aus jedem Akkord wird (a → Dm).
+  - **Schreibweise:** Gelesen wird automatisch deutsch oder international — deutsch erkennt man an H, an klein geschriebenen Moll-Akkorden (a, fis) und an Fis/Es/As. Geschrieben wird wahlweise international (B, Bb) oder deutsch (H, B). Steht im Blatt nur ein einzelnes „B“ ohne H und ohne Bb, ist das nicht entscheidbar; dann sagt ein gelber Hinweis, wie es gelesen wurde und wo man es umstellt. Die Vorlage hatte „deutsch“ fest angehakt — ein englisches Blatt mit B-Dur wäre damit stillschweigend zu Bb geworden.
+  - **Vorzeichen:** Ohne Transponieren bleibt jede Note, wie sie im Blatt steht (die Vorlage machte aus C# auch bei ±0 ein Db). Beim Transponieren wahlweise die geläufige Mischung, nur Kreuze oder nur Bes.
+  - **Maschine** in eigener Datei `tools/akkorde/liedblatt.js` (ohne DOM, auch in Node ladbar): liest jede Zeile in ein gemeinsames Modell — Text mit Akkorden an Textstellen, Akkordzeile ohne Text, ChordPro-Angabe, Capo-Zeile — und schreibt daraus das Zielformat. Einzelheiten, die Arbeit gemacht haben: „Asus4“ ist A mit sus4 und nicht As mit „us4“ (alle Lesarten des Grundtons werden durchprobiert, die längste zuerst); „Intro: C G Am“ wird trotz Vorspann als Akkordzeile erkannt; Taktstriche und „(2x)“ bleiben stehen; `[Refrain]` ist kein Akkord und bleibt; Tabulaturen und Textzeilen wie „Am Abend …“ werden nicht angefasst. Beim Schreiben über den Text wird der Text gestreckt, wenn zwei Akkorde zu dicht stehen (im Wort mit Bindestrichen). ChordPro-Angaben bleiben im ChordPro-Ziel erhalten (`{key: …}` wird mittransponiert) und werden in den anderen Zielen zu gewöhnlichen Zeilen (`{title: …}` → Titel, `{soc}` → „Refrain:“).
+  - Die Capo-Zeile fällt beim Transponieren weg (wie in der Vorlage), das ist aber jetzt ein Häkchen und steht in der Statuszeile — wer nur die Tonart wechselt und das Capo behalten will, schaltet es aus.
+  - Dateien, die kein UTF-8 sind, werden als Windows-1252 gelesen, damit alte Textdateien ihre Umlaute behalten.
+- Testfall: deutsches Blatt mit Capo-Zeile → `[Akkord]` im Text, +5 (a → Dm, F → Bb, Capo weg), zurück über den Text in deutscher Schreibweise (Bb → B), Strecken bei engen Akkorden, Dateiname mit „-plus5“. Jetzt 69 Prüfungen. Die Maschine wurde zusätzlich mit rund 50 Einzelfällen in Node geprüft (Lesarten, Hin-und-zurück, ChordPro).
+
+### Geändert
+- Startseite: „Dokumente & Text“ zählt jetzt 8 Karten; die Datei-Erkennung kennt `.cho`, `.chopro`, `.chordpro`, `.crd` als Liedblatt und schlägt das Werkzeug auch für `.txt` vor. FAQ: Werkzeugzahl 55 („vier von 55“ mit KI, „51 von 55“ ohne; JSON-LD neu erzeugt). Service Worker auf neue Fassung, `liedblatt.js` steht in seiner Bibliotheksliste.
+
 ## 2026-10-02 (Werkzeug 54: Tab-Ton aufnehmen)
 
 ### Hinzugefügt

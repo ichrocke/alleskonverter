@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akkorde transponieren &amp; Liedblatt umwandeln (ChordPro) — kostenlos | Alleskonverter</title>
+<meta name="description" content="Liedblätter umformen: Akkorde über dem Text in [Akkord] im Text (ChordPro) und zurück, dabei in jede Tonart transponieren — auch deutsche Schreibweise mit H und B. Ohne Upload.">
+<link rel="canonical" href="https://alleskonverter.de/tools/akkorde/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Akkorde transponieren &amp; Liedblatt umwandeln (ChordPro) — kostenlos | Alleskonverter">
+<meta property="og:description" content="Akkorde über dem Text in [Akkord] im Text und zurück, dabei transponieren — direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/akkorde/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Akkorde transponieren &amp; Liedblatt umwandeln (ChordPro) — kostenlos | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Liedblatt & Akkorde — Alleskonverter","url":"https://alleskonverter.de/tools/akkorde/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Liedblätter zwischen „Akkorde über dem Text“ und „[Akkord] im Text“ (ChordPro) umwandeln und transponieren — ohne Datenübertragung."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Welche Formate versteht das Werkzeug?","acceptedAnswer":{"@type":"Answer","text":"Beide üblichen Schreibweisen, auch gemischt in einem Blatt: die Akkordzeile über der Textzeile, wie sie in Liederbüchern und auf den meisten Webseiten steht, und den Akkord in eckigen Klammern direkt vor der Silbe, wie ihn ChordPro und viele Apps für Gitarre und Ukulele erwarten. ChordPro-Angaben wie {title: …} oder {soc} bleiben erhalten oder werden beim Umformen zu gewöhnlichen Zeilen."}},{"@type":"Question","name":"Wie viele Halbtöne muss ich transponieren?","acceptedAnswer":{"@type":"Answer","text":"Jeder Schritt verschiebt alle Akkorde um einen Halbton. Zwei Beispiele: Ist ein Lied zu hoch zum Singen, geh zwei oder drei Halbtöne nach unten. Steht über einem Gitarrenblatt „Capo 5“ und du willst die klingenden Akkorde, etwa für Ukulele oder Klavier, sind es +5. Die Zeile darunter zeigt, was aus jedem Akkord wird."}},{"@type":"Question","name":"Was hat es mit H und B auf sich?","acceptedAnswer":{"@type":"Answer","text":"Im Deutschen heißt der Ton unter dem C „H“, und „B“ meint den Halbton darunter. International heißt derselbe Ton „B“, der Halbton darunter „Bb“. Klein geschriebene Akkorde wie „a“ oder „fis“ sind im Deutschen Moll. Das Werkzeug erkennt die deutsche Schreibweise an H, an klein geschriebenen Akkorden und an Fis oder Es. Steht nur ein einzelnes B im Blatt, lässt sich das nicht sicher entscheiden — dann stellst du die Schreibweise selbst ein."}},{"@type":"Question","name":"Warum verrutschen die Akkorde über dem Text?","acceptedAnswer":{"@type":"Answer","text":"Akkorde über dem Text stimmen nur in einer Schrift mit fester Zeichenbreite, etwa Courier oder Consolas. In Word oder einer Mail mit normaler Schrift wandern sie. Das Format mit [Akkord] im Text hat dieses Problem nicht, weil der Akkord an der Silbe hängt."}},{"@type":"Question","name":"Wird mein Liedblatt irgendwohin übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Gelesen, umgeformt und transponiert wird in deinem Browser."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+/* Akkorde über dem Text stimmen nur, wenn nichts umbricht */
+textarea.pane{white-space:pre;overflow:auto;tab-size:4;font-size:13px}
+#input{min-height:260px}
+.unterzeile{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:10px}
+.erkannt{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin:8px 0 0;min-height:1.5em}
+.merker{border-left:3px solid var(--amber);background:var(--card);padding:9px 12px;margin-top:10px;font-size:12.5px;color:var(--ink);line-height:1.6}
+
+.schritte{display:flex;align-items:center;gap:6px}
+.schritte button.icon{width:38px;height:38px;font-size:18px}
+.schritte output{flex:1;text-align:center;font-family:var(--display);font-size:30px;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.schritte button.ghost{padding:11px 10px}
+.check{display:flex;align-items:flex-start;gap:7px;font-size:13.5px;margin-bottom:14px}
+.check input{width:auto;margin-top:3px}
+.zuordnung{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 14px;padding:0;list-style:none;font-family:var(--mono);font-size:11.5px}
+.zuordnung li{border:1px solid var(--rule);background:var(--paper);padding:3px 7px;white-space:nowrap}
+.zuordnung li b{font-weight:500;color:var(--stamp)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Liedblatt &amp; <span>Akkorde</span></h1>
+  <p class="sub">Liedblätter in die Form bringen, die du brauchst: Akkorde über dem Text, [Akkord] direkt vor der Silbe (ChordPro) oder nur der Text — und dabei in jede Tonart transponieren. Liest auch die deutsche Schreibweise mit H und B.</p>
+</header>
+
+<main>
+<div class="grid">
+  <section>
+    <h2>Dein Liedblatt</h2>
+
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <strong>Textdatei oder ChordPro-Datei hierher ziehen</strong>
+      <small>oder klicken — oder den Text unten einfügen</small>
+    </div>
+    <input type="file" id="picker" accept=".txt,.text,.cho,.chopro,.chordpro,.crd,.pro,.tab" hidden>
+
+    <textarea class="pane" id="input" aria-label="Liedblatt" spellcheck="false" style="margin-top:14px" placeholder="G             D7        G&#10;Kein schöner Land in dieser Zeit …&#10;&#10;oder: [G]Kein schöner [D7]Land in dieser [G]Zeit …"></textarea>
+    <div class="unterzeile">
+      <button class="ghost" id="beispiel" type="button">Beispiel einsetzen</button>
+      <button class="ghost" id="leeren" type="button">Leeren</button>
+    </div>
+    <p class="erkannt" id="erkannt" aria-live="polite"></p>
+    <p class="merker" id="bhinweis" hidden>Im Blatt steht ein „B“, aber kein „H“ und kein „Bb“. Gelesen wird es international (deutsch wäre das ein H). Ist das deutsche B gemeint (international Bb), stell rechts die Schreibweise im Liedblatt auf „deutsch“.</p>
+
+    <h2 style="margin-top:28px">Ergebnis</h2>
+    <textarea class="pane" id="output" aria-label="Ergebnis" spellcheck="false" readonly placeholder="Hier erscheint das Ergebnis"></textarea>
+    <div class="unterzeile">
+      <button class="ghost" id="kopieren" type="button" disabled>Ergebnis kopieren</button>
+    </div>
+  </section>
+
+  <aside>
+    <h2>Ausgabe</h2>
+
+    <div class="field">
+      <label for="format">Zielformat</label>
+      <select id="format">
+        <option value="imtext" selected>[Akkord] im Text (ChordPro)</option>
+        <option value="ueber">Akkorde über dem Text</option>
+        <option value="text">Nur der Text, ohne Akkorde</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label id="halbtoene-label">Transponieren (Halbtöne)</label>
+      <div class="schritte" role="group" aria-labelledby="halbtoene-label">
+        <button class="icon" id="tiefer" type="button" aria-label="Einen Halbton tiefer">−</button>
+        <output id="halbtoene" aria-live="polite">0</output>
+        <button class="icon" id="hoeher" type="button" aria-label="Einen Halbton höher">+</button>
+        <button class="ghost" id="null" type="button">Original</button>
+      </div>
+      <div class="hint">Gitarrenblatt mit Capo 5 → +5 ergibt die klingenden Akkorde, etwa für Ukulele.</div>
+    </div>
+
+    <ul class="zuordnung" id="zuordnung" aria-label="Was aus jedem Akkord wird"></ul>
+
+    <div class="field">
+      <label for="vorzeichen">Vorzeichen beim Transponieren</label>
+      <select id="vorzeichen">
+        <option value="auto" selected>Automatisch (Db, Eb, F#, Ab, Bb)</option>
+        <option value="kreuze">Kreuze (C#, D#, F#, G#, A#)</option>
+        <option value="bes">Bes (Db, Eb, Gb, Ab, Bb)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="lesen">Schreibweise im Liedblatt</label>
+      <select id="lesen">
+        <option value="auto" selected>Automatisch erkennen</option>
+        <option value="deutsch">Deutsch (a = Am, H, B = Bb)</option>
+        <option value="international">International (B, Bb)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="schreiben">Schreibweise im Ergebnis</label>
+      <select id="schreiben">
+        <option value="international" selected>International (B, Bb)</option>
+        <option value="deutsch">Deutsch (H, B)</option>
+      </select>
+    </div>
+
+    <label class="check"><input type="checkbox" id="capoweg" checked> Capo-Zeile weglassen, wenn transponiert wird</label>
+
+    <button class="primary" id="go" disabled>Liedblatt sichern</button>
+    <div id="log" aria-live="polite"></div>
+    <div class="stamp" id="stamp">Fertig</div>
+  </aside>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Liedblätter gibt es in zwei Welten. Im Liederbuch und auf den meisten Webseiten steht die Akkordzeile über der Textzeile. Viele Apps für Gitarre und Ukulele wollen den Akkord dagegen in eckigen Klammern direkt vor der Silbe, das ChordPro-Format. Von Hand umzuschreiben ist mühsam und fehleranfällig. Dieses Werkzeug liest beide Formen, schreibt die gewünschte und transponiert auf Wunsch gleich mit.</p>
+  <h3>Welche Formate versteht das Werkzeug?</h3>
+  <p>Beide üblichen Schreibweisen, auch gemischt in einem Blatt: die Akkordzeile über der Textzeile, wie sie in Liederbüchern und auf den meisten Webseiten steht, und den Akkord in eckigen Klammern direkt vor der Silbe, wie ihn ChordPro und viele Apps für Gitarre und Ukulele erwarten. ChordPro-Angaben wie {title: …} oder {soc} bleiben erhalten oder werden beim Umformen zu gewöhnlichen Zeilen.</p>
+  <h3>Wie viele Halbtöne muss ich transponieren?</h3>
+  <p>Jeder Schritt verschiebt alle Akkorde um einen Halbton. Zwei Beispiele: Ist ein Lied zu hoch zum Singen, geh zwei oder drei Halbtöne nach unten. Steht über einem Gitarrenblatt „Capo 5“ und du willst die klingenden Akkorde, etwa für Ukulele oder Klavier, sind es +5. Die Zeile darunter zeigt, was aus jedem Akkord wird.</p>
+  <h3>Was hat es mit H und B auf sich?</h3>
+  <p>Im Deutschen heißt der Ton unter dem C „H“, und „B“ meint den Halbton darunter. International heißt derselbe Ton „B“, der Halbton darunter „Bb“. Klein geschriebene Akkorde wie „a“ oder „fis“ sind im Deutschen Moll. Das Werkzeug erkennt die deutsche Schreibweise an H, an klein geschriebenen Akkorden und an Fis oder Es. Steht nur ein einzelnes B im Blatt, lässt sich das nicht sicher entscheiden — dann stellst du die Schreibweise selbst ein.</p>
+  <h3>Warum verrutschen die Akkorde über dem Text?</h3>
+  <p>Akkorde über dem Text stimmen nur in einer Schrift mit fester Zeichenbreite, etwa Courier oder Consolas. In Word oder einer Mail mit normaler Schrift wandern sie. Das Format mit [Akkord] im Text hat dieses Problem nicht, weil der Akkord an der Silbe hängt.</p>
+  <h3>Wird mein Liedblatt irgendwohin übertragen?</h3>
+  <p>Nein. Gelesen, umgeformt und transponiert wird in deinem Browser.</p>
+</section>
+
+<footer>
+  <p>Tabulaturen und Zeilen, die das Werkzeug nicht als Akkordzeile erkennt, bleiben unverändert stehen. Wird der Platz zwischen zwei Akkorden über dem Text zu knapp, streckt es den Text an dieser Stelle.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script src="../../js/uebergabe.js?v=20260726"></script>
+<script src="../../js/weiter.js?v=20260726"></script>
+<script src="../../js/einstellungen.js?v=20260726"></script>
+<script src="../../js/dropzone.js?v=20260726"></script>
+<script src="liedblatt.js?v=20261002"></script>
+<script>
+/* Volkslied von 1840, gemeinfrei — zeigt Akkordzeilen über dem Text */
+const BEISPIEL = `Kein schöner Land
+
+G            D7             G
+Kein schöner Land in dieser Zeit,
+G            D7             G
+als hier das unsre weit und breit,
+   C       G           D7    G
+wo wir uns finden wohl unter Linden
+D7  G
+zur Abendzeit.`;
+
+let halbtoene = 0, dateiname = 'liedblatt';
+
+function forme(){
+  const quelle = AK.$('#input').value;
+  AK.$('#halbtoene').textContent = (halbtoene > 0 ? '+' : '') + halbtoene;
+  AK.clearDownloads(); AK.stamp(false);
+
+  if(!quelle.trim()){
+    AK.$('#output').value = '';
+    AK.$('#erkannt').textContent = '';
+    AK.$('#zuordnung').innerHTML = '';
+    AK.$('#bhinweis').hidden = true;
+    AK.$('#go').disabled = AK.$('#kopieren').disabled = true;
+    return;
+  }
+
+  const modell = AK.liedblatt.lies(quelle, AK.$('#lesen').value);
+  const ergebnis = AK.liedblatt.schreibe(modell, {
+    format: AK.$('#format').value, halbtoene, vorzeichen: AK.$('#vorzeichen').value,
+    deutsch: AK.$('#schreiben').value === 'deutsch', capoWeg: AK.$('#capoweg').checked,
+  });
+  AK.$('#output').value = ergebnis.text;
+
+  const z = modell.zahl, gefunden = z.ueber + z.imtext + z.allein;
+  const teile = [];
+  if(z.ueber) teile.push(`${z.ueber} × Akkorde über dem Text`);
+  if(z.imtext) teile.push(`${z.imtext} × [Akkord] im Text`);
+  if(z.allein) teile.push(`${z.allein} × Akkordzeile ohne Text`);
+  AK.$('#erkannt').textContent = gefunden
+    ? `Erkannt: ${teile.join(' · ')} · Schreibweise ${modell.deutsch ? 'deutsch' : 'international'}` + (ergebnis.capoEntfernt ? ' · Capo-Zeile weggelassen' : '')
+    : 'Keine Akkorde erkannt. Der Text bleibt, wie er ist.';
+  AK.$('#bhinweis').hidden = !modell.bFraglich;
+  AK.$('#zuordnung').innerHTML = AK.$('#format').value === 'text' ? '' : ergebnis.zuordnung
+    .filter(([alt, neu]) => alt !== neu)
+    .map(([alt, neu]) => `<li>${AK.esc(alt)} → <b>${AK.esc(neu)}</b></li>`).join('');
+  AK.$('#go').disabled = AK.$('#kopieren').disabled = !ergebnis.text;
+}
+
+async function addFiles(dateien){
+  const datei = dateien[0];
+  if(!datei) return;
+  // Ältere Textdateien sind oft nicht UTF-8 — dann stimmen die Umlaute erst mit Windows-1252
+  const bytes = await datei.arrayBuffer();
+  let text;
+  try{ text = new TextDecoder('utf-8', { fatal:true }).decode(bytes); }
+  catch(_){ text = new TextDecoder('windows-1252').decode(bytes); }
+  AK.$('#input').value = text;
+  dateiname = datei.name.replace(/\.[^.]+$/, '') || 'liedblatt';
+  AK.logClear();
+  AK.log(`${datei.name} geladen.`);
+  forme();
+}
+
+AK.$('#input').addEventListener('input', forme);
+['#format','#vorzeichen','#lesen','#schreiben','#capoweg'].forEach(s => AK.$(s).addEventListener('change', forme));
+// Zwölf Halbtöne wären wieder das Original — bei elf springt der Zähler deshalb um
+AK.$('#hoeher').onclick = () => { halbtoene = halbtoene >= 11 ? -11 : halbtoene + 1; forme(); };
+AK.$('#tiefer').onclick = () => { halbtoene = halbtoene <= -11 ? 11 : halbtoene - 1; forme(); };
+AK.$('#null').onclick = () => { halbtoene = 0; forme(); };
+AK.$('#beispiel').onclick = () => { AK.$('#input').value = BEISPIEL; dateiname = 'kein-schoener-land'; forme(); };
+AK.$('#leeren').onclick = () => { AK.$('#input').value = ''; dateiname = 'liedblatt'; AK.logClear(); forme(); AK.$('#input').focus(); };
+
+AK.$('#kopieren').onclick = async () => {
+  const feld = AK.$('#output');
+  try{
+    await navigator.clipboard.writeText(feld.value);
+    AK.log('Ergebnis kopiert.');
+  }catch(_){
+    // Ohne Zugriff auf die Zwischenablage (etwa über file://): markieren, kopieren kann man dann selbst
+    feld.focus(); feld.select();
+    AK.log('Text ist markiert — jetzt mit Strg+C oder ⌘C kopieren.');
+  }
+};
+
+AK.$('#go').onclick = () => {
+  const text = AK.$('#output').value;
+  if(!text) return;
+  AK.clearDownloads(); AK.stamp(false);
+  const zusatz = halbtoene ? `-${halbtoene > 0 ? 'plus' : 'minus'}${Math.abs(halbtoene)}` : '';
+  AK.offerDownload(new Blob([text + '\n'], { type:'text/plain;charset=utf-8' }), dateiname + zusatz + '.txt', '.txt herunterladen');
+  AK.stamp(true);
+};
+
+AK.dropzone('#drop', '#picker', addFiles);
+forme();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

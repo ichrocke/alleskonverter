@@ -50,6 +50,7 @@ window.AK = window.AK || {};
     'xml-lesen':             ['vergleichen','text-werkzeuge'],
     'untertitel':            ['text-werkzeuge','vergleichen'],
     'vergleichen':           ['text-werkzeuge'],
+    'akkorde':               ['text-werkzeuge'],
 
     'medien':                ['medien-schneiden','ton-verbessern','transkription'],
     'medien-schneiden':      ['transkription','medien','ton-verbessern'],
@@ -85,7 +86,7 @@ window.AK = window.AK || {};
     'bildergalerie':'Bildergalerie als HTML', 'testdaten':'Testdaten & Blindtext',
     'termin':'Termin als ICS', 'regex':'Regex ausprobieren',
     'schwaerzen':'Schwärzen (PDF & Bild)', 'pdf-text-ersetzen':'PDF-Text ersetzen',
-    'tab-ton':'Tab-Ton aufnehmen',
+    'tab-ton':'Tab-Ton aufnehmen', 'akkorde':'Liedblatt & Akkorde',
   };
 
   const eigenes = () => {

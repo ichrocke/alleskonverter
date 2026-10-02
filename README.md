@@ -44,6 +44,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [EPUB lesen & umwandeln](tools/epub/index.html) | E-Book im Browser lesen (EPUB 2 + 3), Export als HTML, Text, Markdown oder ZIP je Kapitel |
 | [Texterkennung (OCR)](tools/texterkennung/index.html) | Text aus Bildern und gescannten PDFs erkennen (Tesseract, deutsch/englisch) |
 | [Text-Werkzeuge](tools/text-werkzeuge/index.html) | Suchen & Ersetzen (mehrere Regeln, ganze Wörter, Regex mit Gruppen), Base64, URL-Encode, SHA-Prüfsummen, Zeichen-/Wortzähler, Zeilen aufräumen |
+| [Liedblatt & Akkorde](tools/akkorde/index.html) | Liedblätter zwischen „Akkorde über dem Text“ und „[Akkord] im Text“ (ChordPro) umformen, transponieren, deutsche Schreibweise (H, B) lesen und schreiben |
 | [Texte & Tabellen vergleichen](tools/vergleichen/index.html) | Diff nach Myers, wortgenaue Hervorhebung, Tabellen zellenweise, Export als .diff oder CSV |
 
 **Tabellen & Daten**

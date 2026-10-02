@@ -7,7 +7,7 @@
    • ffmpeg (~32 MB), Texterkennung (~19 MB)
                            → nur bei Bedarf, werden nach dem ersten Einsatz behalten
 */
-const VERSION = '2026-10-02b';
+const VERSION = '2026-10-02c';
 const CACHE = 'alleskonverter-' + VERSION;
 
 /* Beim Installieren: Grundgerüst und alle Bibliotheken mitnehmen (~5 MB).
@@ -64,6 +64,7 @@ const SHELL = [
   /* nicht in der sitemap.xml (noindex), deshalb hier von Hand: */
   '/tools/markdown-html/editor.html',
   '/tools/markdown-html/gemeinsam.js',
+  '/tools/akkorde/liedblatt.js',
 ];
 
 /* Werkzeugseiten aus der sitemap.xml lesen — so wächst der Cache automatisch mit. */

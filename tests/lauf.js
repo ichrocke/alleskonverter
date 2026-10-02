@@ -744,6 +744,28 @@ const FAELLE = [
       const name = await p.$eval('a.download', e => e.getAttribute('download'));
       if(!/^subnetze-192-168-8-0-22\.csv$/.test(name)) throw new Error('Dateiname: ' + name);
     } },
+  { werkzeug:'akkorde',            dateien:[['lied.txt', Buffer.from('Capo 5\n\na        F\nHallo du Welt\nC  G    (2x)\n').toString('base64'), 'text/plain']],
+    vorher: async p => {
+      const aus = () => p.$eval('#output', e => e.value);
+      // Deutsche Schreibweise wird am kleinen „a“ erkannt; ohne Transponieren bleibt die Capo-Zeile
+      if(await aus() !== 'Capo 5\n\n[Am]Hallo du [F]Welt\n[C] [G] (2x)') throw new Error('umgeformt: ' + JSON.stringify(await aus()));
+      if(!/deutsch/.test(await p.$eval('#erkannt', e => e.textContent))) throw new Error('Schreibweise nicht erkannt');
+      // Fünf Halbtöne hoch: a → Dm, F → Bb, und die Capo-Zeile fällt weg
+      for(let i = 0; i < 5; i++) await p.click('#hoeher');
+      if(await aus() !== '[Dm]Hallo du [Bb]Welt\n[F] [C] (2x)') throw new Error('transponiert: ' + JSON.stringify(await aus()));
+      const zuordnung = await p.$$eval('#zuordnung li', els => els.map(e => e.textContent));
+      if(!zuordnung.includes('a → Dm') || !zuordnung.includes('F → Bb')) throw new Error('Zuordnung: ' + zuordnung.join('|'));
+      // Zurück in Akkorde über dem Text, deutsch geschrieben: Bb heißt dann B
+      await p.select('#format', 'ueber'); await p.select('#schreiben', 'deutsch');
+      if(await aus() !== 'Dm       B\nHallo du Welt\nF  C    (2x)') throw new Error('über dem Text: ' + JSON.stringify(await aus()));
+      // Direkt an der Maschine: [Akkord] im Text lesen, enge Akkorde strecken den Text
+      const gestreckt = await p.evaluate(() => AK.liedblatt.schreibe(AK.liedblatt.lies('[Cmaj7]Ha[Dm7]llelu[G]ja', 'auto'), { format:'ueber' }).text);
+      if(gestreckt !== 'Cmaj7 Dm7  G\nHa----lleluja') throw new Error('strecken: ' + JSON.stringify(gestreckt));
+    },
+    pruefen: async p => {
+      const name = await p.$eval('a.download', e => e.getAttribute('download'));
+      if(name !== 'lied-plus5.txt') throw new Error('Dateiname: ' + name);
+    } },
   { werkzeug:'vergleichen',        kein_download:true,
     pruefen: async p => {
       await p.$eval('#a', e => { e.value = 'eins\nzwei\ndrei\n'; e.dispatchEvent(new Event('input')); });
