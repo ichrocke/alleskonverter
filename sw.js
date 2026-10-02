@@ -7,7 +7,7 @@
    • ffmpeg (~32 MB), Texterkennung (~19 MB)
                            → nur bei Bedarf, werden nach dem ersten Einsatz behalten
 */
-const VERSION = '2026-08-26';
+const VERSION = '2026-10-02';
 const CACHE = 'alleskonverter-' + VERSION;
 
 /* Beim Installieren: Grundgerüst und alle Bibliotheken mitnehmen (~5 MB).

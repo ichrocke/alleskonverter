@@ -3,6 +3,20 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-10-02 (Werkzeug 53: Anhänger-Zuladung)
+
+### Hinzugefügt
+- Werkzeug **Anhänger-Zuladung** (`tools/anhaenger/`, Kategorie Alltag) — wie viel darf auf den Anhänger, und reicht der Führerschein? Links die drei Papiere, die man auf dem Tisch hat (Führerschein, Fahrzeugschein, Schein des Anhängers), rechts die Antwort: die Zuladung als große Zahl, die Ladung in Wasserkisten, Zementsäcken oder Waschmaschinen auf einem gezeichneten Anhänger, eine Waage mit Leermasse, Zuladung und beiden Grenzen (zGM des Anhängers, Anhängelast des Autos), der Führerschein-Check für B, B96, BE und Klasse 3 / C1E und Hinweise, wie es passt (B96 eintragen, BE machen, Anhänger ablasten, leichteres Zugfahrzeug). Jedes Feld darf leer bleiben — gerechnet wird mit dem, was da ist, und Lücken werden benannt statt geraten. Beispielwerte für fünf Autos und fünf Anhänger; ein Schema der Zulassungsbescheinigung Teil I zeigt, wo F.2, G, O.1 und O.2 stehen, ein Tipp auf das Kästchen springt ins Feld.
+  - **Herkunft:** Marc hat den Rechner als fertige Einzelseite mitgebracht (eigene Farben, Google Fonts, Dunkelmodus). Übernommen wurden Aufbau, Texte und Rechenweg; das Aussehen ist auf den Papier-Look umgezogen — lokale Schriften (Anton, Archivo, Plex Mono), Stempelgrün statt Verkehrsblau, eckige Karten, kein Dunkelmodus, keine Verbindung zu Google. Die Rechenlogik wurde in den Stil des Projekts umgeschrieben und danach gegen die Vorlage geprüft: 1,14 Millionen Eingabekombinationen, keine Abweichung.
+  - **Regelstand sichtbar:** Direkt unter dem Führerschein-Check steht „Regelstand: Oktober 2026 · § 6 Fahrerlaubnis-Verordnung“ mit der Bitte, nachzuprüfen, wenn das Datum länger zurückliegt. Das Datum steht als Konstante `REGELSTAND` im Skript; ist es über ein Jahr alt, wechselt der Kasten von selbst auf die Warnfarbe und sagt das ausdrücklich. Wer die Regeln gegenprüft, muss also nur diese eine Zeile anfassen. Die kommende EU-Regel (Klasse B bis 4.250 kg unter Auflagen) ist bewusst noch nicht eingerechnet; das steht unter „Gut zu wissen“.
+  - **Gemerkte Eingaben:** Anders als die übrigen Werkzeuge merkt sich dieses nicht nur Einstellungen, sondern auch die eingetragenen Gewichte (lokaler Speicher, Schlüssel `ak.einst.anhaenger`) — niemand tippt den Fahrzeugschein gern zweimal ab. Weil die Datenschutzerklärung bisher „Inhalte ausdrücklich nicht“ sagte, steht die Ausnahme jetzt dort und in der FAQ neben dem QR-Verlauf.
+  - Auf dem Handy liegt unten eine Leiste mit dem Ergebnis, die zur Antwort springt — die Eingaben sind dort länger als ein Bildschirm.
+  - Bewusst **ohne** Download-Knopf: Das Ergebnis ist eine Zahl, kein Dokument.
+- Testfall: Startbeispiel (980 kg, Klasse B reicht), SUV + Pferdeanhänger (B und B96 reichen nicht, BE reicht, Tipps „BE machen“ und „ablasten“), ungebremst mit O.2 als Grenze, fehlende Leermasse, sichtbarer Regelstand, Eingaben überleben ein Neuladen. Jetzt 67 Prüfungen.
+
+### Geändert
+- Startseite: „Alltag“ zählt jetzt 6 Karten. FAQ und Datenschutz: Werkzeugzahl 53 („vier von 53“ mit KI, „49 von 53“ ohne), Hinweis auf die gemerkten Fahrzeuggewichte (JSON-LD neu erzeugt). Service Worker auf neue Fassung, damit die Seite offline mitkommt.
+
 ## 2026-08-26 (Markdown ↔ HTML: großer Editor öffnete nicht mit geladener Datei)
 
 ### Behoben

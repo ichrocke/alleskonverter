@@ -470,6 +470,36 @@ const FAELLE = [
       const e = await p.$eval('#ergebnis', x => x.value);
       if(e !== '25,4') throw new Error('1 Zoll ≠ 25,4 mm, sondern ' + e);
     } },
+  { werkzeug:'anhaenger',          kein_download:true,
+    pruefen: async p => {
+      const zahl = () => p.$eval('#zahl', e => e.textContent);
+      const marken = () => p.$$eval('#kopf .marke', els => els.map(e => e.textContent));
+      const stufe = k => p.$eval(`#leiter li[data-klasse="${k}"] .st`, e => e.textContent);
+      // Start: Kombi + Kastenanhänger mit Klasse B — 1.300 kg zGM minus 320 kg leer
+      if(await zahl() !== '980kg') throw new Error('Startbeispiel: ' + await zahl());
+      if(!(await marken()).includes('Klasse B reicht')) throw new Error('Marken: ' + (await marken()).join('|'));
+      // SUV + Pferdeanhänger: 4.900 kg zusammen, B und B96 reichen nicht; die Anhängelast (2.200) begrenzt
+      await p.click('#auto-b-suv'); await p.click('#anh-b-pferd');
+      if(await zahl() !== '1.300kg') throw new Error('SUV + Pferdeanhänger: ' + await zahl());
+      if(!(await marken()).includes('Klasse B reicht nicht')) throw new Error('Marken: ' + (await marken()).join('|'));
+      if(await stufe('B96') !== 'reicht nicht' || await stufe('BE') !== 'reicht') throw new Error('Leiter: ' + await stufe('B96') + '/' + await stufe('BE'));
+      const tipps = await p.$$eval('#tipps b', els => els.map(e => e.textContent));
+      if(!tipps.includes('Klasse BE machen') || !tipps.includes('Anhänger ablasten')) throw new Error('Tipps: ' + tipps.join('|'));
+      await p.click('#klasse-be');
+      if(!(await marken()).includes('Klasse BE reicht')) throw new Error('BE: ' + (await marken()).join('|'));
+      // Ungebremst zählt O.2 (Kombi: 720 kg) statt der zGM des Anhängers (750 kg)
+      await p.click('#auto-b-kombi'); await p.click('#anh-b-bau');
+      if(await zahl() !== '540kg') throw new Error('ungebremst: ' + await zahl());
+      // Eigene Zahl: Beispiel ist abgewählt, ohne Leermasse gibt es das Gesamtgewicht
+      await p.$eval('#anh-leer', e => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles:true })); });
+      if(await zahl() !== '720kg') throw new Error('ohne Leermasse: ' + await zahl());
+      if(await p.$eval('#anh-herkunft', e => e.textContent) !== 'Deine Werte') throw new Error('Beispiel noch aktiv');
+      // Der Regelstand muss sichtbar dastehen, und die Eingaben überleben ein Neuladen
+      const stand = await p.$eval('#stand', e => e.textContent);
+      if(!/Regelstand: \S+ \d{4}/.test(stand)) throw new Error('Regelstand fehlt: ' + stand);
+      await p.reload({ waitUntil:'load' });
+      if(await p.$eval('#auto-o2', e => e.value) !== '720' || await zahl() !== '720kg') throw new Error('Eingaben nach Neuladen weg');
+    } },
   { werkzeug:'json-yaml',          dateien:[['d.json', JSON_B64, 'application/json']] },
   { werkzeug:'json-lesen',         dateien:[['d.json', JSON_B64, 'application/json']],
     vorher: async p => {

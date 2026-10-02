@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anhänger-Zuladung berechnen — reicht mein Führerschein? | Alleskonverter</title>
+<meta name="description" content="Wie viel darf auf den Anhänger, und reicht Klasse B? Zuladung, Anhängelast und Führerschein (B, B96, BE) mit den Zahlen aus dem Fahrzeugschein berechnen — direkt im Browser.">
+<link rel="canonical" href="https://alleskonverter.de/tools/anhaenger/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alleskonverter">
+<meta property="og:title" content="Anhänger-Zuladung berechnen — reicht mein Führerschein? | Alleskonverter">
+<meta property="og:description" content="Zuladung, Anhängelast und Führerschein (B, B96, BE) mit den Zahlen aus dem Fahrzeugschein berechnen — direkt im Browser.">
+<meta property="og:url" content="https://alleskonverter.de/tools/anhaenger/">
+<meta property="og:image" content="https://alleskonverter.de/assets/og.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Anhänger-Zuladung berechnen — reicht mein Führerschein? | Alleskonverter">
+<meta name="twitter:image" content="https://alleskonverter.de/assets/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Anhänger-Zuladung — Alleskonverter","url":"https://alleskonverter.de/tools/anhaenger/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Zuladung, Anhängelast und Führerschein (B, B96, BE, C1E) für Pkw mit Anhänger berechnen — mit den Zahlen aus dem Fahrzeugschein, ohne Datenübertragung."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was zählt für den Führerschein?","acceptedAnswer":{"@type":"Answer","text":"Die zulässige Gesamtmasse (zGM) aus den Papieren, nie das tatsächliche Gewicht. Ein leerer Anhänger mit 1.300 kg zGM zählt als 1.300 kg."}},{"@type":"Question","name":"Was zählt für die Anhängelast des Autos?","acceptedAnswer":{"@type":"Answer","text":"Hier zählt, was der Anhänger samt Ladung wirklich wiegt. Die Zuladung ist deshalb das, was zwischen der Leermasse des Anhängers und der kleineren der beiden Grenzen übrig bleibt: zGM des Anhängers oder Anhängelast des Autos."}},{"@type":"Question","name":"Was ist mit Stützlast und Zuggesamtgewicht?","acceptedAnswer":{"@type":"Answer","text":"Die Stützlast drückt auf die Kupplung und zählt beim Auto zur Zuladung. Manche Autos haben zusätzlich eine Obergrenze für Auto plus Anhänger (Typenschild, zweite Zahl). Liegt sie niedriger, gilt sie. Beides fragt der Rechner nicht ab."}},{"@type":"Question","name":"Auf welchem Stand sind die Regeln?","acceptedAnswer":{"@type":"Answer","text":"Stand Oktober 2026, gerechnet nach § 6 Fahrerlaubnis-Verordnung. Die neue EU-Führerscheinrichtlinie erlaubt Klasse B künftig unter Auflagen schwerere Fahrzeuge bis 4.250 kg. Das ist hier noch nicht eingerechnet. Alle Angaben ohne Gewähr, maßgeblich sind deine Papiere."}},{"@type":"Question","name":"Werden meine Angaben irgendwohin übertragen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Gerechnet wird in deinem Browser. Die eingetragenen Zahlen merkt sich nur der lokale Speicher deines Browsers, damit sie beim nächsten Besuch wieder dastehen."}}]}]}</script>
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#E6E4DE">
+<link rel="stylesheet" href="../../css/base.css?v=20260726">
+<link rel="stylesheet" href="../../css/tools.css?v=20260726">
+<style>
+/* Links die Papiere, die man auf dem Tisch hat (Führerschein, Fahrzeugschein,
+   Anhängerschein), rechts die Antwort: Zahl, Ladung, Waage, Führerschein-Check. */
+.gespann{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:34px;align-items:start}
+@media(max-width:860px){
+  .gespann{grid-template-columns:minmax(0,1fr);gap:30px}
+  .wrap{padding-bottom:104px}   /* Platz für die Ergebnisleiste */
+}
+.gespann [hidden]{display:none!important}
+
+/* Eingaben: drei Dokumente */
+.schein{border:1px solid var(--rule);background:var(--card);box-shadow:var(--shadow);padding:16px;margin:0 0 14px;min-width:0}
+.scheinkopf{display:flex;align-items:baseline;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin-bottom:12px}
+.scheinkopf h3{font-family:var(--display);font-weight:400;font-size:21px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase;margin:0}
+.woher{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.hinweis{font-size:12.5px;color:var(--ink-soft);line-height:1.5;margin:10px 0 0}
+
+.wahl{display:flex;flex-wrap:wrap;gap:6px}
+.wahl label{position:relative;cursor:pointer}
+.wahl input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.wahl span{display:block;padding:8px 12px;border:1px solid var(--rule);background:var(--paper);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;line-height:1.3}
+.wahl label:hover span{border-color:var(--ink)}
+.wahl input:checked + span{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+.wahl input:focus-visible + span{outline:2px solid var(--stamp);outline-offset:2px}
+.wahl.klein span{padding:6px 9px;font-size:10.5px}
+.ergebnis .wahl span{background:var(--card)}
+.ergebnis .wahl input:checked + span{background:var(--stamp)}
+
+.beispiele{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.beispiele button{padding:6px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:0;
+  font-family:var(--mono);font-size:11px;letter-spacing:.03em;cursor:pointer}
+.beispiele button:hover{border-color:var(--ink)}
+.beispiele button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.beispiele button.leeren{border-style:dashed;color:var(--ink-soft)}
+
+.feld{display:grid;grid-template-columns:44px minmax(0,1fr) 108px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--rule)}
+.feld .kuerzel{font-family:var(--mono);font-size:11.5px;font-weight:500;border:1px solid var(--ink-soft);text-align:center;padding:3px 0;color:var(--ink-soft)}
+.feld .bez{min-width:0;font-weight:600;font-size:13.5px;line-height:1.3}
+.feld .bez small{display:block;font-weight:400;font-size:12px;color:var(--ink-soft);margin-top:1px}
+.feld .wertfeld{display:flex;align-items:baseline;gap:6px}
+.feld input{width:100%;min-width:0;font-size:16px;text-align:right;padding:6px 8px;font-variant-numeric:tabular-nums}
+.feld .einh{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+.bremse{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:11px;border-top:1px solid var(--rule)}
+.bremse .bez{font-weight:600;font-size:13.5px}
+
+/* Wo steht das: Schema des Fahrzeugscheins */
+.wo{border-top:1px solid var(--rule);padding-top:10px}
+.wo summary{cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--stamp)}
+.wo .hinweis b{color:var(--ink);font-weight:600}
+.blatt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--ink-soft);background:var(--field);margin-top:10px}
+.blatt span{padding:8px 6px;font-size:11px;line-height:1.25;color:var(--ink-soft);min-height:54px;display:flex;flex-direction:column;justify-content:flex-end}
+.blatt span + span{border-left:1px dashed var(--ink-soft)}
+.blatt span.hier{background:#CFE3D8;color:var(--stamp);font-weight:600;box-shadow:inset 0 0 0 2px var(--stamp)}
+.lupe{border:2px solid var(--stamp);background:var(--field);font-family:var(--mono);font-size:10px;line-height:1;margin-top:10px}
+.lupe .reihe{display:flex;height:20px;border-top:1px solid var(--rule)}
+.lupe .reihe:first-child{border-top:0}
+.lupe .nr{flex:none;width:22px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);border-right:1px solid var(--ink-soft)}
+.lupe .reihe.mit .nr{font-weight:500;color:var(--stamp)}
+.lupe .zellen{flex:1;display:flex;min-width:0}
+.lupe .zelle{display:flex;align-items:center;padding:0 0 0 3px;min-width:0;color:var(--ink-soft);border:0;border-left:1px solid var(--rule);border-radius:0;
+  background:transparent;font:inherit;text-align:left;white-space:nowrap;overflow:hidden}
+.lupe .zelle:first-child{border-left:0}
+.lupe button.zelle{cursor:pointer;background:#CFE3D8;color:var(--stamp);font-weight:500;font-size:11px}
+.lupe button.zelle.an,.lupe button.zelle:hover{background:var(--stamp);color:var(--stamp-text)}
+
+/* Ergebnis */
+.kopf{display:flex;flex-direction:column;gap:10px}
+.marken{display:flex;flex-wrap:wrap;gap:6px}
+.marke{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;line-height:1.4;padding:4px 9px;border:1px solid var(--ink-soft);background:var(--card)}
+.marke.ok{background:var(--stamp);border-color:var(--stamp);color:var(--stamp-text)}
+.marke.nein{background:var(--alert);border-color:var(--alert);color:var(--stamp-text)}
+.marke.offen{background:var(--amber);border-color:var(--amber);color:var(--stamp-text)}
+.zahl{font-family:var(--display);font-size:clamp(64px,13vw,124px);line-height:.95;letter-spacing:.01em;font-variant-numeric:tabular-nums;margin:0}
+.zahl small{font-size:.36em;letter-spacing:.02em;margin-left:.18em}
+.zahl.blass{color:var(--ink-soft)}
+.zahl.wort{font-size:clamp(30px,5vw,44px);line-height:1.05;text-transform:uppercase}
+.unterzeile{font-size:16px;max-width:52ch;margin:0}
+.unterzeile b{font-weight:600}
+.dazu{color:var(--ink-soft);font-size:13.5px;max-width:60ch;margin:0}
+
+.block{margin-top:28px}
+.blockkopf{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-bottom:10px}
+.blockkopf h2{flex:1 1 180px;margin:0}
+
+/* Ladung auf dem Anhänger */
+.stapel{margin-left:30px;min-height:56px;display:flex;flex-wrap:wrap-reverse;align-content:flex-start;gap:3px;padding:0 6px 4px}
+.stueck{display:block;flex:none}
+.stueck.kiste{width:20px;height:15px;background:linear-gradient(#14382e,#14382e) center 3px/9px 2px no-repeat,var(--stamp)}
+.stueck.sack{width:25px;height:11px;border-radius:5px;background:#B5A482}
+.stueck.wm{width:24px;height:28px;border:2px solid var(--ink-soft);background:radial-gradient(circle at 50% 60%,var(--card) 0 4px,var(--ink-soft) 4px 6px,var(--card) 6.5px)}
+.stapel.blass .stueck{opacity:.3}
+.haenger{position:relative;height:34px}
+.haenger .boden{position:absolute;left:30px;right:0;top:0;height:7px;background:var(--ink)}
+.haenger .deichsel{position:absolute;left:6px;width:28px;top:2px;height:3px;background:var(--ink)}
+.haenger .kugel{position:absolute;left:0;top:-1px;width:9px;height:9px;border-radius:50%;background:var(--ink)}
+.haenger .rad{position:absolute;left:58%;top:5px;width:27px;height:27px;border-radius:50%;border:7px solid var(--ink);background:var(--paper)}
+.ladenotiz{font-size:13.5px;color:var(--ink-soft);margin:6px 0 0}
+.ladenotiz b{color:var(--ink);font-weight:600}
+
+/* Waage */
+.waage{position:relative;height:26px;background:var(--field);border:1px solid var(--rule);overflow:hidden}
+.waage .s{position:absolute;top:0;bottom:0}
+.waage .s.leer{background:var(--ink-soft)}
+.waage .s.leer.drueber{background:var(--alert)}
+.waage .s.lade{background:var(--stamp)}
+.waage .s.frei{background:repeating-linear-gradient(135deg,var(--rule) 0 4px,var(--card) 4px 8px)}
+.waage .m{position:absolute;top:0;bottom:0;width:0;border-left:3px solid var(--ink)}
+.waage .m.auto{border-left-style:dashed}
+.achse{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:4px}
+.legende{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 20px;font-size:13px}
+.legende li{display:flex;align-items:center;gap:8px;min-width:0}
+.legende .k{flex:none;width:14px;height:12px}
+.legende .k.leer{background:var(--ink-soft)}
+.legende .k.lade{background:var(--stamp)}
+.legende .k.ma{width:0;height:14px;border-left:3px solid var(--ink);margin:0 6px 0 5px}
+.legende .k.mz{width:0;height:14px;border-left:3px dashed var(--ink);margin:0 6px 0 5px}
+.legende .v{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;margin-left:auto;white-space:nowrap}
+.legende li.bindet{font-weight:600}
+
+/* Führerschein-Check */
+.summe{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin:0 0 8px}
+.leiter{list-style:none;margin:0;padding:0}
+.leiter li{display:grid;grid-template-columns:140px minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:9px 0;border-top:1px solid var(--rule)}
+.leiter li:last-child{border-bottom:1px solid var(--rule)}
+.leiter .n{font-weight:600}
+.leiter .n em{display:block;font-style:normal;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--stamp)}
+.leiter .r{font-size:13.5px;color:var(--ink-soft);min-width:0}
+.leiter .st{white-space:nowrap;font-family:var(--mono);font-size:12px}
+@media(max-width:520px){
+  .leiter li{grid-template-columns:minmax(0,1fr) auto}
+  .leiter .r{grid-column:1 / -1;grid-row:2}
+}
+.stand{border-left:3px solid var(--stamp);background:var(--card);padding:9px 12px;margin:12px 0 0;font-size:12.5px;color:var(--ink-soft);line-height:1.6;max-width:65ch}
+.stand b{color:var(--ink);font-weight:600}
+.stand.alt{border-left-color:var(--amber);color:var(--ink)}
+
+/* Hinweise */
+.meldungen{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.meldung{border-left:3px solid var(--rule);background:var(--card);padding:9px 12px;font-size:13px;color:var(--ink-soft);line-height:1.55;max-width:65ch;margin:0}
+.meldung.warn{border-left-color:var(--amber);color:var(--ink)}
+.tipps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.tipps li{max-width:65ch;font-size:14px}
+.tipps b{display:block;font-weight:600}
+.tipps span{color:var(--ink-soft)}
+
+/* Ergebnisleiste am Handy */
+.leiste{display:none}
+@media(max-width:860px){
+  .leiste{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:5;align-items:center;justify-content:space-between;gap:12px;
+    width:100%;border:0;border-radius:0;background:var(--ink);color:var(--paper);font:inherit;text-align:left;cursor:pointer;
+    padding:10px 20px calc(10px + env(safe-area-inset-bottom,0px))}
+  .leiste .lw{font-family:var(--display);font-size:25px;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .leiste .lt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-align:right;min-width:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow"><a href="../../index.html">← Alle Werkzeuge</a><span>Läuft vollständig im Browser · nichts wird hochgeladen</span></div>
+  <h1>Anhänger-<span>Zuladung</span></h1>
+  <p class="sub">Wie viel darf auf den Anhänger — und reicht der Führerschein? Klasse wählen und die Zahlen aus den Fahrzeugscheinen eintragen. Was du nicht weißt, lässt du leer; gerechnet wird mit allem, was da ist. Pkw mit Anhänger, Regeln für Deutschland.</p>
+</header>
+
+<main>
+<div class="gespann">
+  <form class="papiere" id="form" autocomplete="off">
+    <h2>Deine Papiere</h2>
+
+    <fieldset class="schein">
+      <div class="scheinkopf"><h3>Führerschein</h3><span class="woher">Rückseite, Spalte 9 bis 12</span></div>
+      <div class="wahl" role="radiogroup" aria-label="Führerscheinklasse">
+        <label><input type="radio" name="klasse" id="klasse-ohne" value=""><span>Weiß nicht</span></label>
+        <label><input type="radio" name="klasse" id="klasse-b" value="B" checked><span>B</span></label>
+        <label><input type="radio" name="klasse" id="klasse-b96" value="B96"><span>B96</span></label>
+        <label><input type="radio" name="klasse" id="klasse-be" value="BE"><span>BE</span></label>
+        <label><input type="radio" name="klasse" id="klasse-c1e" value="C1E"><span>Klasse 3 / C1E</span></label>
+      </div>
+      <p class="hinweis" id="klasse-hinweis"></p>
+    </fieldset>
+
+    <fieldset class="schein">
+      <div class="scheinkopf"><h3>Auto</h3><span class="woher" id="auto-herkunft"></span></div>
+      <div class="beispiele" id="auto-beispiele" aria-label="Beispielwerte für das Auto"></div>
+      <div class="felder">
+        <label class="feld" for="auto-zgm"><span class="kuerzel">F.2</span><span class="bez">Zulässige Gesamtmasse<small>Zeile 5, rechts · meist gleich F.1</small></span><span class="wertfeld"><input type="text" id="auto-zgm" inputmode="numeric" placeholder="leer"><span class="einh">kg</span></span></label>
+        <label class="feld" for="auto-leer"><span class="kuerzel">G</span><span class="bez">Leermasse<small>Zeile 3, rechts · mit 75 kg für den Fahrer</small></span><span class="wertfeld"><input type="text" id="auto-leer" inputmode="numeric" placeholder="leer"><span class="einh">kg</span></span></label>
+        <label class="feld" for="auto-o1"><span class="kuerzel">O.1</span><span class="bez">Anhängelast gebremst<small>Zeile 9, ganz links</small></span><span class="wertfeld"><input type="text" id="auto-o1" inputmode="numeric" placeholder="leer"><span class="einh">kg</span></span></label>
+        <label class="feld" for="auto-o2"><span class="kuerzel">O.2</span><span class="bez">Anhängelast ungebremst<small>Zeile 9, zweites Feld</small></span><span class="wertfeld"><input type="text" id="auto-o2" inputmode="numeric" placeholder="leer"><span class="einh">kg</span></span></label>
+      </div>
+      <details class="wo" open>
+        <summary>Wo steht das im Fahrzeugschein?</summary>
+        <p class="hinweis">Schein <b>ganz aufklappen</b> und die Seite mit den vielen Kästchen nehmen. Links stehen Kennzeichen und Halter, die Gewichte stehen im <b>rechten Drittel</b>.</p>
+        <div class="blatt" aria-hidden="true"><span>Titel, Kennzeichen, Halter</span><span>Marke, Typ, Motor</span><span class="hier">Maße und Gewichte</span></div>
+        <p class="hinweis">Das rechte Drittel vergrößert. Tipp auf ein grünes Feld, um die Zahl einzutragen.</p>
+        <div class="lupe" id="auto-lupe"></div>
+        <p class="hinweis">Schema der Zulassungsbescheinigung Teil I. Die Zeilen sind von oben gezählt.</p>
+      </details>
+    </fieldset>
+
+    <fieldset class="schein">
+      <div class="scheinkopf"><h3>Anhänger</h3><span class="woher" id="anh-herkunft"></span></div>
+      <div class="beispiele" id="anh-beispiele" aria-label="Beispielwerte für den Anhänger"></div>
+      <div class="felder">
+        <label class="feld" for="anh-zgm"><span class="kuerzel">F.2</span><span class="bez">Zulässige Gesamtmasse<small>Zeile 5, rechts · auch auf dem Typenschild</small></span><span class="wertfeld"><input type="text" id="anh-zgm" inputmode="numeric" placeholder="leer"><span class="einh">kg</span></span></label>
+        <label class="feld" for="anh-leer"><span class="kuerzel">G</span><span class="bez">Leermasse<small>Zeile 3, rechts · Anhänger ohne Ladung</small></span><span class="wertfeld"><input type="text" id="anh-leer" inputmode="numeric" placeholder="leer"><span class="einh">kg</span></span></label>
+      </div>
+      <details class="wo">
+        <summary>Wo steht das im Schein des Anhängers?</summary>
+        <p class="hinweis">Der Anhänger hat <b>dasselbe Formular</b> wie das Auto. Ganz aufklappen, die Gewichte stehen im <b>rechten Drittel</b>.</p>
+        <div class="blatt" aria-hidden="true"><span>Titel, Kennzeichen, Halter</span><span>Marke, Typ, Aufbau</span><span class="hier">Maße und Gewichte</span></div>
+        <div class="lupe" id="anh-lupe"></div>
+        <p class="hinweis">Schema der Zulassungsbescheinigung Teil I. Die Zeilen sind von oben gezählt.</p>
+      </details>
+      <div class="bremse">
+        <span class="bez">Bremse am Anhänger</span>
+        <div class="wahl klein" role="radiogroup" aria-label="Bremse am Anhänger">
+          <label><input type="radio" name="bremse" id="bremse-ja" value="1" checked><span>gebremst</span></label>
+          <label><input type="radio" name="bremse" id="bremse-nein" value="0"><span>ungebremst</span></label>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+  <section class="ergebnis" id="ergebnis">
+    <h2>Ergebnis</h2>
+    <div class="kopf" id="kopf" aria-live="polite"></div>
+
+    <div class="block" id="b-ladung">
+      <div class="blockkopf">
+        <h2>So viel passt drauf</h2>
+        <div class="wahl klein" role="radiogroup" aria-label="Ladung zeigen als">
+          <label><input type="radio" name="einheit" id="einheit-kiste" value="kiste" checked><span>Wasserkisten</span></label>
+          <label><input type="radio" name="einheit" id="einheit-sack" value="sack"><span>Zementsäcke</span></label>
+          <label><input type="radio" name="einheit" id="einheit-wm" value="wm"><span>Waschmaschinen</span></label>
+        </div>
+      </div>
+      <div class="stapel" id="stapel"></div>
+      <div class="haenger" aria-hidden="true"><span class="deichsel"></span><span class="kugel"></span><span class="boden"></span><span class="rad"></span></div>
+      <p class="ladenotiz" id="ladenotiz"></p>
+    </div>
+
+    <div class="block" id="b-waage">
+      <h2>Gewicht des Anhängers</h2>
+      <div id="waage"></div>
+    </div>
+
+    <div class="block" id="b-klasse">
+      <h2>Führerschein-Check</h2>
+      <p class="summe" id="summe"></p>
+      <ul class="leiter" id="leiter"></ul>
+      <p class="stand" id="stand"></p>
+    </div>
+
+    <div class="block" id="b-tipps">
+      <h2 id="tipps-titel">Hinweise</h2>
+      <div class="meldungen" id="meldungen"></div>
+      <ul class="tipps" id="tipps"></ul>
+    </div>
+  </section>
+</div>
+</main>
+
+<section class="seotext">
+  <h2>Gut zu wissen</h2>
+  <p>Darf ich diesen Anhänger ziehen, und wie viel darf drauf? Dafür gibt es drei Grenzen, die gern verwechselt werden: den Führerschein, die Anhängelast des Autos und die zulässige Gesamtmasse des Anhängers. Dieser Rechner nimmt die Zahlen aus den Fahrzeugscheinen und zeigt, welche Grenze zuerst greift — für Baumarkt-Anhänger, Wohnwagen und Pferdeanhänger genauso wie für den Autotransporter.</p>
+  <h3>Was zählt für den Führerschein?</h3>
+  <p>Die zulässige Gesamtmasse (zGM) aus den Papieren, nie das tatsächliche Gewicht. Ein leerer Anhänger mit 1.300 kg zGM zählt als 1.300 kg.</p>
+  <h3>Was zählt für die Anhängelast des Autos?</h3>
+  <p>Hier zählt, was der Anhänger samt Ladung wirklich wiegt. Die Zuladung ist deshalb das, was zwischen der Leermasse des Anhängers und der kleineren der beiden Grenzen übrig bleibt: zGM des Anhängers oder Anhängelast des Autos.</p>
+  <h3>Was ist mit Stützlast und Zuggesamtgewicht?</h3>
+  <p>Die Stützlast drückt auf die Kupplung und zählt beim Auto zur Zuladung. Manche Autos haben zusätzlich eine Obergrenze für Auto plus Anhänger (Typenschild, zweite Zahl). Liegt sie niedriger, gilt sie. Beides fragt der Rechner nicht ab.</p>
+  <h3>Auf welchem Stand sind die Regeln?</h3>
+  <p>Stand Oktober 2026, gerechnet nach § 6 Fahrerlaubnis-Verordnung. Die neue EU-Führerscheinrichtlinie erlaubt Klasse B künftig unter Auflagen schwerere Fahrzeuge bis 4.250 kg. Das ist hier noch nicht eingerechnet. Alle Angaben ohne Gewähr, maßgeblich sind deine Papiere.</p>
+  <h3>Werden meine Angaben irgendwohin übertragen?</h3>
+  <p>Nein. Gerechnet wird in deinem Browser. Die eingetragenen Zahlen merkt sich nur der lokale Speicher deines Browsers, damit sie beim nächsten Besuch wieder dastehen.</p>
+</section>
+
+<footer>
+  <p>Alle Angaben ohne Gewähr — maßgeblich sind deine Fahrzeugpapiere und die Fahrerlaubnis-Verordnung. Die Beispielwerte sind typische Größenordnungen, keine Daten eines bestimmten Modells.</p>
+  <ul class="footlinks" style="margin-top:14px"><li><a href="../../faq.html">Häufige Fragen</a></li><li><a href="../../impressum.html">Impressum</a></li><li><a href="../../datenschutz.html">Datenschutz</a></li><li><a href="https://paypal.me/marc85444" target="_blank" rel="noopener">Spenden (PayPal)</a></li></ul>
+</footer>
+</div>
+
+<button type="button" class="leiste" id="leiste" aria-label="Zum Ergebnis springen"><span class="lw" id="leiste-wert"></span><span class="lt" id="leiste-text"></span></button>
+
+<script src="../../js/ui.js?v=20260726"></script>
+<script>
+/* ---------- Rechenlogik, ohne DOM ----------
+   zGM = zulässige Gesamtmasse. c ist die zGM des Autos, t die des Anhängers;
+   beides darf fehlen (null), dann wird mit dem gerechnet, was da ist. */
+const KLASSEN = {
+  B:   { name:'Klasse B',       regel:'Anhänger bis 750 kg zGM. Schwerer nur, wenn Auto und Anhänger zusammen höchstens 3.500 kg zGM haben.' },
+  B96: { name:'B96',            regel:'Auto und Anhänger zusammen bis 4.250 kg zGM.' },
+  BE:  { name:'Klasse BE',      regel:'Anhänger bis 3.500 kg zGM hinter einem Auto bis 3.500 kg.' },
+  C1E: { name:'Klasse 3 / C1E', regel:'Auto und Anhänger zusammen bis 12.000 kg zGM. Alte Klasse 3 (vor 1999) schließt das ein.' },
+};
+const REIHENFOLGE = ['B','B96','BE','C1E'];
+const MIN_AUTO = 900;   // leichter ist kein Zugfahrzeug
+/* Wann die Regeln zuletzt gegen die Fahrerlaubnis-Verordnung geprüft wurden.
+   Steht sichtbar beim Führerschein-Check; nach einem Jahr mahnt die Seite von selbst. */
+const REGELSTAND = { jahr:2026, monat:10 };
+
+const kg = n => Math.round(n).toLocaleString('de-DE');
+
+/* Darf diese Klasse ein Auto mit zGM c und einen Anhänger mit zGM t fahren?
+   true / false / null (hängt vom Auto ab) */
+function erlaubt(klasse, c, t){
+  if(t == null) return null;
+  if(c != null && c > 3500){
+    if(klasse !== 'C1E' || c > 7500) return false;
+    return t <= 750 || c + t <= 12000;
+  }
+  if(klasse === 'B' || klasse === 'B96'){
+    const grenze = klasse === 'B' ? 3500 : 4250;
+    if(t <= 750) return true;
+    if(c == null) return grenze - t >= MIN_AUTO ? null : false;
+    return c + t <= grenze;
+  }
+  if(klasse === 'BE') return t <= 3500;
+  if(t <= 3500) return true;
+  if(c == null) return 12000 - t >= MIN_AUTO ? null : false;
+  return c + t <= 12000;
+}
+
+/* Größte Anhänger-zGM, die diese Klasse hinter einem Auto mit zGM c erlaubt */
+function groessterAnhaenger(klasse, c){
+  if(c != null && c > 3500) return (klasse === 'C1E' && c <= 7500) ? Math.max(750, 12000 - c) : 0;
+  if(klasse === 'B')   return c == null ? 750 : Math.max(750, 3500 - c);
+  if(klasse === 'B96') return c == null ? 750 : Math.max(750, 4250 - c);
+  if(klasse === 'BE')  return 3500;
+  return c == null ? 3500 : Math.max(3500, 12000 - c);
+}
+
+function aufstieg(k){
+  if(k === 'B96') return { t:'B96 eintragen lassen', d:'Fahrerschulung in der Fahrschule, mindestens 7 Stunden, ohne Prüfung. Danach dürfen Auto und Anhänger zusammen 4.250 kg zGM haben. BE geht auch und deckt noch mehr ab.' };
+  if(k === 'BE')  return { t:'Klasse BE machen', d:'Fahrstunden und eine praktische Prüfung, keine Theorieprüfung. Danach sind Anhänger bis 3.500 kg zGM erlaubt.' };
+  return { t:'Klasse C1E nötig', d:'Das ist eine Lkw-Klasse mit eigener Ausbildung und Prüfung. Wer den Führerschein vor 1999 gemacht hat (alte Klasse 3), hat sie meist schon.' };
+}
+
+/* s = { klasse, auto:{zgm, leer, o1, o2}, anh:{zgm, leer, gebremst} }
+   modus:  'zuladung' (kg Ladung) · 'gesamt' (Anhänger samt Ladung) · 'groesster' (noch kein Anhänger) · 'fehlt' · 'leer'
+   status: 'ok' · 'nein' · 'offen' (zGM des Autos fehlt) · 'ohne' (keine Klasse gewählt) · null (zGM des Anhängers fehlt) */
+function rechne(s){
+  const auto = s.auto, anh = s.anh, klasse = s.klasse || null;
+  const c = auto.zgm, t = anh.zgm;
+  const hatAnh = t != null || anh.leer != null;
+  const r = { modus:'leer', zuladung:null, maxGewicht:null, grenze:null, grenzen:[], status:null, noetig:null, noetigOffen:false,
+              tipps:[], warnungen:[], luecken:[], autoZuladung:null, klasseMax:null, anhaengelast:null, klasse };
+
+  /* Technische Grenzen: tatsächliches Gewicht des Anhängers */
+  let zug = null;
+  if(anh.gebremst){ if(auto.o1 != null) zug = auto.o1; }
+  else if(auto.o2 != null) zug = Math.min(auto.o2, 750);
+  r.anhaengelast = zug;
+  if(t != null) r.grenzen.push({ art:'anhaenger', kg:t });
+  if(zug != null) r.grenzen.push({ art:'auto', kg:zug });
+  else if(!anh.gebremst && hatAnh) r.grenzen.push({ art:'ungebremst', kg:750 });
+  for(const g of r.grenzen){
+    if(r.maxGewicht == null || g.kg < r.maxGewicht){ r.maxGewicht = g.kg; r.grenze = g.art; }
+  }
+
+  if(hatAnh){
+    if(r.maxGewicht != null && anh.leer != null){ r.modus = 'zuladung'; r.zuladung = Math.max(0, r.maxGewicht - anh.leer); }
+    else if(r.maxGewicht != null) r.modus = 'gesamt';
+    else r.modus = 'fehlt';
+  }else{
+    r.klasseMax = klasse ? groessterAnhaenger(klasse, c) : null;
+    r.modus = (r.klasseMax != null || auto.o1 != null || auto.o2 != null) ? 'groesster' : 'leer';
+  }
+
+  /* Führerschein */
+  r.leiter = REIHENFOLGE.map(k => ({
+    klasse:k, name:KLASSEN[k].name, regel:KLASSEN[k].regel,
+    reicht: t != null ? erlaubt(k, c, t) : null, max: groessterAnhaenger(k, c), meine: k === klasse,
+  }));
+  if(t != null){
+    const ersteOk    = REIHENFOLGE.findIndex(k => erlaubt(k, c, t) === true);
+    const ersteOffen = REIHENFOLGE.findIndex(k => erlaubt(k, c, t) === null);
+    r.noetig = ersteOk >= 0 ? REIHENFOLGE[ersteOk] : null;
+    r.noetigOffen = ersteOffen >= 0 && (ersteOk < 0 || ersteOffen < ersteOk);
+    if(klasse){ const e = erlaubt(klasse, c, t); r.status = e === true ? 'ok' : e === false ? 'nein' : 'offen'; }
+    else r.status = 'ohne';
+  }
+
+  /* Warnungen und Lücken */
+  if(c != null && c > 3500) r.warnungen.push('Dein Auto hat über 3.500 kg zGM. Dafür reicht keine B-Klasse, nötig ist C1 oder die alte Klasse 3.');
+  if(!anh.gebremst && t != null && t > 750) r.warnungen.push('Ungebremste Anhänger gibt es nur bis 750 kg zGM. Hat dein Anhänger eine Auflaufbremse, stell auf „gebremst“.');
+  if(anh.leer != null && t != null && anh.leer >= t) r.warnungen.push('Beim Anhänger ist die Leermasse nicht kleiner als die zGM. Bitte die beiden Felder prüfen.');
+  if(auto.leer != null && c != null && auto.leer >= c) r.warnungen.push('Beim Auto ist die Leermasse nicht kleiner als die zGM. Bitte die beiden Felder prüfen.');
+  if(anh.leer != null && r.maxGewicht != null && anh.leer > r.maxGewicht && r.grenze !== 'anhaenger') r.warnungen.push('Der Anhänger wiegt schon leer mehr, als dein Auto ziehen darf.');
+  if(hatAnh){
+    if(t == null) r.luecken.push('Die zGM des Anhängers fehlt. Führerschein und Anhänger-Grenze sind deshalb nicht geprüft.');
+    if(anh.gebremst && auto.o1 == null) r.luecken.push('Die Anhängelast des Autos fehlt (Feld O.1). Ob dein Auto das ziehen darf, ist nicht geprüft.');
+    if(!anh.gebremst && auto.o2 == null) r.luecken.push('Feld O.2 fehlt. Gerechnet mit der gesetzlichen Obergrenze für ungebremste Anhänger von 750 kg.');
+  }
+  if(c != null && auto.leer != null && c > auto.leer) r.autoZuladung = c - auto.leer;
+
+  /* Tipps */
+  const nm = klasse ? KLASSEN[klasse].name : null;
+  if(r.status === 'nein'){
+    if(r.noetig) r.tipps.push(aufstieg(r.noetig));
+    else if(!r.noetigOffen) r.tipps.push({ t:'Lkw-Klasse nötig', d:'Dieses Gespann liegt über 12.000 kg zGM. Dafür brauchst du Klasse CE.' });
+    if(c != null && c <= 3500){
+      const ziel = groessterAnhaenger(klasse, c);
+      if(ziel < t && ziel > (anh.leer == null ? 0 : anh.leer)){
+        let d = `Wird die zGM des Anhängers auf ${kg(ziel)} kg herabgesetzt, reicht ${nm}.`;
+        if(anh.leer != null){
+          const rest = Math.min(ziel, zug == null ? ziel : zug) - anh.leer;
+          if(rest > 0) d += ` Es bleiben dann ${kg(rest)} kg Zuladung.`;
+        }
+        d += ' Das Ablasten läuft über eine Prüfstelle (TÜV, DEKRA) und die Zulassungsstelle.';
+        r.tipps.push({ t:'Anhänger ablasten', d });
+      }
+      if(klasse === 'B' || klasse === 'B96'){
+        const autoMax = (klasse === 'B' ? 3500 : 4250) - t;
+        if(autoMax >= MIN_AUTO && c > autoMax) r.tipps.push({ t:'Leichteres Zugfahrzeug', d:`Hinter einem Auto mit höchstens ${kg(autoMax)} kg zGM dürftest du diesen Anhänger mit ${nm} ziehen.` });
+      }
+    }
+  }else if(r.status === 'offen'){
+    const grenze = klasse === 'B' ? 3500 : klasse === 'B96' ? 4250 : 12000;
+    r.tipps.push({ t:'zGM des Autos eintragen', d:`Feld F.2 im Fahrzeugschein. Mit ${nm} geht dieser Anhänger nur, wenn das Auto höchstens ${kg(grenze - t)} kg zGM hat.` });
+  }else if(r.status === 'ohne'){
+    if(r.noetig && !r.noetigOffen) r.tipps.push({ t:'Nötig ist mindestens ' + KLASSEN[r.noetig].name, d:KLASSEN[r.noetig].regel });
+    else if(r.noetigOffen) r.tipps.push({ t:'Welche Klasse nötig ist, hängt vom Auto ab', d:`Trag die zGM des Autos ein (Feld F.2). Klasse B reicht nur, wenn das Auto höchstens ${kg(3500 - t)} kg zGM hat.` + (r.noetig ? ` Sicher reicht ${KLASSEN[r.noetig].name}.` : '') });
+    else r.tipps.push({ t:'Lkw-Klasse nötig', d:'Dieses Gespann liegt über dem, was mit Pkw-Klassen erlaubt ist.' });
+  }
+  if(r.maxGewicht != null && t != null && zug != null && t !== zug){
+    if(r.grenze === 'auto') r.tipps.push({ t:'Die Grenze setzt dein Auto', d:`Es darf ${kg(zug)} kg ziehen. Der Anhänger selbst dürfte samt Ladung ${kg(t)} kg wiegen.` });
+    else r.tipps.push({ t:'Die Grenze setzt der Anhänger', d:`Er darf samt Ladung ${kg(t)} kg wiegen. Dein Auto dürfte ${kg(zug)} kg ziehen.` });
+  }
+  if((r.status === 'ok' || r.modus === 'groesster') && c != null && c <= 3500 && (klasse === 'B' || klasse === 'B96')){
+    const meins = groessterAnhaenger(klasse, c);
+    let d = `Mit ${nm} und diesem Auto ist ein Anhänger bis ${kg(meins)} kg zGM erlaubt.`;
+    if(klasse === 'B' && groessterAnhaenger('B96', c) > meins) d += ` Mit B96 wären es ${kg(Math.min(groessterAnhaenger('B96', c), 3500))} kg, mit BE 3.500 kg.`;
+    if(klasse === 'B96' && meins < 3500) d += ' Mit BE wären es 3.500 kg.';
+    r.tipps.push({ t:'Luft nach oben', d });
+  }
+  if(r.autoZuladung != null) r.tipps.push({ t:'Im Auto selbst', d:`${kg(r.autoZuladung)} kg für Mitfahrer und Gepäck. Die Stützlast des Anhängers geht davon ab.` });
+  return r;
+}
+
+/* ---------- Oberfläche ---------- */
+const BEISPIELE = {
+  auto: [
+    { id:'klein', name:'Kleinwagen',  w:{ zgm:1550, leer:1100, o1:1000, o2:550 } },
+    { id:'kombi', name:'Kombi',       w:{ zgm:2000, leer:1450, o1:1500, o2:720 } },
+    { id:'suv',   name:'SUV',         w:{ zgm:2500, leer:1900, o1:2200, o2:750 } },
+    { id:'eauto', name:'E-Auto',      w:{ zgm:2650, leer:2150, o1:1600, o2:750 } },
+    { id:'bus',   name:'Transporter', w:{ zgm:3000, leer:2100, o1:2500, o2:750 } },
+  ],
+  anh: [
+    { id:'bau',    name:'Baumarkt-Anhänger', w:{ zgm:750,  leer:180 },  gebremst:false },
+    { id:'kasten', name:'Kastenanhänger',    w:{ zgm:1300, leer:320 },  gebremst:true },
+    { id:'wowa',   name:'Wohnwagen',         w:{ zgm:1500, leer:1200 }, gebremst:true },
+    { id:'pferd',  name:'Pferdeanhänger',    w:{ zgm:2400, leer:900 },  gebremst:true },
+    { id:'auto',   name:'Autotransporter',   w:{ zgm:2700, leer:600 },  gebremst:true },
+  ],
+};
+const FELDER = { auto:['zgm','leer','o1','o2'], anh:['zgm','leer'] };
+const EINHEITEN = {
+  kiste: { eins:'Wasserkiste',   viele:'Wasserkisten',   kg:16, notiz:'Kiste mit 12 × 0,7 l Glas, etwa 16 kg' },
+  sack:  { eins:'Zementsack',    viele:'Zementsäcke',    kg:25, notiz:'Sack zu 25 kg' },
+  wm:    { eins:'Waschmaschine', viele:'Waschmaschinen', kg:75, notiz:'etwa 75 kg pro Stück' },
+};
+/* Gleicher Schlüsselaufbau wie js/einstellungen.js. Hier werden ausnahmsweise auch
+   die eingetragenen Gewichte gemerkt — die tippt niemand gern zweimal vom Schein ab. */
+const SCHLUESSEL = 'ak.einst.anhaenger';
+let aktiv = { auto:null, anh:null };   // gewähltes Beispiel je Dokument
+
+function zahl(id){
+  const v = AK.$('#' + id).value.trim();
+  if(!v) return null;
+  const ziffern = v.split(',')[0].replace(/[^\d]/g, '');
+  return ziffern ? Math.min(parseInt(ziffern, 10), 99999) : null;
+}
+const wahl = name => { const el = AK.$(`input[name="${name}"]:checked`); return el ? el.value : ''; };
+function setzeWahl(name, wert){ const el = AK.$(`input[name="${name}"][value="${wert}"]`); if(el) el.checked = true; }
+
+function baueBeispiele(art){
+  const box = AK.$(`#${art}-beispiele`);
+  box.innerHTML = BEISPIELE[art].map(b =>
+    `<button type="button" id="${art}-b-${b.id}" data-id="${b.id}" aria-pressed="false">${b.name}</button>`
+  ).join('') + `<button type="button" class="leeren" id="${art}-loeschen" data-id="">Felder leeren</button>`;
+  box.addEventListener('click', e => {
+    const knopf = e.target.closest('button');
+    if(!knopf) return;
+    setzeBeispiel(art, knopf.dataset.id || null);
+    zeige();
+  });
+}
+function setzeBeispiel(art, id){
+  const b = BEISPIELE[art].find(x => x.id === id);
+  FELDER[art].forEach(f => { AK.$(`#${art}-${f}`).value = b ? kg(b.w[f]) : ''; });
+  if(b && art === 'anh') setzeWahl('bremse', b.gebremst ? '1' : '0');
+  aktiv[art] = b ? id : null;
+}
+function zeigeBeispiele(){
+  for(const art of ['auto','anh']){
+    BEISPIELE[art].forEach(b => AK.$(`#${art}-b-${b.id}`).setAttribute('aria-pressed', aktiv[art] === b.id ? 'true' : 'false'));
+    const etwas = FELDER[art].some(f => AK.$(`#${art}-${f}`).value.trim() !== '');
+    AK.$(`#${art}-herkunft`).textContent = aktiv[art] ? 'Beispielwerte' : etwas ? 'Deine Werte' : 'Leer, wird nicht geprüft';
+  }
+}
+
+function lies(){
+  return {
+    klasse: wahl('klasse') || null,
+    auto: { zgm:zahl('auto-zgm'), leer:zahl('auto-leer'), o1:zahl('auto-o1'), o2:zahl('auto-o2') },
+    anh:  { zgm:zahl('anh-zgm'), leer:zahl('anh-leer'), gebremst: wahl('bremse') !== '0' },
+  };
+}
+
+function zeige(){
+  const s = lies(), r = rechne(s);
+  const einheitId = wahl('einheit') || 'kiste', einheit = EINHEITEN[einheitId] || EINHEITEN.kiste;
+  const nm = s.klasse ? KLASSEN[s.klasse].name : null;
+  zeigeBeispiele();
+  AK.$('#klasse-hinweis').textContent = s.klasse ? KLASSEN[s.klasse].regel : 'Kein Problem. Du siehst im Ergebnis, welche Klasse für dein Gespann nötig ist.';
+
+  /* Kopf */
+  const marken = [];
+  let gross = '', zeile = '', dazu = '', leisteWert = '', leisteText = '';
+  if(r.status === 'ok')    marken.push(['ok', nm + ' reicht']);
+  if(r.status === 'nein')  marken.push(['nein', nm + ' reicht nicht']);
+  if(r.status === 'offen') marken.push(['offen', 'Führerschein offen: zGM des Autos fehlt']);
+  if(r.status === 'ohne')  marken.push(['info', r.noetig && !r.noetigOffen ? 'Nötig: mindestens ' + KLASSEN[r.noetig].name : r.noetigOffen ? 'Nötige Klasse hängt vom Auto ab' : 'Nötig: Lkw-Klasse']);
+  if(r.modus === 'zuladung' || r.modus === 'gesamt'){
+    if(r.grenze === 'auto')       marken.push(['info', 'Grenze: Anhängelast des Autos']);
+    if(r.grenze === 'anhaenger')  marken.push(['info', 'Grenze: zGM des Anhängers']);
+    if(r.grenze === 'ungebremst') marken.push(['info', 'Grenze: ungebremst 750 kg']);
+  }
+  let stueck = 0;
+  if(r.modus === 'zuladung'){
+    stueck = Math.floor(r.zuladung / einheit.kg);
+    gross = `<p class="zahl${r.status === 'nein' ? ' blass' : ''}" id="zahl">${kg(r.zuladung)}<small>kg</small></p>`;
+    zeile = r.status === 'nein'
+      ? `wären technisch drin. Mit <b>${AK.esc(nm)}</b> darfst du dieses Gespann aber gar nicht fahren, auch nicht leer.`
+      : `darfst du auf den Anhänger laden. Das sind etwa <b>${kg(stueck)} ${stueck === 1 ? einheit.eins : einheit.viele}</b>.`;
+    leisteWert = kg(r.zuladung) + ' kg'; leisteText = r.status === 'nein' ? nm + ' reicht nicht' : 'Zuladung Anhänger';
+  }else if(r.modus === 'gesamt'){
+    gross = `<p class="zahl" id="zahl">${kg(r.maxGewicht)}<small>kg</small></p>`;
+    zeile = 'darf der Anhänger samt Ladung wiegen.';
+    dazu = 'Trag die Leermasse des Anhängers ein (Feld G), dann siehst du, wie viel davon Zuladung ist.';
+    leisteWert = kg(r.maxGewicht) + ' kg'; leisteText = 'Anhänger samt Ladung';
+  }else if(r.modus === 'groesster'){
+    if(r.klasseMax != null){
+      gross = `<p class="zahl" id="zahl">${kg(r.klasseMax)}<small>kg</small></p>`;
+      zeile = `zGM darf dein Anhänger mit <b>${AK.esc(nm)}</b> höchstens haben` + (s.auto.zgm == null ? ', solange die zGM des Autos fehlt.' : '.');
+      leisteWert = kg(r.klasseMax) + ' kg'; leisteText = 'größter Anhänger (zGM)';
+    }else{
+      const last = s.auto.o1 != null ? s.auto.o1 : s.auto.o2;
+      gross = `<p class="zahl" id="zahl">${kg(last)}<small>kg</small></p>`;
+      zeile = `darf dein Auto ziehen (${s.auto.o1 != null ? 'gebremster' : 'ungebremster'} Anhänger samt Ladung).`;
+      leisteWert = kg(last) + ' kg'; leisteText = 'Anhängelast';
+    }
+    const teile = [];
+    if(r.klasseMax != null && s.auto.o1 != null) teile.push(`Dein Auto zieht gebremst bis ${kg(s.auto.o1)} kg` + (s.auto.o2 != null ? `, ungebremst bis ${kg(Math.min(s.auto.o2, 750))} kg` : '') + '. Das meint das echte Gewicht samt Ladung.');
+    teile.push('Trag einen Anhänger ein oder wähle ein Beispiel, dann wird die Zuladung ausgerechnet.');
+    dazu = teile.join(' ');
+  }else if(r.modus === 'fehlt'){
+    gross = '<p class="zahl wort" id="zahl">Noch eine Zahl fehlt</p>';
+    zeile = 'Trag die zGM des Anhängers (Feld F.2) oder die Anhängelast des Autos (Feld O.1) ein.';
+    leisteWert = '–'; leisteText = 'noch eine Zahl fehlt';
+  }else{
+    gross = '<p class="zahl wort" id="zahl">Trag etwas ein</p>';
+    zeile = 'Wähle ein Beispiel für Auto und Anhänger oder tipp die Zahlen aus deinen Papieren ab.';
+    leisteWert = '–'; leisteText = 'noch keine Werte';
+  }
+  AK.$('#kopf').innerHTML =
+    (marken.length ? '<div class="marken">' + marken.map(m => `<span class="marke ${m[0]}">${AK.esc(m[1])}</span>`).join('') + '</div>' : '') +
+    gross + `<p class="unterzeile">${zeile}</p>` + (dazu ? `<p class="dazu">${dazu}</p>` : '');
+  AK.$('#leiste-wert').textContent = leisteWert;
+  AK.$('#leiste-text').textContent = leisteText;
+
+  /* Ladung: höchstens 180 Symbole, darüber steht eines für mehrere Stück */
+  const mitLadung = r.modus === 'zuladung';
+  AK.$('#b-ladung').hidden = !mitLadung;
+  if(mitLadung){
+    const je = Math.max(1, Math.ceil(stueck / 180)), symbole = Math.floor(stueck / je);
+    const stapel = AK.$('#stapel');
+    stapel.innerHTML = `<span class="stueck ${einheitId}"></span>`.repeat(symbole);
+    stapel.className = 'stapel' + (r.status === 'nein' ? ' blass' : '');
+    AK.$('#ladenotiz').innerHTML = stueck === 0
+      ? `Für eine ${einheit.eins} reicht es nicht mehr.`
+      : `<b>${kg(stueck)} ${stueck === 1 ? einheit.eins : einheit.viele}</b> · ${einheit.notiz}` + (je > 1 ? ` · 1 Symbol = ${je} Stück` : '');
+  }
+
+  /* Waage */
+  const mitWaage = r.maxGewicht != null && (r.modus === 'zuladung' || r.modus === 'gesamt');
+  AK.$('#b-waage').hidden = !mitWaage;
+  if(mitWaage){
+    const leer = s.anh.leer, ende = Math.max(...r.grenzen.map(g => g.kg), leer || 0);
+    const pz = v => (v / ende * 100).toFixed(2);
+    const voll = Math.max(r.maxGewicht, leer || 0);
+    let h = '<div class="waage">';
+    if(leer != null) h += `<span class="s leer${leer > r.maxGewicht ? ' drueber' : ''}" style="left:0;width:${pz(Math.min(leer, ende))}%"></span>`;
+    if(leer != null && r.zuladung > 0) h += `<span class="s lade" style="left:${pz(leer)}%;width:${pz(r.zuladung)}%"></span>`;
+    if(ende > voll) h += `<span class="s frei" style="left:${pz(voll)}%;width:${pz(ende - voll)}%"></span>`;
+    for(const g of r.grenzen) h += `<span class="m ${g.art === 'anhaenger' ? 'anh' : 'auto'}" style="left:min(${pz(g.kg)}%, calc(100% - 3px))"></span>`;
+    h += `</div><div class="achse"><span>0 kg</span><span>${kg(ende)} kg</span></div><ul class="legende">`;
+    if(leer != null) h += `<li><span class="k leer"></span>Anhänger leer<span class="v">${kg(leer)} kg</span></li>`;
+    if(r.zuladung != null) h += `<li><span class="k lade"></span>Zuladung<span class="v">${kg(r.zuladung)} kg</span></li>`;
+    for(const g of r.grenzen){
+      const name = g.art === 'anhaenger' ? 'Grenze Anhänger (zGM)' : g.art === 'auto' ? 'Grenze Auto (Anhängelast)' : 'Grenze ungebremst';
+      h += `<li class="${g.art === r.grenze ? 'bindet' : ''}"><span class="k ${g.art === 'anhaenger' ? 'ma' : 'mz'}"></span>${name}<span class="v">${kg(g.kg)} kg</span></li>`;
+    }
+    AK.$('#waage').innerHTML = h + '</ul>';
+  }
+
+  /* Führerschein-Check */
+  const c = s.auto.zgm, t = s.anh.zgm;
+  AK.$('#summe').textContent = (c != null && t != null)
+    ? `Auto ${kg(c)} kg + Anhänger ${kg(t)} kg = ${kg(c + t)} kg zGM zusammen`
+    : t != null ? `Anhänger ${kg(t)} kg zGM · zGM des Autos fehlt`
+    : c != null ? `Auto ${kg(c)} kg zGM · so groß darf der Anhänger je Klasse sein`
+    : 'Ohne Zahlen: die Regeln je Klasse';
+  AK.$('#leiter').innerHTML = r.leiter.map(l => {
+    let st = '';
+    if(t != null) st = l.reicht === true ? '<span class="st badge b-ok">reicht</span>'
+      : l.reicht === false ? '<span class="st badge b-lock">reicht nicht</span>'
+      : '<span class="st badge b-raster">je nach Auto</span>';
+    else if(c != null) st = `<span class="st">bis ${kg(l.max)} kg</span>`;
+    return `<li data-klasse="${l.klasse}"><span class="n">${l.meine ? '<em>Dein Führerschein</em>' : ''}${AK.esc(l.name)}</span><span class="r">${AK.esc(l.regel)}</span>${st}</li>`;
+  }).join('');
+
+  /* Hinweise */
+  AK.$('#tipps-titel').textContent = r.status === 'nein' ? 'So passt es' : 'Hinweise';
+  AK.$('#meldungen').innerHTML = r.warnungen.map(w => `<p class="meldung warn">${AK.esc(w)}</p>`).join('') +
+                                 r.luecken.map(l => `<p class="meldung">${AK.esc(l)}</p>`).join('');
+  AK.$('#meldungen').hidden = !(r.warnungen.length || r.luecken.length);
+  AK.$('#tipps').hidden = !r.tipps.length;
+  AK.$('#tipps').innerHTML = r.tipps.map(x => `<li><b>${AK.esc(x.t)}</b><span>${AK.esc(x.d)}</span></li>`).join('');
+  AK.$('#b-tipps').hidden = !(r.tipps.length || r.warnungen.length || r.luecken.length);
+
+  sichern();
+}
+
+function sichern(){
+  try{
+    const stand = { klasse:wahl('klasse'), bremse:wahl('bremse'), einheit:wahl('einheit'), aktiv, felder:{} };
+    for(const art of ['auto','anh']) FELDER[art].forEach(f => { stand.felder[`${art}-${f}`] = AK.$(`#${art}-${f}`).value; });
+    localStorage.setItem(SCHLUESSEL, JSON.stringify(stand));
+  }catch(_){ /* Speicher voll oder gesperrt */ }
+}
+function laden(){
+  try{
+    const stand = JSON.parse(localStorage.getItem(SCHLUESSEL) || 'null');
+    if(!stand || !stand.felder) return false;
+    for(const art of ['auto','anh']) FELDER[art].forEach(f => {
+      const id = `${art}-${f}`;
+      if(typeof stand.felder[id] === 'string') AK.$('#' + id).value = stand.felder[id];
+    });
+    setzeWahl('klasse', stand.klasse || ''); setzeWahl('bremse', stand.bremse || '1'); setzeWahl('einheit', stand.einheit || 'kiste');
+    aktiv = { auto:(stand.aktiv && stand.aktiv.auto) || null, anh:(stand.aktiv && stand.aktiv.anh) || null };
+    return true;
+  }catch(_){ return false; }
+}
+
+/* Schema: rechtes Drittel der Zulassungsbescheinigung Teil I —
+   je Zeile die Feldcodes mit ihrer Breite in Prozent */
+const LUPE = [
+  [['L',18],['9',17],['P.2/P.4',42],['T',23]],
+  [['18',49],['19',51]],
+  [['20',49],['G',51]],
+  [['12',28],['13',35],['Q',37]],
+  [['V.7',28],['F.1',35],['F.2',37]],
+  [['7.1',28],['7.2',35],['7.3',37]],
+  [['8.1',28],['8.2',35],['8.3',37]],
+  [['U.1',28],['U.2',35],['U.3',37]],
+  [['O.1',28],['O.2',32],['S.1',17],['S.2',23]],
+  [['15.1',100]],[['15.2',100]],[['15.3',100]],
+  [['R',60],['11',40]],
+  [['K',100]],
+  [['6',49],['17',11],['16',40]],
+  [['21',100]],
+];
+const LUPE_ZIEL = {
+  auto: { 'F.1':'auto-zgm', 'F.2':'auto-zgm', 'G':'auto-leer', 'O.1':'auto-o1', 'O.2':'auto-o2' },
+  anh:  { 'F.1':'anh-zgm', 'F.2':'anh-zgm', 'G':'anh-leer' },
+};
+function baueLupe(art){
+  const box = AK.$(`#${art}-lupe`), ziel = LUPE_ZIEL[art];
+  box.innerHTML = LUPE.map((reihe, i) =>
+    `<div class="reihe${reihe.some(z => ziel[z[0]]) ? ' mit' : ''}"><span class="nr">${i + 1}</span><span class="zellen">` +
+    reihe.map(([code, breite]) => ziel[code]
+      ? `<button type="button" class="zelle" style="width:${breite}%" data-feld="${ziel[code]}" aria-label="Feld ${code} eintragen">${code}</button>`
+      : `<span class="zelle" style="width:${breite}%">${code}</span>`
+    ).join('') + '</span></div>'
+  ).join('');
+  box.addEventListener('click', e => {
+    const knopf = e.target.closest('button');
+    if(!knopf) return;
+    const feld = AK.$('#' + knopf.dataset.feld);
+    feld.focus(); feld.select();
+  });
+  /* Feld und Kästchen im Schema leuchten gemeinsam auf */
+  const markiere = (id, an) => box.querySelectorAll(`button[data-feld="${id}"]`).forEach(b => b.classList.toggle('an', an));
+  for(const id of new Set(Object.values(ziel))){
+    const feld = AK.$('#' + id), zeile = feld.closest('.feld');
+    feld.addEventListener('focus', () => markiere(id, true));
+    feld.addEventListener('blur', () => markiere(id, false));
+    zeile.addEventListener('pointerenter', () => markiere(id, true));
+    zeile.addEventListener('pointerleave', () => { if(document.activeElement !== feld) markiere(id, false); });
+  }
+}
+
+function zeigeStand(){
+  const monat = new Date(REGELSTAND.jahr, REGELSTAND.monat - 1, 1).toLocaleDateString('de-DE', { month:'long', year:'numeric' });
+  const heute = new Date();
+  const alter = (heute.getFullYear() - REGELSTAND.jahr) * 12 + heute.getMonth() + 1 - REGELSTAND.monat;
+  const el = AK.$('#stand');
+  el.classList.toggle('alt', alter >= 12);
+  el.innerHTML = `<b>Regelstand: ${monat}</b> · § 6 Fahrerlaubnis-Verordnung. ` + (alter >= 12
+    ? 'Dieser Stand ist über ein Jahr alt. Prüf bitte nach, ob die Regeln noch gelten, bevor du dich darauf verlässt.'
+    : 'Führerscheinregeln ändern sich. Liegt das Datum länger zurück, prüf bitte nach, ob sie noch gelten.');
+}
+
+/* ---------- Aufbau ---------- */
+zeigeStand();
+baueLupe('auto'); baueLupe('anh');
+baueBeispiele('auto'); baueBeispiele('anh');
+if(!laden()){ setzeBeispiel('auto', 'kombi'); setzeBeispiel('anh', 'kasten'); }
+
+AK.$('#form').addEventListener('submit', e => e.preventDefault());
+AK.$('#form').addEventListener('input', e => {
+  // Wer selbst tippt oder die Bremse umstellt, hat kein Beispiel mehr vor sich
+  const id = e.target.id || '';
+  if(e.target.type !== 'radio'){
+    if(id.startsWith('auto-')) aktiv.auto = null;
+    if(id.startsWith('anh-')) aktiv.anh = null;
+  }
+  if(e.target.name === 'bremse') aktiv.anh = null;
+  zeige();
+});
+AK.$$('input[name="einheit"]').forEach(el => el.addEventListener('change', zeige));
+AK.$('#leiste').onclick = () => AK.$('#ergebnis').scrollIntoView({ behavior:'smooth', block:'start' });
+zeige();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

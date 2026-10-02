@@ -87,6 +87,7 @@ Ein kostenloser Alles-in-einem-Konverter, der **vollständig lokal im Browser** 
 | [QR-Code erstellen](tools/qr-code/index.html) | 12 QR-Typen (Link, WLAN, vCard, GiroCode …), Farben/Logos/Rahmen, Bild-im-Code, PNG/SVG-Export |
 | [Passwort-Generator](tools/passwort/index.html) | Zeichenfolgen, Passphrasen und PINs mit echtem Zufall, Stärke- und Zeitschätzung |
 | [Einheiten &amp; Zeitzonen](tools/einheiten/index.html) | Neun Größenarten umrechnen, Uhrzeit in 20 Zeitzonen |
+| [Anhänger-Zuladung](tools/anhaenger/index.html) | Zuladung, Anhängelast und Führerscheinklasse (B, B96, BE, C1E) aus den Zahlen des Fahrzeugscheins; Schema der Zulassungsbescheinigung, sichtbarer Regelstand |
 | [Termin als ICS](tools/termin/index.html) | Kalender-Einladung nach RFC 5545 mit Zeitzone, Wiederholung, Erinnerung und Teilnehmern |
 | [ZIP entpacken & packen](tools/zip/index.html) | Archive öffnen, Dateien einzeln oder gebündelt herausholen; Dateien zu ZIP packen |
 
