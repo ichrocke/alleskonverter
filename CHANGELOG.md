@@ -3,6 +3,12 @@
 Alle nennenswerten Änderungen am Alleskonverter, neueste zuerst.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## 2026-11-09 (Vorbereitung Serverumzug)
+
+### Geändert
+- `deploy.sh` nimmt jetzt wahlweise eine andere Zugangsdaten-Datei als Argument (`./deploy.sh .env.neu`) und kennt eine Probe (`DRY=1`), die nur anzeigt, was übertragen oder gelöscht würde. Hintergrund: Die Website soll auf einen neuen Server umziehen — erst alle Dateien hinüber, dann die Domain. Bis zum Domainwechsel bleiben so beide Server mit demselben Skript befüllbar, ohne die alten Zugangsdaten anzufassen. `.env.*` ist vom Upload und vom Git ausgeschlossen.
+- Festgestellt beim Vorab-Blick auf den alten Server: Dort liegt nichts, was nicht auch lokal liegt — der Spiegel ist 1:1 (Probe-Lauf ohne Unterschiede). Der Umzug der Daten ist damit nur ein Deploy auf den neuen Server; die Whisper-Modelle (~1 GB) müssen lokal vorhanden sein (`vendor/whisper/holen.sh`), sonst fehlen sie drüben.
+
 ## 2026-10-02 (Werkzeug 55: Liedblatt & Akkorde)
 
 ### Hinzugefügt
